@@ -1,0 +1,9 @@
+------------------
+title: Create React Component
+date: 2015-08-31 08:17
+tags: [js react.js]
+------------------
+
+## React Component
+
+

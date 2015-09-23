@@ -1,0 +1,2 @@
+let earn x = x - 2999
+let prg x = earn x / 4154 * 100

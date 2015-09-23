@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Hash λ Bye - nix-does-not-use-overriden-packages-by-user</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Hash λ Bye</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>nix-does-not-use-overriden-packages-by-user</h1>
+
+            <div class="info">
+    Posted on January 19, 2015
+    
+</div>
+
+<p>I’m developing haskell app with nix package manager on OSX.</p>
+<p>I added <code>$HOME/.nixpkgs/config.nix</code> to override package definitions. These package are deployed on Hackage only (not Nixpkgs repo) such as <a href="https://hackage.haskell.org/package/HDBC-session-0.1.0.0">HDBC-session</a>.</p>
+<p>Then I ran <code>nix-shell</code> on my local project depends on those packages, but evaluation of nix expression was failed because nix could not find package names.</p>
+<p>How can I import overriden packages by user when I run <code>nix-shell</code>?</p>
+<h3 id="procedure">Procedure</h3>
+<p>create a cabal project using HDBC-session</p>
+<pre><code>loading initial cache file /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Bootstrap.cmk/InitialCacheFlags.cmake
+-- The C compiler identification is Clang 3.5.0
+-- The CXX compiler identification is Clang 3.5.0
+-- Check for working C compiler: /nix/store/6jny8h3lgmz0amz5l7nkr22g7gmgn6cr-clang-wrapper-9.9.9/bin/clang
+-- Check for working C compiler: /nix/store/6jny8h3lgmz0amz5l7nkr22g7gmgn6cr-clang-wrapper-9.9.9/bin/clang -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working CXX compiler: /nix/store/6jny8h3lgmz0amz5l7nkr22g7gmgn6cr-clang-wrapper-9.9.9/bin/clang++
+-- Check for working CXX compiler: /nix/store/6jny8h3lgmz0amz5l7nkr22g7gmgn6cr-clang-wrapper-9.9.9/bin/clang++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Looking for C++ include iostream
+-- Looking for C++ include iostream - found
+-- Check for STD namespace
+-- Check for STD namespace - found
+-- Check for ANSI scope
+-- Check for ANSI scope - found
+-- Check for sstream
+-- Check for sstream - found
+-- Looking for unsetenv
+-- Looking for unsetenv - found
+-- Looking for environ
+-- Looking for environ - not found
+-- Checking whether header cstdio is available
+-- Checking whether header cstdio is available - yes
+-- Checking for Large File Support
+-- Checking for Large File Support - yes
+-- Checking whether STL classes are in std namespace
+-- Checking whether STL classes are in std namespace - yes
+-- Checking whether ANSI stream headers are available
+-- Checking whether ANSI stream headers are available - yes
+-- Checking whether ANSI streams are in std namespace
+-- Checking whether ANSI streams are in std namespace - yes
+-- Checking whether ANSI string stream is available
+-- Checking whether ANSI string stream is available - yes
+-- Checking whether header cstddef is available
+-- Checking whether header cstddef is available - yes
+-- Checking whether stl string has operator!= for char*
+-- Checking whether stl string has operator!= for char* - yes
+-- Checking whether stl has iterator_traits
+-- Checking whether stl has iterator_traits - yes
+-- Checking whether stl has standard template allocator
+-- Checking whether stl has standard template allocator - yes
+-- Checking for rebind member of stl allocator
+-- Checking for rebind member of stl allocator - yes
+-- Checking for non-standard argument to stl allocator&lt;&gt;::max_size
+-- Checking for non-standard argument to stl allocator&lt;&gt;::max_size - no
+-- Checking whether stl containers support allocator objects.
+-- Checking whether stl containers support allocator objects. - yes
+-- Checking whether ios has binary openmode
+-- Checking whether ios has binary openmode - yes
+-- Checking whether &quot;&lt;&gt;&quot; is needed for template friends
+-- Checking whether &quot;&lt;&gt;&quot; is needed for template friends - yes
+-- Checking for member template support
+-- Checking for member template support - yes
+-- Checking for standard template specialization syntax
+-- Checking for standard template specialization syntax - yes
+-- Checking whether argument dependent lookup is supported
+-- Checking whether argument dependent lookup is supported - yes
+-- Checking whether struct stat has st_mtim member
+-- Checking whether struct stat has st_mtim member - no
+-- Checking whether C++ compiler has 'long long'
+-- Checking whether C++ compiler has 'long long' - yes
+-- Checking whether C++ compiler has '__int64'
+-- Checking whether C++ compiler has '__int64' - no
+-- Checking for C type size macros
+-- Checking for C type size macros - compiled
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of char
+-- Check size of char - done
+-- Check size of __int64
+-- Check size of __int64 - failed
+-- Checking whether char is signed
+-- Checking whether char is signed - yes
+-- Checking if istream supports long long
+-- Checking if istream supports long long - yes
+-- Checking if ostream supports long long
+-- Checking if ostream supports long long - yes
+-- Checking whether C compiler has ptrdiff_t in stddef.h
+-- Checking whether C compiler has ptrdiff_t in stddef.h - yes
+-- Checking whether C compiler has ssize_t in unistd.h
+-- Checking whether C compiler has ssize_t in unistd.h - yes
+-- Checking whether CXX compiler has setenv
+-- Checking whether CXX compiler has setenv - yes
+-- Checking whether CXX compiler has unsetenv
+-- Checking whether CXX compiler has unsetenv - yes
+-- Checking whether CXX compiler has environ in stdlib.h
+-- Checking whether CXX compiler has environ in stdlib.h - no
+-- Checking whether CXX compiler has utimes
+-- Checking whether CXX compiler has utimes - yes
+-- Checking whether CXX compiler has utimensat
+-- Checking whether CXX compiler has utimensat - no
+-- Looking for include files sys/types.h, ifaddrs.h
+-- Looking for include files sys/types.h, ifaddrs.h - found
+-- Checking whether CXX compiler has rlimit64
+-- Checking whether CXX compiler has rlimit64 - no
+-- Checking whether CXX compiler has atol
+-- Checking whether CXX compiler has atol - yes
+-- Checking whether CXX compiler has atoll
+-- Checking whether CXX compiler has atoll - yes
+-- Checking whether CXX compiler has _atoi64
+-- Checking whether CXX compiler has _atoi64 - no
+-- Looking for C++ include execinfo.h
+-- Looking for C++ include execinfo.h - found
+-- Checking whether backtrace works with this C++ compiler
+-- Checking whether backtrace works with this C++ compiler - yes
+-- Looking for C++ include dlfcn.h
+-- Looking for C++ include dlfcn.h - found
+-- Checking whether dladdr works with this C++ compiler
+-- Checking whether dladdr works with this C++ compiler - yes
+-- Looking for C++ include cxxabi.h
+-- Looking for C++ include cxxabi.h - found
+-- Checking whether cxxabi works with this C++ compiler
+-- Checking whether cxxabi works with this C++ compiler - yes
+-- Using system-installed BZIP2
+-- Using system-installed CURL
+-- Using system-installed EXPAT
+-- Using system-installed LIBARCHIVE
+-- Using system-installed ZLIB
+-- Found ZLIB: /nix/store/ww6634v3wmr6kml7y7xmxwjxwdra1cj9-zlib-1.2.8/lib/libz.dylib (found version &quot;1.2.8&quot;)
+-- Found CURL: /nix/store/ybnxjvcznq77mgd41ma9vmz2v04cs1sg-curl-7.39.0/lib/libcurl.dylib (found version &quot;7.39.0&quot;)
+-- Found BZip2: /nix/store/2cki151jvfjrjkmfllnw5gqvf77jq3gp-bzip2-1.0.6/lib/libbz2.a (found version &quot;1.0.6&quot;)
+-- Looking for BZ2_bzCompressInit in /nix/store/2cki151jvfjrjkmfllnw5gqvf77jq3gp-bzip2-1.0.6/lib/libbz2.a
+-- Looking for BZ2_bzCompressInit in /nix/store/2cki151jvfjrjkmfllnw5gqvf77jq3gp-bzip2-1.0.6/lib/libbz2.a - found
+-- Found LibArchive: /nix/store/q9rzp2l4hrga5wn4qvdmvldy6hg6h9l6-libarchive-3.1.2/lib/libarchive.dylib (found version &quot;3.1.2&quot;)
+-- Found EXPAT: /nix/store/5vbsbla9q043w1jjjl9dgqbd9rhawd0f-expat-2.1.0/lib/libexpat.dylib (found version &quot;2.1.0&quot;)
+-- Looking for wsyncup in /usr/lib/libcurses.dylib
+-- Looking for wsyncup in /usr/lib/libcurses.dylib - found
+-- Looking for elf.h
+-- Looking for elf.h - not found
+-- Looking for a Fortran compiler
+-- Looking for a Fortran compiler - NOTFOUND
+-- Found unsuitable Qt version &quot;&quot; from NOTFOUND
+-- Performing Test run_pic_test
+-- Performing Test run_pic_test - Success
+CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
+Please set them or make sure they are set and tested correctly in the CMake files:
+CURSES_CURSES_H_PATH
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source/CursesDialog/form
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+   used as include directory in directory /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/Source
+
+-- Configuring incomplete, errors occurred!
+See also &quot;/private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/CMakeFiles/CMakeOutput.log&quot;.
+See also &quot;/private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-cmake-2.8.12.2.drv-0/cmake-2.8.12.2/CMakeFiles/CMakeError.log&quot;.
+---------------------------------------------
+Error when bootstrapping CMake:
+Problem while running initial CMake
+---------------------------------------------
+builder for ‘/nix/store/xh676axsay1d0yk5fcxf18qg5w0p7pdz-cmake-2.8.12.2.drv’ failed with exit code 11
+cannot build derivation ‘/nix/store/qk9qwbc6kz5p7ncgkkdayfpmixbchrg7-clang-3.5.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/l4s7cp335xykw3pjd5npc6mzxkvmprjy-libc++-3.5.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/8y5p439cwmzjr2pvrdyi0g2vyrjimirv-libcxxabi-pre-217324.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/1i96sglv1dp5rf1q5ki37mmc5z1m3r7p-llvm-3.5.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/fy44f8l1v91ba9xmx92cz2mk9wpvcix7-cctools-port-855.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/y1wk7shbagmr94lzx9md537wkyxlr689-clang-wrapper-3.5.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/qmy5ydq3v54zdcad6a65sa767lpky874-stdenv-darwin-boot.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/1qk0c0ks6za1g5a66x3z04a718q58q91-CF-855.17.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/a13vydlhns0zclv4vys1067254753086-Libsystem-1197.1.1.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/cgmpizn9w6287vfvhrqd6iizv68ik8g2-bash-4.3-p30.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/kjnq3h7dygspv1nw74cjjc8m53jmfy58-bzip2-1.0.6.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/cglvrral1m2f90hk5fnj5dv12lcw6vnc-clang-wrapper-3.5.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/xc9wzyc5frdng2ysy2ig5awapja5in84-coreutils-8.23.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/rqgvypcsrc0ama1qxzp50awqjl1mfmky-diffutils-3.3.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/w6lmi8nkj8sllbrsbmvwvv8ai9v6w0wx-dyld-239.4.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/5k5s2w0p0hgcwl1khmq4zpfnavsinnwz-findutils-4.4.2.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/4q8h89j1hvj0i91dp1azclqjmwsh0qn8-gawk-4.1.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/3pfzd3xdnmvndpnjk0dz94b9lrwz6aiw-gnugrep-2.20.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/mfbhcc2vs7sxw1mnppsslw7hj71sic4n-gnumake-3.82.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/qppz51m4h5fq049jv1gmyz2fh3hrxf01-gnused-4.2.2.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/amx4lafmb6q19jay7iirlvdp3r11xg9z-gnutar-1.27.1.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/423qy5cn1w3h7xhv5y2kd1gmf0wb1asf-gzip-1.6.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/kfklcxwp5zamqjg0gj3dvv1lrpg2kj31-patch-2.7.1.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/kkvn6afdw3iavybi1qf1mbx5pl5m4b3c-unzip-6.0.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/5fxapfwc84g8gp7xdibcca3xm5jic31c-xz-5.0.7.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/ab0plzvbvqf1rzilm74rin4n6czi87qy-zlib-1.2.8.drv’: 1 dependencies couldn't be built
+cannot build derivation ‘/nix/store/gf76f7q7myvl7h5v0w6dhmb9h9wz050h-nix-1.8.drv’: 1 dependencies couldn't be built
+error: build of ‘/nix/store/gf76f7q7myvl7h5v0w6dhmb9h9wz050h-nix-1.8.drv’ failed</code></pre>
+<p>どうやらXCodeのCLIツールが入っていないことが原因のようなので、それを入れてやりなおす。</p>
+<p>nix-env -i nix nix-env -iA nixpkgs.haskellPackages.ghc</p>
+<pre><code>building path(s) ‘/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared’
+building /nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared
+unpacking sources
+unpacking source archive /nix/store/9fs439xl75nspfdf3pn0d09kvx97jv6m-sql-words-0.1.3.0.tar.gz
+source root is sql-words-0.1.3.0
+patching sources
+configuring
+[1 of 1] Compiling Main             ( Setup.hs, /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-haskell-sql-words-ghc7.8.4-0.1.3.0-shared.drv-0/Main.o )
+Linking Setup ...
+configure flags: --disable-split-objs --disable-library-profiling --disable-executable-profiling --enable-shared --enable-library-vanilla --enable-executable-dynamic --enable-tests  --with-gcc=/nix/store/kah8sr3znvfixjyaxw7gnbf6ds4h7y9q-clang-wrapper-3.5.0/bin/clang --ghc-option=-optl=-Wl,-headerpad_max_install_names --with-gcc=clang
+Configuring sql-words-0.1.3.0...
+Dependency Cabal -any: using Cabal-1.18.1.5
+Dependency QuickCheck &gt;=2: using QuickCheck-2.7.6
+Dependency base &lt;5: using base-4.7.0.2
+Dependency cabal-test-compat -any: using cabal-test-compat-0.2.0.0
+Dependency sql-words -any: using sql-words-0.1.3.0
+/nix/store/dflp75a5k1bv04d9dribd91p8py4qcwh-ghc-7.8.4-wrapper/bin/ghc --info
+Using Cabal-1.18.1.5 compiled by ghc-7.8
+Using compiler: ghc-7.8.4
+Using install prefix:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared
+Binaries installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/bin
+Libraries installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/lib/ghc-7.8.4/sql-words-0.1.3.0
+Private binaries installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/libexec
+Data files installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/share/x86_64-osx-ghc-7.8.4/sql-words-0.1.3.0
+Documentation installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/share/doc/x86_64-osx-ghc-7.8.4/sql-words-0.1.3.0
+Configuration files installed in:
+/nix/store/0gfsrhck6yn9xiwb29w58gvvay8i6lg5-haskell-sql-words-ghc7.8.4-0.1.3.0-shared/etc
+No alex found
+Using ar found on system at:
+/nix/store/l0v7xfxkprchwbbwhfg2w2igxq458691-cctools-port-855/bin/ar
+No c2hs found
+No cpphs found
+No ffihugs found
+Using gcc version 4.2.1 given by user at:
+/nix/store/kah8sr3znvfixjyaxw7gnbf6ds4h7y9q-clang-wrapper-3.5.0/bin/clang
+Using ghc version 7.8.4 found on system at:
+/nix/store/dflp75a5k1bv04d9dribd91p8py4qcwh-ghc-7.8.4-wrapper/bin/ghc
+Using ghc-pkg version 7.8.4 found on system at:
+/nix/store/dflp75a5k1bv04d9dribd91p8py4qcwh-ghc-7.8.4-wrapper/bin/ghc-pkg
+No greencard found
+Using haddock version 2.14.3 found on system at:
+/nix/store/cx7rijk6shnzpidksfa06brl764bz66j-ghc-7.8.4/bin/haddock
+No happy found
+No hmake found
+Using hpc version 0.67 found on system at:
+/nix/store/dflp75a5k1bv04d9dribd91p8py4qcwh-ghc-7.8.4-wrapper/bin/hpc
+Using hsc2hs version 0.67 found on system at:
+/nix/store/dflp75a5k1bv04d9dribd91p8py4qcwh-ghc-7.8.4-wrapper/bin/hsc2hs
+Using hscolour version 1.20 found on system at:
+/nix/store/ag77w2g88x6352c610pawl54rjbbljfr-haskell-hscolour-ghc7.8.4-1.20.3-shared/bin/HsColour
+No hugs found
+No jhc found
+Using ld found on system at:
+/nix/store/kah8sr3znvfixjyaxw7gnbf6ds4h7y9q-clang-wrapper-3.5.0/bin/ld
+No lhc found
+No lhc-pkg found
+No nhc98 found
+No pkg-config found
+Using ranlib found on system at:
+/nix/store/l0v7xfxkprchwbbwhfg2w2igxq458691-cctools-port-855/bin/ranlib
+Using strip found on system at:
+/nix/store/l0v7xfxkprchwbbwhfg2w2igxq458691-cctools-port-855/bin/strip
+Using tar found on system at:
+/nix/store/l27j1sibzpq3kkvwxmc064blwlghr32w-gnutar-1.27.1/bin/tar
+No uhc found
+building
+Building sql-words-0.1.3.0...
+Preprocessing library sql-words-0.1.3.0...
+[1 of 4] Compiling Language.SQL.Keyword.Internal.Type ( src/Language/SQL/Keyword/Internal/Type.hs, dist/build/Language/SQL/Keyword/Internal/Type.o )
+[2 of 4] Compiling Language.SQL.Keyword.Concat ( src/Language/SQL/Keyword/Concat.hs, dist/build/Language/SQL/Keyword/Concat.o )
+[3 of 4] Compiling Language.SQL.Keyword.Type ( src/Language/SQL/Keyword/Type.hs, dist/build/Language/SQL/Keyword/Type.o )
+[4 of 4] Compiling Language.SQL.Keyword ( src/Language/SQL/Keyword.hs, dist/build/Language/SQL/Keyword.o )
+In-place registering sql-words-0.1.3.0...
+Preprocessing test suite 'monoids' for sql-words-0.1.3.0...
+[1 of 1] Compiling MonoidLaw        ( test/MonoidLaw.hs, dist/build/MonoidLaw.o )
+In-place registering monoids-0.1.3.0...
+[1 of 1] Compiling Main             ( dist/build/monoidsStub/monoidsStub-tmp/monoidsStub.hs, dist/build/monoidsStub/monoidsStub-tmp/Main.dyn_o )
+Linking dist/build/monoidsStub/monoidsStub ...
+ghc: panic! (the 'impossible' happened)
+  (GHC version 7.8.4 for x86_64-apple-darwin):
+	Don't understand library name monoids
+
+Please report this as a GHC bug:  http://www.haskell.org/ghc/reportabug
+
+builder for ‘/nix/store/2n50wyma2k657n3lhfd5rv950p7cqqk1-haskell-sql-words-ghc7.8.4-0.1.3.0-shared.drv’ failed with exit code 1
+cannot build derivation ‘/nix/store/wwbqna6vgwfmfp74vyjjx91lblsv6s9v-haskell-env-ghc-7.8.4.drv’: 1 dependencies couldn't be built
+error: build of ‘/nix/store/wwbqna6vgwfmfp74vyjjx91lblsv6s9v-haskell-env-ghc-7.8.4.drv’ failed
+/Users/ilyaletre/.nix-profile/bin/nix-shell: failed to build all dependencies</code></pre>
+<p>↓これと同事象だろうか？ <a href="https://ghc.haskell.org/trac/ghc/ticket/9625">hoe</a></p>
+<p>よくメッセージを読んでみるとテスト用のビルドもしようとしている。 明らかに要らないので削った。</p>
+<p>こんどはcabalが通らない</p>
+<pre><code>building path(s) ‘/nix/store/qc3xbwzgk7fzlq578hmc795rcij2557g-haskell-sql-words-ghc7.8.4-0.1.3.0-shared’
+building /nix/store/qc3xbwzgk7fzlq578hmc795rcij2557g-haskell-sql-words-ghc7.8.4-0.1.3.0-shared
+unpacking sources
+unpacking source archive /nix/store/9fs439xl75nspfdf3pn0d09kvx97jv6m-sql-words-0.1.3.0.tar.gz
+source root is sql-words-0.1.3.0
+patching sources
+configuring
+[1 of 1] Compiling Main             ( Setup.hs, /private/var/folders/9b/fc607s3977l1h53rdsfzq1rm0000gn/T/nix-build-haskell-sql-words-ghc7.8.4-0.1.3.0-shared.drv-0/Main.o )
+Linking Setup ...
+configure flags: --disable-split-objs --disable-library-profiling --disable-executable-profiling --enable-shared --enable-library-vanilla --enable-executable-dynamic --enable-tests  --with-gcc=/nix/store/kah8sr3znvfixjyaxw7gnbf6ds4h7y9q-clang-wrapper-3.5.0/bin/clang --ghc-option=-optl=-Wl,-headerpad_max_install_names --with-gcc=clang
+Configuring sql-words-0.1.3.0...
+Setup: At least the following dependencies are missing:
+QuickCheck &gt;=2, cabal-test-compat -any
+builder for ‘/nix/store/dzwd026v9z46l8qzpfp8wnx6bs0kkbak-haskell-sql-words-ghc7.8.4-0.1.3.0-shared.drv’ failed with exit code 1
+cannot build derivation ‘/nix/store/xk9j44694h3zfy22s2d9crd5qpj0f8m7-haskell-env-ghc-7.8.4.drv’: 1 dependencies couldn't be built
+error: build of ‘/nix/store/xk9j44694h3zfy22s2d9crd5qpj0f8m7-haskell-env-ghc-7.8.4.drv’ failed
+/Users/ilyaletre/.nix-profile/bin/nix-shell: failed to build all dependencies</code></pre>
+<h3 id="reference">reference</h3>
+<p>http://lethalman.blogspot.it/search/label/nixpills</p>
+
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

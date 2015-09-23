@@ -1,0 +1,33 @@
+---
+title: About
+---
+
+こんにちは。プログラマーやってます。
+
+ネットワーク系業務の経験が多いです。
+
+### What I have done (やってきたこと）
+
+1. MPLS -VPNの構築、コンフィグ作成
+2. Zabbixを用いた網内サービス・設備監視インフラの構築
+3. NETCONFを用いたMPLS網の動的制御Web APIの構築
+4. DockerやJenkinsなどを用いてオンプレミスでのCI環境構築
+5. Pythonを使った周辺ツールの開発
+
+SDN技術を用いたサービス構築が多いです。
+
+### What I will do (興味のあること)
+
+1. 関数型プログラミングに興味があってHaskellを中心にトイプログラムを書いています。
+2. ネットワークセキュリティ技術(特にTLSとIPsec)に興味があって学習中です。
+
+
+
+
+I'm a programmer.
+
+I have written web applications in Python and Java at work so far.
+Most of applications I wrote are for controlling and monitoring network appliance.
+So I'm familiar with SNMP, OpenFlow, routing protocols and MPLS technologies to provide VPN, PseudoWireEmulation.
+
+And also I'm interested in Functional Programming using Haskell and Scala.
