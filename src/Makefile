@@ -3,7 +3,7 @@
 all: build
 	
 clean:
-	./site clean
+	rm ../*.html && rm -rf ../css ../images ../posts && ./site clean
 
 site: site.hs
 	ghc --make -threaded site.hs

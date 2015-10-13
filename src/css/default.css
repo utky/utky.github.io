@@ -1,8 +1,10 @@
 body {
-    color: black;
+    color: #1c1c1c;
     font-size: 16px;
     margin: 0px auto 0px auto;
-    width: 600px;
+    width: 800px;
+    font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #eaeaea;
 }
 
 div#header {
@@ -53,4 +55,13 @@ div.info {
     color: #555;
     font-size: 14px;
     font-style: italic;
+}
+
+pre {
+  font-family: monospace,Courier;
+  color: #000;
+  background-color: #dedede;
+  border: 1px solid #ccc;
+  padding: 1em;
+  white-space: pre-wrap;
 }
