@@ -38,6 +38,7 @@ tags: [math]
 
 さて、ここから \\(\\lnot P \\lor Q \\)が導けるか試してみよう。
 
+
 \\(
 \\lnot P \\lor (P \\land Q) \\\\
 = 分配法則 \\\\
@@ -45,6 +46,7 @@ tags: [math]
 = \\lnot P \\lor P は恒に真 \\\\
 (\\lnot P \\lor Q) \\\\
 \\)
+
 
 となった。
 

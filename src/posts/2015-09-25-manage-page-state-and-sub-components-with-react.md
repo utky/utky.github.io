@@ -6,9 +6,16 @@ tags: [js react]
 
 *注意事項*
 
-ここで書いたReact.jsのstateに対するアプローチの正しさには議論の余地がありそうです。
+下記の投稿ではReactにおけるComponentのstateの所在を求めて
+ぐだぐだと書いています。
 
-最後にも書きましたが、Componentにstateを保持させること自体が原則的に忌避されるべきであるようです。
+が2015/10現在ではほとんどアプローチに決着がついており、
+下記のフレームワークでそれぞれにそのアプローチが表現されています。
+
+- [flux](https://github.com/facebook/flux)
+- [redux](https://github.com/rackt/redux)
+
+とりあえず使ってみて思想を感じるのがよいと思います。
 
 問題の発見
 --------------
@@ -36,48 +43,14 @@ Reactは原則的に「_`state`は最小限にして、できる限り全てを`
 
 ここでポイントとなるのは*owneeで起こる入力イベントをどうハンドルするか*です。
 
-例として下記のようにHome画面にLoginFormというフォームを持たせることを考えます。
+React上でpropsを伝搬させていく上でのポイントは下記の三点だと理解していますが、
+特にイベントのハンドルで重要なのは3です。
 
-```
-/**
- * フォームを含むページ全体のインスタンス
- */
-class Home extends Component {
-  render() {
-    return (
-      <div>
-        <LoginForm/>
-      </div>
-    );
-  }
-}
+1. データは常にOwnerからOwneeへと流れます。
+2. Owneeは常に`props`しか受け取らず`state`を持ちません。
+3. Owneeはローカル`state`を持つ代わりに変更のイベントを上位コンポーネントを通知します。
 
-/**
- * ユーザの認証情報を入力するフォーム
- */
-class LoginForm extends Component {
-  render() {
-    return (
-      <form>
-        <fieldset>
-          <input type='text'/>
-          <input type='password'/>
-          <button type='submit'>Login</button>
-        </fieldset>
-      </form>
-    );
-  }
-}
-
-```
-
-これをReactらしく下記のルールに従って書き換えていきます。
-
-* データは常にOwnerからOwneeへと流れます。
-* Owneeは常に`props`しか受け取らず`state`を持ちません。
-* Owneeはローカル`state`を持つ代わりに変更のイベントを上位コンポーネントを通知します。
-
-ケーススタディ
+データフロー
 -------------
 
 React.jsではTwo-way bindingの項でこれに言及していました。
@@ -86,25 +59,19 @@ React.jsではTwo-way bindingの項でこれに言及していました。
 たぶんこんな感じでデータが流れるのが _React-way_ なのだと理解しています。
 
 ```
-                  Data Flow
+    Data Flow
 
-      props       props       props
-Owner ----> Ownee ----> Ownee ----> Ownee
-              |           |           | onChange
-  <-----------+-----------+-----------+
+      props       
+Home ----> LoginForm
+              | onChange
+  <-----------+
 
-                  Event Flow
+    Event Flow
 ```
 
 上位から下位へとデータをパスしていきDOMを生成する一種のストリーム処理みたいですね。
 
-上記のように美しいデータフローが実現できるかは微妙ですが、
-前述のHomeとLoginFormを少しずつ書き換えてReact-wayなデータフローを作ってみましょう。
-
-
-### その1: Bad practiceから始める
-
-ここで事切れるぼく。
+fluxの有無に関わらずReactに閉じて考えてもデータのデータのフローが一方向になります。
 
 
 よりよい方法

@@ -7,7 +7,11 @@
         <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
         </script>
     </head>
     <body>
@@ -59,7 +63,6 @@
 <p>Chefだとノードから要求してプロビジョニングを実行できるが、 Ansibleではそういう機構がないはず？</p>
 <p>Vif Driver?</p>
 <p>OpenStackとContrailを安定して相互接続するのはこれからの課題。 OpenStackのバージョンが変わるだけで連携が死んだりする。</p>
-<h2 id="openstackサミット">OpenStackサミット</h2>
 
         </div>
         <div id="footer">

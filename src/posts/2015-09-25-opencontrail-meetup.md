@@ -78,4 +78,4 @@ Vif Driver?
 OpenStackとContrailを安定して相互接続するのはこれからの課題。
 OpenStackのバージョンが変わるだけで連携が死んだりする。
 
-## OpenStackサミット
+
