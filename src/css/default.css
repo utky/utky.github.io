@@ -71,10 +71,12 @@ h5 {
 }
 
 .body h3:before {
-  content: "[ ";
+  content: "▶ ";
 }
 
+/*
 .body h3:after {
   content: " ]";
 }
+*/
 
