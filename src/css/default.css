@@ -2,66 +2,79 @@ body {
     color: #1c1c1c;
     font-size: 16px;
     margin: 0px auto 0px auto;
-    width: 800px;
-    font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    background-color: #eaeaea;
+    max-width: 800px;
+    font-family: "游ゴシック",YuGothic,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #ededed;
 }
 
-div#header {
-    border-bottom: 2px solid black;
-    margin-bottom: 30px;
-    padding: 12px 0px 12px 0px;
+/* defualt */
+a {
+  color: #09368d;
 }
 
-div#logo a {
-    color: black;
-    float: left;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
+/* thick */
+h1, h2, h3, h4, h5 {
+  color: #06296e;
 }
 
-div#header #navigation {
-    text-align: right;
+/* light */
+a:hover {
+  color: #285dc6;
 }
 
-div#header #navigation a {
-    color: black;
-    font-size: 18px;
-    font-weight: bold;
-    margin-left: 12px;
-    text-decoration: none;
-    text-transform: uppercase;
+/* highlight */
+a:active {
+  color: #4d77cb;
 }
 
-div#footer {
-    border-top: solid 2px black;
-    color: #555;
-    font-size: 12px;
-    margin-top: 30px;
-    padding: 12px 0px 12px 0px;
-    text-align: right;
+.body a:visited {
+  color: purple;
 }
 
 h1 {
-    font-size: 24px;
+  font-size: 1.5em;
 }
 
-h2 {
-    font-size: 20px;
+h2, .brand {
+  font-size: 1.3em;
 }
 
-div.info {
-    color: #555;
-    font-size: 14px;
-    font-style: italic;
+h3 {
+  font-size: 1.0em;
 }
 
-pre {
-  font-family: monospace,Courier;
-  color: #000;
-  background-color: #dedede;
-  border: 1px solid #ccc;
-  padding: 1em;
-  white-space: pre-wrap;
+h4 {
+  font-size: 0.8em;
 }
+
+h5 {
+  font-size: 0.8em;
+}
+
+.brand {
+  font-style: bold;
+}
+
+.info {
+  color: #4d77cb;
+}
+
+.title {
+  font-size: 2em;
+  color: #09368d;
+}
+
+.body h1 {
+  margin-top: 40px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #4d77cb;
+}
+
+.body h3:before {
+  content: "[ ";
+}
+
+.body h3:after {
+  content: " ]";
+}
+
