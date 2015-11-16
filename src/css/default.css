@@ -74,9 +74,7 @@ h5 {
   content: "▶ ";
 }
 
-/*
-.body h3:after {
-  content: " ]";
+.archives li {
+  list-style: square;
+  margin-bottom: 0.3em;
 }
-*/
-
