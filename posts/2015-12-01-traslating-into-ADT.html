@@ -131,17 +131,32 @@ saveFoo
 <p><code>Persist</code>の性質について下記のように記述します。</p>
 <p><code>Persist(a)</code>は…</p>
 <ol style="list-style-type: decimal">
-<li><code>a</code>を永続化する抽象的な命令を表します。 … Persist-1</li>
-<li>命令を実行する時には<code>a</code>を<code>Store</code>が解釈できる必要があります。 … Persist-2</li>
-<li><code>a</code>を1つ以上のエンティティeの合成へと変換できる必要があります。 … Persist-3</li>
+<li><code>a</code>を永続化する抽象的な命令を表します。</li>
 </ol>
-<p>形式的にこの性質を表現するにあたって、 <code>a</code>という対象についての関係(relation)を文章から抽出します。</p>
-<p>関係について記述しているのはPersist-2およびPersist-3ですね。 これを形式的に記述してみましょう。</p>
 <h3 id="persistの数訳">Persistの数訳</h3>
-<p>\( \forall a Store(a) \land f(a) \in E \to Persist(a) \)</p>
+<p>任意の<code>a</code>について永続化の命令を適用できる。</p>
+<p>\( \forall a Persist(a) \)</p>
+<p>ほんまか……？</p>
+<p>かなり怪しいですがいったんこれでいきます。</p>
 <h3 id="persistのadt訳">PersistのADT訳</h3>
-<pre><code>(a -&gt; Entity e) -&gt; a -&gt; Persist a</code></pre>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">Store, Persist, Fetchあたりを記述する</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Persist</span> a</code></pre></div>
+<p>ほんとか……ほんとにこれでいいのか？</p>
+<p>なんかもっとこうそれっぽい制約とかを表現しなくていいのか？</p>
+<h3 id="fetchの定義と性質">Fetchの定義と性質</h3>
+<p><code>Fetch</code>の性質について下記のように記述します。</p>
+<p><code>Fetch(a, b)</code>は…</p>
+<ol style="list-style-type: decimal">
+<li>外部へと<code>a</code>を入力して<code>b</code>を受け取る要求を表します。</li>
+</ol>
+<p>外部をブラックボックスとみなした時にFetchはちょうど関数の働きをします。</p>
+<h3 id="fetchの数訳">Fetchの数訳</h3>
+<p>\( \forall a, \forall b Fetch(a, b) \)</p>
+<h3 id="fetchのadt訳">FetchのADT訳</h3>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Fetch</span> a b</code></pre></div>
+<p>あれ……bの型はどうやって決まるのだろう？ bの型はaにのみ依存して決まるわけではない。 a -&gt; bの対応がどこかに存在するという仮定を利用している。</p>
+<p>((a -&gt; b) ∧ a) -&gt; b という前件肯定でFetchが導かれている。</p>
+<p>bはあとで取り出すことができるデータを表している。 しかしbを単純な幽霊型(Phantom type)にすると、この<code>Fetch</code>を <code>Functor</code>のインスタンスにする際に定義に困りそうなことがわかる。</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">TODO: Store, Persist, Fetchあたりを記述する</code></pre></div>
 <h3 id="entityの定義と性質">Entityの定義と性質</h3>
 <p><code>Entity</code>の性質について下記のように記述します。</p>
 <p><code>Entity(k, a)</code>は…</p>
@@ -156,7 +171,7 @@ saveFoo
 <ol style="list-style-type: decimal">
 <li><code>a</code>の集合を表します。</li>
 <li>各元<code>a</code>は識別子<code>k</code>を用いて取り出すことができます。</li>
-<li></li>
+<li>TODO:</li>
 </ol>
 <h2 id="イベント">イベント</h2>
 <p>静的なデータモデル、永続化にまつわる計算の性質。 これでドメインは充分か考えます。</p>
@@ -165,10 +180,10 @@ saveFoo
 <p>まずはイベントと状態の遷移を図式化してみます。 例としてIssueのライフサイクルを記述します。</p>
 <pre><code>図が入る</code></pre>
 <p>この図から発見できた状態を<code>IssueState</code>というデータ型で表現してみます。</p>
-<pre><code>IssueState</code></pre>
+<pre><code>TODO: IssueState</code></pre>
 <p>これは状態遷移図でいう長方形の箱に相当します。</p>
 <p>次に各箱への遷移を促すイベント/アクションについて定義します。 対象としているデータに対して何が起きうるか、どんなときに状態が変わるか、 といった「変化のきっかけ」を書き下すようにします。</p>
-<pre><code>IssueEvent</code></pre>
+<pre><code>TODO: IssueEvent</code></pre>
 <h2 id="クエリ問い合わせ">クエリ（問い合わせ）</h2>
 <p>ここまで状態の記述と遷移についてデータ型を用いて表現しましたが、 他にもできなければならないことがあります。</p>
 <p>データの問い合わせです。 これは状態遷移とは関係の無い操作であるため、イベントとして表現するのは適切ではありません。 問い合わせはデータを変更してはいけません。</p>
@@ -176,11 +191,13 @@ saveFoo
 <p><em>“パラメータpを条件にrをドメインから取り出す”</em></p>
 <p>でしょうか。</p>
 <h3 id="クエリの定義">クエリの定義</h3>
-<p>∀r∈ドメイン ∀p. Q(p, r)</p>
+<p>TODO: ∀r∈ドメイン ∀p. Q(p, r)</p>
 <h3 id="定義のadt訳">定義のADT訳</h3>
+<p>TODO:</p>
 <h2 id="アプリケーション層">アプリケーション層</h2>
 <p>イベントと状態を記述できたことにより、 あるデータを変更したい場合はイベントを作成してドメインへと送り込めば良い、という規則が見えてきました。 逆に言うとそれ以外はできません。</p>
 <p>これは強力な制約です。</p>
+<p>TODO:</p>
 
             </div>
         </div>

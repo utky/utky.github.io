@@ -196,31 +196,65 @@ IssueとTimeTrackを入れる
 
 `Persist(a)`は...
 
-1. `a`を永続化する抽象的な命令を表します。 … Persist-1
-2. 命令を実行する時には`a`を`Store`が解釈できる必要があります。 … Persist-2
-3. `a`を1つ以上のエンティティeの合成へと変換できる必要があります。 … Persist-3
-
-形式的にこの性質を表現するにあたって、
-`a`という対象についての関係(relation)を文章から抽出します。
-
-関係について記述しているのはPersist-2およびPersist-3ですね。
-これを形式的に記述してみましょう。
+1. `a`を永続化する抽象的な命令を表します。
 
 ### Persistの数訳
 
+任意の`a`について永続化の命令を適用できる。
+
 \\(
-\\forall a Store(a) \\land f(a) \\in E \\to Persist(a)
+\\forall a Persist(a)
 \\)
+
+ほんまか……？
+
+かなり怪しいですがいったんこれでいきます。
 
 ### PersistのADT訳
 
+```haskell
+a -> Persist a
 ```
-(a -> Entity e) -> a -> Persist a
+
+ほんとか……ほんとにこれでいいのか？
+
+なんかもっとこうそれっぽい制約とかを表現しなくていいのか？
+
+### Fetchの定義と性質
+
+`Fetch`の性質について下記のように記述します。
+
+`Fetch(a, b)`は...
+
+1. 外部へと`a`を入力して`b`を受け取る要求を表します。
+
+外部をブラックボックスとみなした時にFetchはちょうど関数の働きをします。
+
+### Fetchの数訳
+
+\\(
+\\forall a, \\forall b Fetch(a, b)
+\\)
+
+### FetchのADT訳
+
+```haskell
+a -> Fetch a b
 ```
+
+あれ……bの型はどうやって決まるのだろう？
+bの型はaにのみ依存して決まるわけではない。
+a -> bの対応がどこかに存在するという仮定を利用している。
+
+((a -> b) ∧ a) -> b という前件肯定でFetchが導かれている。
+
+bはあとで取り出すことができるデータを表している。
+しかしbを単純な幽霊型(Phantom type)にすると、この`Fetch`を
+`Functor`のインスタンスにする際に定義に困りそうなことがわかる。
 
 
 ```haskell
-Store, Persist, Fetchあたりを記述する
+TODO: Store, Persist, Fetchあたりを記述する
 ```
 
 
@@ -241,7 +275,7 @@ Store, Persist, Fetchあたりを記述する
 
 1. `a`の集合を表します。
 2. 各元`a`は識別子`k`を用いて取り出すことができます。
-3. 
+3. TODO: 
 
 
 イベント
@@ -267,7 +301,7 @@ Store, Persist, Fetchあたりを記述する
 
 
 ```
-IssueState
+TODO: IssueState
 ```
 
 これは状態遷移図でいう長方形の箱に相当します。
@@ -277,7 +311,7 @@ IssueState
 といった「変化のきっかけ」を書き下すようにします。
 
 ```
-IssueEvent
+TODO: IssueEvent
 ```
 
 クエリ（問い合わせ）
@@ -298,9 +332,11 @@ IssueEvent
 
 ### クエリの定義
 
-∀r∈ドメイン ∀p. Q(p, r)
+TODO: ∀r∈ドメイン ∀p. Q(p, r)
 
 ### 定義のADT訳
+
+TODO: 
 
 
 アプリケーション層
@@ -311,3 +347,5 @@ IssueEvent
 逆に言うとそれ以外はできません。
 
 これは強力な制約です。
+
+TODO: 
