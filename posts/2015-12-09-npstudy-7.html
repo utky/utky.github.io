@@ -75,7 +75,7 @@
 <blockquote>
 <p>サービスのエンドポイントは浮動するのが前提となるので、 サービス検知やローバラが重要。 ホスト間接続はVXLAN一択</p>
 </blockquote>
-<p>なんでVXLAN一択なんだろうか。</p>
+<p>なんでVXLAN一択なんだろうか。 → この記載によるとDockerのlibnetworkがVXLANしか提供していないからのようだ。<a href="https://docs.docker.com/engine/userguide/networking/dockernetworks/#an-overlay-network">An overlay network</a></p>
 <p><a href="https://github.com/docker/libnetwork/blob/master/docs/design.md">libnetwork</a></p>
 <h3 id="infra-as-code">Infra as Code</h3>
 <blockquote>
