@@ -133,15 +133,18 @@ saveFoo
 <ol style="list-style-type: decimal">
 <li><code>a</code>を永続化する抽象的な命令を表します。</li>
 </ol>
+<p>命令は実行される永続化機構<code>Store</code>に応じて適切に解釈されますが、 ここではドメインに集中するために命令の具体的な表現は考えません。</p>
 <h3 id="persistの数訳">Persistの数訳</h3>
 <p>任意の<code>a</code>について永続化の命令を適用できる。</p>
 <p>\( \forall a Persist(a) \)</p>
+<p>特になんの制約もありません。保存しろ、という指示だけです。</p>
 <p>ほんまか……？</p>
 <p>かなり怪しいですがいったんこれでいきます。</p>
 <h3 id="persistのadt訳">PersistのADT訳</h3>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Persist</span> a</code></pre></div>
 <p>ほんとか……ほんとにこれでいいのか？</p>
 <p>なんかもっとこうそれっぽい制約とかを表現しなくていいのか？</p>
+<p>あーでも、このデータを保存したい。どうやってするかは問わない（キリッ）っていうデータを表していると思えば別にこれでもいいのかな。</p>
 <h3 id="fetchの定義と性質">Fetchの定義と性質</h3>
 <p><code>Fetch</code>の性質について下記のように記述します。</p>
 <p><code>Fetch(a, b)</code>は…</p>
@@ -152,10 +155,7 @@ saveFoo
 <h3 id="fetchの数訳">Fetchの数訳</h3>
 <p>\( \forall a, \forall b Fetch(a, b) \)</p>
 <h3 id="fetchのadt訳">FetchのADT訳</h3>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Fetch</span> a b</code></pre></div>
-<p>あれ……bの型はどうやって決まるのだろう？ bの型はaにのみ依存して決まるわけではない。 a -&gt; bの対応がどこかに存在するという仮定を利用している。</p>
-<p>((a -&gt; b) ∧ a) -&gt; b という前件肯定でFetchが導かれている。</p>
-<p>bはあとで取り出すことができるデータを表している。 しかしbを単純な幽霊型(Phantom type)にすると、この<code>Fetch</code>を <code>Functor</code>のインスタンスにする際に定義に困りそうなことがわかる。</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">p <span class="ot">-&gt;</span> <span class="dt">Fetch</span> p r</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">TODO: Store, Persist, Fetchあたりを記述する</code></pre></div>
 <h3 id="entityの定義と性質">Entityの定義と性質</h3>
 <p><code>Entity</code>の性質について下記のように記述します。</p>
@@ -174,7 +174,7 @@ saveFoo
 <li>TODO:</li>
 </ol>
 <h2 id="イベント">イベント</h2>
-<p>静的なデータモデル、永続化にまつわる計算の性質。 これでドメインは充分か考えます。</p>
+<p>これまで静的なデータモデル、永続化にまつわる計算の性質について考えてきました。 これでドメインは充分か考えます。</p>
 <p>上記で示したProjectやSprint, Issueにはライフサイクルがあります。 ライフサイクルとはあるデータがある瞬間にとりうる状態の段階です。 外部からイベントやアクションを受信した時に状態は次の段階に遷移します。</p>
 <p>イベントの受信とライフサイクルの状態遷移を定義できないでしょうか。</p>
 <p>まずはイベントと状態の遷移を図式化してみます。 例としてIssueのライフサイクルを記述します。</p>

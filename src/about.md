@@ -4,7 +4,7 @@ title: About
 
 こんにちは。プログラマーやってます。
 
-ネットワーク系業務の経験が多いです。
+ネットワーク系の仕事をよくしています。
 
 ### What I have done (やってきたこと）
 
@@ -20,14 +20,3 @@ SDN技術を用いたサービス構築が多いです。
 
 1. 関数型プログラミングに興味があってHaskellを中心にトイプログラムを書いています。
 2. ネットワークセキュリティ技術(特にTLSとIPsec)に興味があって学習中です。
-
-
-
-
-I'm a programmer.
-
-I have written web applications in Python and Java at work so far.
-Most of applications I wrote are for controlling and monitoring network appliance.
-So I'm familiar with SNMP, OpenFlow, routing protocols and MPLS technologies to provide VPN, PseudoWireEmulation.
-
-And also I'm interested in Functional Programming using Haskell and Scala.

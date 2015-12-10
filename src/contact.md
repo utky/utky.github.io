@@ -2,4 +2,5 @@
 title: Contact
 ---
 
-ilyaletre at gmail.com
+- [Twitter](https://twitter.com/ilyaletre)
+- [GitHub](https://github.com/utky)
