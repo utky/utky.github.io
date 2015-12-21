@@ -132,13 +132,14 @@ saveFoo
 <p><code>Persist(a)</code>は…</p>
 <ol style="list-style-type: decimal">
 <li><code>a</code>を永続化する抽象的な命令を表します。</li>
+<li><code>a</code>は処理系<code>Store</code>が永続化するためのデータ形式に変換可能である。</li>
 </ol>
-<p>命令は実行される永続化機構<code>Store</code>に応じて適切に解釈されますが、 ここではドメインに集中するために命令の具体的な表現は考えません。</p>
+<p>2の性質は<code>Store</code>というドメインの外にいる登場人物が関係するため、 考慮から外した方が良さそうです。</p>
 <h3 id="persistの数訳">Persistの数訳</h3>
 <p>任意の<code>a</code>について永続化の命令を適用できる。</p>
 <p>\( \forall a Persist(a) \)</p>
 <p>特になんの制約もありません。保存しろ、という指示だけです。</p>
-<p>ほんまか……？</p>
+<p>ほんまか……？ 精々<code>Store</code>がこの命令を処理する際に<code>a</code>が何らかの保存用データ形式に 変換できるルールの定義が必要ですがあとで考えても大丈夫そうです。</p>
 <p>かなり怪しいですがいったんこれでいきます。</p>
 <h3 id="persistのadt訳">PersistのADT訳</h3>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Persist</span> a</code></pre></div>

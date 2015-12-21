@@ -48,8 +48,6 @@
     
 </div>
 
-<h2 id="srchack-openwrtの今">13:45 <span class="citation">@SRCHACK</span> OpenWrtの今</h2>
-<p>テストケースの実行をserverspecなどでまとめて行う。 netnsを使ってホスト間の通信をさせる。</p>
 <h2 id="はぎわらさん">14:00 はぎわらさん</h2>
 <p>物理ネットワークのテスト。 TremaやMininetの柔軟な構成を物理ネットワークでも再現することでテストしたい。</p>
 <p>mininetのホストとエッジ装置間のpatch panelをovsで実現している。</p>
@@ -58,12 +56,13 @@
 <p>Q. テスト対象ネットワークの状態を変更して副作用が起きるような検証にどう対応するか。</p>
 <p>Q. ProductionとStageもpatchでB/Gデプロイのように切り替えることができるのでは</p>
 <h2 id="clorets8lack-nfvの運用事例">14:17 <span class="citation">@Clorets8lack</span> NFVの運用事例</h2>
+<p><a href="http://www.slideshare.net/cloretsblack/nfv-tremaday8">スライド</a></p>
 <p>広域ネットのBCP対策をNFVでやる、という話。PoCの提案くらいのレベル。</p>
 <p>既存のネットワークには変更を加えない。</p>
 <p>別拠点に配置したNFVをdest NATゲートウェイにする。 ユーザは問題が起きたらNFV側をnext hopに切り替える。</p>
 <p>NFVはVyOSを使っている。</p>
-<h2 id="openvnet">14:45 OpenVNet</h2>
-<p>Axshで働いている人</p>
+<h2 id="openvnet-アンドレアスキーケンスさん">14:45 OpenVNet アンドレアス・キーケンスさん</h2>
+<p>Axshで働いている方。</p>
 <p>NFVのような機能を凝集した層がある。</p>
 <pre><code>VM VM VM
 -------------
@@ -73,7 +72,8 @@ Physical</code></pre>
 <p>VNAが制御のコア部分（Tremaがいる）</p>
 <p>VNet Edgeにはどんな機能があるのか？</p>
 <p>wakameusersgroup.org</p>
-<h2 id="openstack-kuryr">15:00 OpenStack Kuryr</h2>
+<h2 id="openstack-kuryr-qb0c80aeさん">15:00 OpenStack Kuryr qb0c80aEさん</h2>
+<p><a href="http://www.slideshare.net/qb0C80aE/openstack-kuryr">スライド</a></p>
 <p>OpenStackとDockerNetworkingのはなし。</p>
 <p>NeutronとDockerのNWをつないでくれる。 いくつかのスクリプトだけで連携できるようになるらしい。</p>
 <ul>
@@ -81,7 +81,8 @@ Physical</code></pre>
 <li>netns: L3</li>
 </ul>
 <p>nsdbに使うkvsはzookeeperらしい</p>
-<h2 id="opendaylightでapplicationを設定する">15:10 OpenDaylightでApplicationを設定する</h2>
+<h2 id="opendaylightでapplicationを設定する-ichさん">15:10 OpenDaylightでApplicationを設定する Ichさん</h2>
+<p><a href="http://www.slideshare.net/ChunghanLee4/lch-trema-02pub">スライド</a></p>
 <p>KarafはOSGiのラッパー。</p>
 <p>YANGってSNMPのMIBと同じ？</p>
 <p>RESTconf = Rest + Netconf</p>
@@ -91,7 +92,8 @@ Physical</code></pre>
 <p>featureというのはOpenDaylightで使える機能やプロトコルの単位で作成される。</p>
 <p>発表者本人からのODLディスりがすごい。</p>
 <p>RESTCONFの実装を作るのはすごくきになる。 NETCONFをHTTPのトランスポートまでリフトするものだとしたらとてもいいと思う。</p>
-<h2 id="openflow-traceroute">15:45 Openflow Traceroute</h2>
+<h2 id="openflow-traceroute-atzmさん">15:45 Openflow Traceroute <span class="citation">@atzmさん</span></h2>
+<p><a href="http://www.slideshare.net/atzm/openflow-traceroute">スライド</a></p>
 <ul>
 <li>D-planeでの動的解析がしたい</li>
 <li>なるべく本番flowを触らない</li>
@@ -104,7 +106,8 @@ Physical</code></pre>
 </ul>
 <p>OFSの数だけ色というマーカを定義する →ではなくmetadataを使ってシンプルにマーカを管理するだけでいける、という話。</p>
 <p>OpenFlowでは障害切り分けがすごく大変そうなので、 こういう解析系ノウハウが提案されていくのは普及への強い力になると思う。</p>
-<h2 id="yasuhito-高宮安仁">16:00 <span class="citation">@yasuhito</span> 高宮安仁</h2>
+<h2 id="yasuhito-高宮安仁さん">16:00 <span class="citation">@yasuhito</span> 高宮安仁さん</h2>
+<p><a href="http://www.slideshare.net/yasuhito/trema-56088422">スライド</a></p>
 <p>ネットワークスライスを提供したいとする。</p>
 <ul>
 <li>スライス機能</li>
@@ -128,6 +131,9 @@ PathManager: FlowModでリンクを消す</code></pre>
 <p>TremaはOFS向けのバックエンドなんだな。 TremaではRPC機能としてプロキシインタフェースを作って外部から呼ばせる方法がある。</p>
 <p>これはもはやJava時代のRMIと同じなのでもうダメだ。 Haskellのservantみたいに型から導出するような道があればいいのに。</p>
 <p>※ なんというかIce breakして質問しやすくするのも大事だな。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>MP-BGP使ったVPN運用やっている人がいるとしれただけでもよかった。 自分がやってるノウハウってどこで活かせるのか徹底的に疑問だったので。</p>
+<p>参加されている年齢層は比較的高めに感じたし、とても温和な方が多そうだった。 IT業界は広いけれどネットワーク分野はいい雰囲気で好きだな。 問題解決のためにバリバリ作るというスタンスが見えてよいな。</p>
 
             </div>
         </div>
