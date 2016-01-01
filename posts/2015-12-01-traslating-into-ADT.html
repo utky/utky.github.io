@@ -145,18 +145,19 @@ saveFoo
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Persist</span> a</code></pre></div>
 <p>ほんとか……ほんとにこれでいいのか？</p>
 <p>なんかもっとこうそれっぽい制約とかを表現しなくていいのか？</p>
-<p>あーでも、このデータを保存したい。どうやってするかは問わない（キリッ）っていうデータを表していると思えば別にこれでもいいのかな。</p>
+<p>あーでも、このデータを保存したい。どうやってするかは問わない（キリッ）っていうデータを表していると思えば別にこれでもいいのかな。（感想）</p>
 <h3 id="fetchの定義と性質">Fetchの定義と性質</h3>
 <p><code>Fetch</code>の性質について下記のように記述します。</p>
 <p><code>Fetch(a, b)</code>は…</p>
 <ol style="list-style-type: decimal">
 <li>外部へと<code>a</code>を入力して<code>b</code>を受け取る要求を表します。</li>
+<li><code>b</code>はどこか外部の<code>Store</code>から生成されたデータです。</li>
 </ol>
 <p>外部をブラックボックスとみなした時にFetchはちょうど関数の働きをします。</p>
 <h3 id="fetchの数訳">Fetchの数訳</h3>
 <p>\( \forall a, \forall b Fetch(a, b) \)</p>
 <h3 id="fetchのadt訳">FetchのADT訳</h3>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">p <span class="ot">-&gt;</span> <span class="dt">Fetch</span> p r</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Fetch</span> a b</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">TODO: Store, Persist, Fetchあたりを記述する</code></pre></div>
 <h3 id="entityの定義と性質">Entityの定義と性質</h3>
 <p><code>Entity</code>の性質について下記のように記述します。</p>
