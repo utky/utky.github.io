@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - New Year Protocol</title>
+        <title>Hash λ Bye - New Year Protocol 2016</title>
         <link rel="stylesheet" type="text/css" href="../css/pure-nr-min.css" />
         <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -40,7 +40,7 @@
         </div>
 
         <div id="content">
-            <h1 class="title">New Year Protocol</h1>
+            <h1 class="title">New Year Protocol 2016</h1>
 
             <div class="body">
             <div class="info">
@@ -52,9 +52,14 @@
 <h2 id="年-振り返り">2015年 振り返り</h2>
 <p>ポイントを絞って。</p>
 <h3 id="haskell">Haskell</h3>
-<p>Freeモナドベースの設計パターンを覚える。 fp in scalaで説明していた自然変換を使ったDSLの変換が特に有益だと感じた。</p>
+<p>Freeモナドベースの設計パターンを覚える。</p>
+<pre><code>-- f: 問題領域上での操作を表すDSLのAST
+-- a: DSLを評価した結果生成される値の型
+Free f a</code></pre>
+<p>特定の目的を持ったモジュールを作る場合は、とにかく<code>f :: * -&gt; *</code>に適用される データ型を定義していくのが設計のメイン作業になる。</p>
+<p>さらにfp in scalaでは自然変換を用いて<code>f</code>を別の意味論<code>g</code>へと変換することで、<code>f</code>に拡張性を持たせていく手段を学んだ。</p>
 <p><a href="http://functor.tokyo/blog/2015-11-20-testing-db-access">5 Ways to Test Applications that Access a Database in Haskell</a></p>
-<p>GADTの効果を実感する。</p>
+<p>AST定義をする流れでGADTの効果を実感する。</p>
 <p><a href="https://en.m.wikibooks.org/wiki/Haskell/GADT">GADT</a></p>
 <h3 id="react.js">React.js</h3>
 <p>社内向けのプロダクトで導入。サポートするユースケースが増えていくに連れてStoreが複雑になっていく。 自然とReduxアーキテクチャが正しいように思いはじめる。</p>
