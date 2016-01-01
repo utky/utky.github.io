@@ -57,8 +57,14 @@
 -- a: DSLを評価した結果生成される値の型
 Free f a</code></pre>
 <p>特定の目的を持ったモジュールを作る場合は、とにかく<code>f :: * -&gt; *</code>に適用される データ型を定義していくのが設計のメイン作業になる。</p>
-<p>さらにfp in scalaでは自然変換を用いて<code>f</code>を別の意味論<code>g</code>へと変換することで、<code>f</code>に拡張性を持たせていく手段を学んだ。</p>
+<p><a href="http://www.haskellforall.com/2012/07/purify-code-using-free-monads.html">Purify code using free monads</a></p>
 <p><a href="http://functor.tokyo/blog/2015-11-20-testing-db-access">5 Ways to Test Applications that Access a Database in Haskell</a></p>
+<p>さらにfp in scalaでは自然変換を用いて<code>f</code>を別の意味論<code>g</code>へと変換することで、<code>f</code>に拡張性を持たせていく手段を学んだ。</p>
+<p>下記の例だと<code>List</code>や<code>Option</code>が<code>Free f a</code>の<code>f</code>に相当し、<code>List a -&gt; Option a</code>は<code>f a -&gt; g a</code>という自然変換を構成する。</p>
+<p><a href="http://eed3si9n.com/learning-scalaz/ja/Natural-Transformation.html">自然変換(Natural Transformation)</a></p>
+<pre><code>List a -&gt; Option a
+↓
+f a -&gt; g a</code></pre>
 <p>AST定義をする流れでGADTの効果を実感する。</p>
 <p><a href="https://en.m.wikibooks.org/wiki/Haskell/GADT">GADT</a></p>
 <h3 id="react.js">React.js</h3>
