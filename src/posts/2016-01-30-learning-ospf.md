@@ -249,3 +249,8 @@ AS外部の経路をエリア内へ教える。
 - Link State ID: Network Address
 - Netmask
 - Forwarding Address: 外部ネットワークへと転送可能なルータのアドレス
+
+OSPFルータがサービス回線を直接収容している場合などは、
+そのインタフェースをパッシブにしておくとこのType 5で広告できるってこと？
+
+それともその向こうにルータがいる場合にそのルータが持つ経路をredistributeするために使う？
