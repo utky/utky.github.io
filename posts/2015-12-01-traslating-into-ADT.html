@@ -102,7 +102,7 @@ saveFoo
 <p>今回作りたいアプリケーションではBacklog管理と時間計測を行いたいと考えています。 まずは解決するべき問題であるドメインの整理から始めます。</p>
 <p>ドメインはデータベース技術やユーザインタフェースに依存せず純粋に 保たれなければいけないため、何より最初に設計を始められる部分でもあります。 逆にデータベースとの接続や外部API呼び出しを考慮しなければいけないような場面に出くわした場合、 それはドメインを純粋に保てていない危険信号と捉えるべきです。</p>
 <p>まずはBacklogの構成要素となるユーザーストーリーに相当する<code>Issue</code>、 そして<code>Issue</code>に対してとりかかった作業の実績時間<code>TimeTrack</code>を定義します。</p>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">IssueとTimeTrackを入れる</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">Issue</span>と<span class="dt">TimeTrack</span>を入れる</code></pre></div>
 <p>これらのデータ型は値を格納することを目的としたデータコンテナの一種です。 計算の振る舞いに関する記述は持ちません。</p>
 <p>ただ名詞として表現された概念の属性を一覧化しているだけです。 こうした概念はユースケースの検討初期に自ずと解ってくることが多いので、 定義が必要であることはすぐに発見できます。</p>
 <p>難しいのは出来事や振る舞いをよく観察することで見つかるような、 「計算の性質、制約、条件」を表すデータ型です。</p>
@@ -158,7 +158,7 @@ saveFoo
 <p>\( \forall a, \forall b Fetch(a, b) \)</p>
 <h3 id="fetchのadt訳">FetchのADT訳</h3>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">a <span class="ot">-&gt;</span> <span class="dt">Fetch</span> a b</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">TODO: Store, Persist, Fetchあたりを記述する</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="dt">TODO</span><span class="fu">:</span> <span class="dt">Store</span>, <span class="dt">Persist</span>, <span class="dt">Fetch</span>あたりを記述する</code></pre></div>
 <h3 id="entityの定義と性質">Entityの定義と性質</h3>
 <p><code>Entity</code>の性質について下記のように記述します。</p>
 <p><code>Entity(k, a)</code>は…</p>

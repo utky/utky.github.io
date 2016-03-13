@@ -5,3 +5,4 @@ src/dist
 src/*.hi
 src/*.o
 *.DS_Store
+.stack-work

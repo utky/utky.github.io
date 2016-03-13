@@ -6,12 +6,12 @@ clean:
 	rm ../*.html && rm -rf ../css ../images ../posts && ./site clean
 
 site: site.hs
-	ghc --make -threaded site.hs
+	stack ghc -- --make site.hs
 
 build: site
 	./site build
 
-run: site
+run: build
 	./site watch
 
 deploy: site
