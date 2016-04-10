@@ -4,5 +4,10 @@ src/site
 src/dist
 src/*.hi
 src/*.o
+src/latex/*.aux
+src/latex/*.pdf
+src/latex/*.dvi
+src/latex/*.log
+src/latex/*.gz
 *.DS_Store
 .stack-work

@@ -1,4 +1,4 @@
-.PHONY: all build run clean
+.PHONY: all build run clean latex
 
 all: build
 	
@@ -16,3 +16,6 @@ run: build
 
 deploy: site
 	./site deploy
+
+latex:
+	sudo docker run --rm -v `pwd`/latex:/latex thii/platex build profile.tex
