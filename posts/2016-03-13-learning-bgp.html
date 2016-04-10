@@ -90,6 +90,15 @@
 <h3 id="asコンフェデレーション">ASコンフェデレーション</h3>
 <p>またはiBGPのピアをさらに小さなプライベートASに分割した上でASコンフェデレーションを使って一つにまとめ上げる。</p>
 <p>以前は前者の方がよいと思っていたが、分割統治の考え方からすると後者のASコンフェデの方が綺麗なきがする。</p>
+<h2 id="openflowとbgp">OpenFlowとBGP</h2>
+<p>OpenFlowのメリットはC-planeとD-planeの分離だ。 この分離の考え方はもちろん他のプロトコルでも応用できる。</p>
+<p>BGPは経路制御を担当するのでC-planeのプロトコルとなる。 対となるD-planeはIP。ルーティングテーブルの情報を使ってパケットをフォワーディングする。</p>
+<p>このBGPのアーキテクチャをOpenFlowを使って分離するとこうなる。</p>
+<ul>
+<li>C-plane: BGP on OpenFlow controller</li>
+<li>D-plane: IP on OpenFlow switch</li>
+</ul>
+<p>一台のBGPルータであればベストパスの選択が終わったらローカルなルーティングテーブルに書き込むだけで終わる。 OpenFlowのようにレイヤーが分離されたアーキテクチャではどうだろうか。 BGPをハンドルするcontrollerがローカルのDBに経路を保存する必要があるかもしれない。 さらにdatapathに対してそれらの経路を設定する必要がある。そのためにはBGPで生成された経路をOpenFlow メッセージに変換datapathに投入する必要がある。</p>
 
             </div>
         </div>
