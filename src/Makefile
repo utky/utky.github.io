@@ -19,3 +19,4 @@ deploy: site
 
 latex:
 	sudo docker run --rm -v `pwd`/latex:/latex thii/platex build profile.tex
+	cp latex/*.pdf resources/
