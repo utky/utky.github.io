@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - ネットワークからのフレームをAttoparsecで解析する (W.I.P)</title>
+        <link rel="stylesheet" type="text/css" href="../css/pure-nr-min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/highlight.css">
+
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+        <script src="../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    </head>
+    <body>
+        <div class="pure-menu pure-menu-horizontal">
+          <a href="../" class="brand pure-menu-heading pure-menu-link">Hash λ Bye</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a href="../" class="pure-menu-link">Home</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../about.html" class="pure-menu-link"><i class="fa fa-user"></i>About</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../contact.html" class="pure-menu-link">Contact</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../archive.html" class="pure-menu-link">Archive</a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="content">
+            <h1 class="title">ネットワークからのフレームをAttoparsecで解析する (W.I.P)</h1>
+
+            <div class="body">
+            <div class="info">
+    Posted on April 18, 2016
+    
+</div>
+
+<h2 id="はじめに">はじめに</h2>
+<p>ネットワークから入力されたネットワークプロトコルのフレームを解析して 処理するようなことが仕事柄よく必要になります。</p>
+<p>ここで想定しているネットワーク・プロトコルとは</p>
+<ul>
+<li>OpenFlow</li>
+<li>BGP (Border Gateway Protocol)</li>
+<li>LDP (Label Distribution Protocol)</li>
+</ul>
+<p>などです。</p>
+<p>主にL4のTCPやUDP上で動作するネットワーク制御プロトコルのことを指します。</p>
+<p>SMTPやHTTPなどを期待されている方、ごめんなさい。 ここではネットワークの<em>制御</em>にフォーカスしたプロトコルしか言及しません。</p>
+<p>この手のプロトコルは多くの場合、固定長フォーマット+可変長TLVフォーマットで構成されています。 いずれにしてもJSONのように<code>{}</code>や<code>[]</code>など識別子を頼りに解析をするのではなく、 フィールドの長さを頼りにバイナリデータを解析します。</p>
+<p>市井のAttoparsecベースのparserを見ていると、フィールドの長さをベースにデータ解析をおこなう例が少ないです。 多くの場合HTTPやJSON, SMTP, LDAPなどテキストから識別子を解析するプロトコルの実装です。 固定長+可変長TLVフォーマットのフレーム解析はニーズが少ないせいか見かけません。 ここではそうした固定長+可変長TLVフォーマットのフレーム解析にAttoparsecを使う上でのポイントを記しておきたいと思います。</p>
+<p>Javaのネットワークライブラリである <a href="http://netty.io/">Netty</a> にはこういうかゆいところに手が届く <a href="http://netty.io/4.0/api/io/netty/handler/codec/LengthFieldBasedFrameDecoder.html">API</a> があるんですよね。Nettyの成熟っぷりが凄まじい。</p>
+<h2 id="ゴール">ゴール</h2>
+<p>OpenFlowのEchoRequestメッセージの解析をゴールとします。</p>
+<p>OpenFlowのハンドシェークシーケンスでは通常Helloメッセージの送受信が先にくるのですが、 Helloはいつの間にか複雑になっていたので、あとに回します。</p>
+<h2 id="openflow">OpenFlow</h2>
+<p>OpenFlowはネットワークパケットが持つ様々なヘッダ情報をもとに「フロー」として分類し、 フロー単位にスイッチングを行うOpenFlowスイッチを制御するためのプロトコルです。 OpenFlowスイッチを制御するためのアプリケーションをOpenFlowコントローラと呼びます。</p>
+<h3 id="フレームフォーマット">フレームフォーマット</h3>
+<h4 id="openflowヘッダ">OpenFlowヘッダ</h4>
+<p>すべてのOpenFlowプロトコルのデータについてくるヘッダです。</p>
+<pre><code> 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| version (8)   | type (8)      | length (16)                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| xid (32)                                                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</code></pre>
+<dl>
+<dt>version</dt>
+<dd>OpenFlowプロトコルのバージョン
+</dd>
+<dt>type</dt>
+<dd>OpenFlowヘッダのあとに続くペイロードの種類 (Hello, EchoRequest, FlowMod etc.)
+</dd>
+<dt>length</dt>
+<dd>OpenFlowヘッダそのものも含めたフレーム長
+</dd>
+<dt>xid</dt>
+<dd>トランザクションID
+</dd>
+</dl>
+<h4 id="echorequestメッセージ">EchoRequestメッセージ</h4>
+<p>OpenFlowヘッダのあとにlengthからOpenFlowヘッダサイズ8オクテット を引いた分のサイズを持つデータが続きます。</p>
+<pre><code> 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| version (8)   | type (8)      | length (16)                   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| xid (32)                                                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| arbitary-length data field                                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</code></pre>
+<h2 id="解析の考え方">解析の考え方</h2>
+<p>先頭から固定長のフィールドを読んでいくのはとても簡単です。 AttoparsecのParserを素直に使えばいいだけです。</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">version <span class="ot">&lt;-</span> anyWord8
+type_ <span class="ot">&lt;-</span> anyWord8
+length <span class="ot">&lt;-</span> anyWord16
+xid <span class="ot">&lt;-</span> anyWord32
+<span class="co">-- anyWord16とanyWord32は標準ではついていないので適当に自作します</span></code></pre></div>
+<p>問題は<code>arbitary-length data field</code>のところです。 可変長フィールドです。　</p>
+<p>長さは事前に読み込んだ<code>length</code>から計算できます。 <code>length</code>はOpenFlowヘッダを含んだフレームの長さです。</p>
+<pre><code>length = OpenFlowヘッダ長(8) + ペイロードのデータ長</code></pre>
+<p>いま知りたいのはフレームからOpenFlowヘッダを除いた残りの部分のデータ長です。</p>
+<pre><code>ペイロードのデータ長 = length - OpenFlowヘッダ長(8)</code></pre>
+<p>なので<code>length - 8</code>が残りのフィールドの長さになります。 これをHaskellで書くとこんな感じです。Nオクテットのデータを<code>ByteString</code>として読み込む<code>take</code>を使います。</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">payload <span class="ot">&lt;-</span> take (length <span class="fu">-</span> <span class="dv">8</span>)</code></pre></div>
+<p>あとはこのペイロードを解析すればいいだけです。</p>
+<h2 id="問題">問題</h2>
+<p>と、ここまでコードを書いてきて私は違和感を覚えました。</p>
+
+            </div>
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

@@ -1,5 +1,5 @@
 ------------------
-title: 代数的データ型へと翻訳する
+title: [WIP]代数的データ型へと翻訳する
 date: 2015-10-19
 tags: [haskell, functional programming]
 ------------------
