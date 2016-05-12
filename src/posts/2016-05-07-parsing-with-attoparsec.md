@@ -1,5 +1,5 @@
 ------------------
-title: ネットワークからのフレームをAttoparsecで解析する (W.I.P)
+title: ネットワークからのフレームをAttoparsecで解析する (WIP)
 date: 2016-04-18
 tags: [network, haskell]
 ------------------
@@ -135,5 +135,4 @@ payload <- take (length - 8)
 
 ## 問題
 
-と、ここまでコードを書いてきて私は違和感を覚えました。
-
+*T.B.D.*
