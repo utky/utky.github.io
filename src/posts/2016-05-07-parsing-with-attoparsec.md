@@ -1,7 +1,7 @@
 ------------------
-title: ネットワークからのフレームをAttoparsecで解析する (WIP)
-date: 2016-04-18
-tags: [network, haskell]
+title: OpenFlowのメッセージをAttoparsecで解析する
+date: 2016-05-15
+tags: [network, haskell, openflow]
 ------------------
 
 ## はじめに
