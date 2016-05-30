@@ -125,23 +125,19 @@ proof :: P -> Q
 
 [Subset Relation is Transitive](https://proofwiki.org/wiki/Subset_Relation_is_Transitive)
 
-\\(
-
-A \\subseteq B \\land B \\subseteq C
+\\( A \\subseteq B \\land B \\subseteq C \\)
 
 = 部分集合の定義
 
-forall x (x \\in A \\rightarrow x \\in B) \\land (x \\in B \\rightarrow x \\in C)
+\\( \\forall x ((x \\in A \\rightarrow x \\in B) \\land (x \\in B \\rightarrow x \\in C)) \\)
 
 = 仮言三段論法 ★
 
-forall x (x \\in A \\rightarrow x \\in C)
+\\( \\forall x (x \\in A \\rightarrow x \\in C) \\)
 
 = 部分集合の定義
 
-A \\subseteq C
-
-\\)
+\\( A \\subseteq C \\)
 
 ★のところがブレイクスルーだった。直感的には分かることだが自分はそれを正しい定理として導入できなかった。
 何故なら仮言三段論法という定理を知らなかったからだ。
