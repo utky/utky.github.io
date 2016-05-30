@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - 証明を学ぶ (WIP)</title>
+        <title>Hash λ Bye - 証明を学ぶ</title>
         <link rel="stylesheet" type="text/css" href="../css/pure-nr-min.css" />
         <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
@@ -40,7 +40,7 @@
         </div>
 
         <div id="content">
-            <h1 class="title">証明を学ぶ (WIP)</h1>
+            <h1 class="title">証明を学ぶ</h1>
 
             <div class="body">
             <div class="info">
@@ -64,8 +64,8 @@
 <h2 id="問題の解決に向けて">問題の解決に向けて</h2>
 <h3 id="命題を整理する">命題を整理する</h3>
 <p>難しくて大きな仕事の依頼が来た時は、それを分解する。WBSを作ったりするのはそのアプローチの一つだ。 この考え方を応用できないだろうか。</p>
-<p>いくつかの例題を解きながら思考の過程を整理しようと思う。</p>
-<h2 id="集合">1. 集合</h2>
+<p>例題を解きながら思考の過程を整理しようと思う。</p>
+<h2 id="集合">集合</h2>
 <p>\( A \subseteq B \land B \subseteq C \Rightarrow A \subseteq C \)</p>
 <p>を証明してみる。集合の包含関係についての三段論法だ。</p>
 <h3 id="問題の分解">問題の分解</h3>
@@ -82,7 +82,42 @@
 <p>証明はこの関数の実装を与えるような作業だ。 つまり与えられた<code>P</code>という仮定に他の関数(定理・公理)を適用して<code>Q</code>という結論を生じることを示す。</p>
 <p>そう考えてみる。</p>
 <p>これを証明の手続きで表現するのであれば、仮定を変形しながら結論を導く作業が証明の道筋となる。</p>
-<p><em>T.B.D.</em></p>
+<h3 id="証明">証明</h3>
+<p>仮定を要素との関係で表してみる。それを変形しながら結論へと辿り着けるか確認してみよう。</p>
+<p>\( \forall x (x \in A \rightarrow x \in B) \land (x \in B \rightarrow x \in C) \)</p>
+<p>この仮定の式と結論の式を見比べてみる。</p>
+<p>\( \forall x (x \in A \rightarrow x \in C) \)</p>
+<p><code>B</code>についての命題と論理積\(\land\)が消去できれば結論に辿り着けそうだ。</p>
+<p>含意の関係を消去する方法は解らないが、論理積と論理和なら消去の規則が使えるかもしれない。</p>
+<p>含意を論理和に変形してみる。 まずは仮定の論理積の左側。</p>
+<p>\( \forall x (x \in A \rightarrow x \in B) \)</p>
+<p>これを論理和に変形する。</p>
+<p>\( \forall x (\lnot (x \in A) \lor x \in B) \)</p>
+<p>この時点で</p>
+<p>\( \forall x (\lnot (x \in A) \lor x \in B) \land (x \in B \rightarrow x \in C)\)</p>
+<p><em>そしてこのあと式を変形し続けて泥沼にはまっていく……。</em></p>
+<p>けっきょく仮定から結論は導けなかった。悔しいながらも解答を見てみる。</p>
+<h3 id="解答">解答</h3>
+<p><a href="https://proofwiki.org/wiki/Subset_Relation_is_Transitive">Subset Relation is Transitive</a></p>
+<p>\(</p>
+<p>A \subseteq B \land B \subseteq C</p>
+<p>= 部分集合の定義</p>
+<p>forall x (x \in A \rightarrow x \in B) \land (x \in B \rightarrow x \in C)</p>
+<p>= 仮言三段論法 ★</p>
+<p>forall x (x \in A \rightarrow x \in C)</p>
+<p>= 部分集合の定義</p>
+<p>A \subseteq C</p>
+<p>\)</p>
+<p>★のところがブレイクスルーだった。直感的には分かることだが自分はそれを正しい定理として導入できなかった。 何故なら仮言三段論法という定理を知らなかったからだ。 それが直感的に正しいからといって自分で定理として導入することはできない。 だから使えなかった。</p>
+<p>本当はこの三段論法（論理含意の推移律）を補題として証明すべきだったのかもしれない。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>解ったのは証明の作り方。</p>
+<ul>
+<li>仮定から出発する</li>
+<li>既知の定理を使って仮定を変形する</li>
+<li>結論の式を導く</li>
+</ul>
+<p>またこれを達成するためにいくらか結論の式をあれこれ変えてみて、 自分が解きやすい形にするのも、最初の段階で試してみる価値があると解った。</p>
 
             </div>
         </div>
