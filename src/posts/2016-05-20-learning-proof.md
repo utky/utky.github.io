@@ -127,7 +127,7 @@ proof :: P -> Q
 
 \\( A \\subseteq B \\land B \\subseteq C \\)
 
-= 部分集合の定義
+= 部分集合の定義(ここは気づけた)
 
 \\( \\forall x ((x \\in A \\rightarrow x \\in B) \\land (x \\in B \\rightarrow x \\in C)) \\)
 
@@ -135,7 +135,7 @@ proof :: P -> Q
 
 \\( \\forall x (x \\in A \\rightarrow x \\in C) \\)
 
-= 部分集合の定義
+= 部分集合の定義(これを使って論理含意から関係へと戻すべきなのも気づいていた)
 
 \\( A \\subseteq C \\)
 
