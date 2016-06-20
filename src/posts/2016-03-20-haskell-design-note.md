@@ -71,16 +71,28 @@ Haskellでここ1年くらいずーっと悩んでいた問題が少し解けて
 
 ```
 Application
-↓
+↓ depends
 Domain
-↓
+↓ depends
 Infrastructure
 ```
 
 ### 水平的な関係による変換
 
+Applicationはドメインが受理可能なイベントの集合を定義する。
+Domainはイベントを解釈してアプリケーションの状態を書き換える。
+Domainが生成したコマンドのツリーはInfrastructureで解釈され実際のミドルウェアへの操作に変換される。
+
+Applicationはユースケースレベルの抽象度を表し、
+DomainはBounded Contextレベルの抽象度での操作を定義し、
+Infrastructureは実装されたミドルウェアレベルの操作を定義する。
+(このレベル自体は従来型の垂直的アーキテクチャと変わらない)
+
 ```
-Application → Domain → Infrastructure
+            translates         translates                 run
+Application ----------> Domain ----------> Infrastructure -----> IO
+            depends            depends
+            ---------->        <----------
 ```
 
 ### ドメインをピュアに保つ恩恵
@@ -98,6 +110,12 @@ T.B.D.
 そのため構造体のようなレコードとメソッドの代わりとなる関数をひたすら書いていました。
 結果的に起きたのはデータ型に対してどんどん増えていくバラバラの関数です。
 
+```
+Object = structure + methods
+↓
+Functional way = record + functions
+```
+
 それぞれの関数の型注釈はそこそこ上手く事前条件と事後条件を表しているのです。
 しかしそれらがバラバラと増えていくと目的のために必要な関数を見つけるのにもだんだん苦労するようになってきます。
 
@@ -112,6 +130,7 @@ T.B.D.
 ユースケースは複数の操作に分解できるので、それらは後回し
 - プリミティブを作る
 プリミティブを合成してユースケースを作ると考える
+これがDSLのASTになる？
 - プリミティブを組み合わせてドメインのユースケースを作る
 - specを書いて使い方をつかむ
 
