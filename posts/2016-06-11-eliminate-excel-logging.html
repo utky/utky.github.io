@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - Excelログを掃討する</title>
+        <link rel="stylesheet" type="text/css" href="../css/pure-nr-min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/highlight.css">
+
+
+    </head>
+    <body>
+        <div class="pure-menu pure-menu-horizontal">
+          <a href="../" class="brand pure-menu-heading pure-menu-link">Hash λ Bye</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a href="../" class="pure-menu-link">Home</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../about.html" class="pure-menu-link"></i>About</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../contact.html" class="pure-menu-link">Contact</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../archive.html" class="pure-menu-link">Archive</a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="content">
+            <h1 class="title">Excelログを掃討する</h1>
+
+            <div class="body">
+            <div class="info">
+    Posted on June 11, 2016
+    
+</div>
+
+<h2 id="問題">問題</h2>
+<p>Excelにログを貼ることがよくある。 いわゆる検証のエヴィデンスとして。</p>
+<p>今まで検証チームの人たちは自分の好きなテキストエディタでログを確認して、 Excelにコピペしていたんだけど、直近の検証ではテストケースも多いしログの種類も多いので いい加減手動でコピペするのが辛くなってきたというのがある。</p>
+<p>なんでログを渡すだけでは駄目なのかというと、 工程を承認する人がテストケースとログの抜粋を一つの資料で確認したいからだ。 もうこの前提自体は是正できない。そんな政治的交渉をしている時間がない。</p>
+<h2 id="整理する">整理する</h2>
+<p>達成したいのはなにか。</p>
+<ol style="list-style-type: decimal">
+<li>ログは自動で集められてサーバにアップロードされる</li>
+<li>サーバにある圧縮されたログファイルはrsyncで作業者の端末にダウンロードされる</li>
+<li>作業はログを確認しシステムの挙動・状態が期待どおりであることを確認する</li>
+<li>★作業者は期待通りであると判断した根拠となるログを複数件抜粋する</li>
+<li>★抜粋されたログは対応する試験項目を表すExcelシートにペーストされる</li>
+</ol>
+<p>★の部分を効率的に処理したい。 Excelを作業者がいちいち開いてペーストするなんてありえない。 プログラムで処理したいわけだ。</p>
+<p>どうやって楽できるか考える。</p>
+<p>1,2は自動化された基盤を使えることがわかっているので今は考えないでおく。</p>
+<p>3は人間による判断をする必要がある。機械的に判断するための定式化は難しい。 というか人間が機械的に判断できることをやっているというよりは、 定式化が面倒なので人間の直観を使って判断させてる、が正解。つまりプログラマの敗北かも。</p>
+<p>4,5が今回のスコープ。 作業者はログファイルの「ここからここまで」を抜粋したらそれにメタデータをつける。</p>
+<p>データフロー</p>
+<pre><code>                        [メタ情報]
+                            |
+                            v
+[ログ] -&gt; (抜粋処理) -&gt; (Excel化) -&gt; [試験ログシート]
+              ^             ^
+              |             |
+          [抜粋規則] [エヴィデンスシート]</code></pre>
+<h2 id="考え方">考え方</h2>
+<p>どんなプログラミングでもこの考え方は有効だと思う。</p>
+<p>すなわち<strong>「プログラムはデータの変換(transformation)に徹する」</strong></p>
+<p>データをストリームとみなす時、プログラムはストリームに対するフィルタの役割を演じる。</p>
+<p>今回であればsourceとなるストリームは大量のログだ。それをフィルタにかけるとExcelシートが出てくる。 まるでひとつの大きな関数とみなす。</p>
+<p>ちなみにこれはScala Cookbookから学んだ発想。便利。</p>
+<p>Haskellで学んだデータ加工の考え方でいくと、 ログのデータは中間的な構造に変形されたあとにExcelとしてレンダリングされるだけと考える。</p>
+<h2 id="メタ情報">メタ情報</h2>
+<p>ログファイルが持つメタ情報は下記のようなものがある。</p>
+<ul>
+<li>ノード</li>
+<li>タイプスタンプ</li>
+<li>タグ</li>
+<li>実行コマンド</li>
+</ul>
+<p>テキストデータに構造をもたせるためにはマークアップが必要になる。 JSONだったら素直にObjectとして表現できるのだけど、可読性を重視してできるだけplain textの表現を維持するべきか。</p>
+<pre><code># id: 1-a
+# stage: before
+# log-name: process
+# node: some-host
+# timestamp: 2016-01-01T00:00:00.000
+# tags: process
+# process: ps aux
+〜ログの本文〜</code></pre>
+<p>こんな風にすればself containedなログファイルになりそう。 ログを取得するプログラムの修正でこうしたメタデータは追加できそうだ。</p>
+<p>このログを処理する時の重要なデータとなる。</p>
+<h2 id="抜粋">抜粋</h2>
+<p>いくつかのログから必要な箇所を抜粋し一つのエヴィデンスとする。 そのテストがパスしたことを示す根拠をログに求める。 試験の作業者はなんのログを見て試験結果を判断したかを示すため、ログを抜粋する。 これを複数の担当者が同時に行うことになる。(担当によって確認するところが分担されている)</p>
+<p>ログの抜粋は集約して一つのデータとなる。 ここで生成されたエヴィデンス群は次の過程でExcelとしてレンダリングされることになる。</p>
+<ol style="list-style-type: decimal">
+<li>作業者の端末でログを確認する できれば好きなエディタで確認してほしい</li>
+<li>担当者は一箇所にログを集める</li>
+<li>集めたログをもとにExcelシートを生成する</li>
+</ol>
+<h2 id="気づく">気づく</h2>
+<p>あー、まてよ。<em>ログを集約する仕組みまであればいいのかな。</em> 集約の単位はチケットで表現できる。だからITSでいい。ただログを担当者がペーストできればいい。</p>
+<p><strong>Excelに貼るのは人の手でやってもいいということかもしれない。</strong></p>
+<p>最小限コストを書けるべきなのは、ITSの運用プロセスやルールだ。 <em>一定のルールでnormalizeすることでプログラムそれをデータとして扱えるようになる。</em> 本当に大事なのはそれだけだ。</p>
+<p>ルールに従ってデータを処理するプログラムなんて後で書けるんだ。</p>
+<p>だからITSでの運用方法を決めよう。 そしてITSのもつAPIからデータを抽出しExcelを生成するところまで考えよう。</p>
+<h2 id="itsに記入するデータの正規化">ITSに記入するデータの正規化</h2>
+<p>ITSに登録するチケットがテストケース1件を表すとする。 各チケットには最低限テストケースの手順と合否をメモする。</p>
+<p>例えばエヴィデンスはひとつのテストケースで1ファイルとする。 最終的にテスト全体でエヴィデンスをまとめた1ファイルがほしいなら、VBAマクロなどで適当に処理できる。 情報はできるだけ細かい粒度で保管するのが正しい。それらを合成するのは簡単だ。</p>
+<p>だとするとエビデンスファイルの中身はどうなるだろうか。</p>
+<ul>
+<li>テストケースについての記述</li>
+<li>どの観点のテストか</li>
+<li>どんな手順で記述するか</li>
+<li>システムが満たすべき条件はなにか</li>
+</ul>
+<h2 id="ログ抜粋の記法">ログ抜粋の記法</h2>
+<p>仮にITSのチケットに対してログを抜粋を貼り付ける方法を取るとする。 チケットのコメント欄にログを貼り付けることになるだろう。</p>
+<p>この時にメタ情報とログの抜粋が必要になる。 試験者の手元にあるログに記されたメタ情報を貼り付けるか。面倒だなあ。</p>
+<p>メタ情報をコピペすれば一発でITSで可読可能なテキストになるようにしたい。 とすると例えばmarkdown記法に準拠したメタ情報を最初から出力するべきだ。</p>
+<pre><code>- id: 1-a
+- stage: before
+- name: process
+- node: some-host
+- timestamp: 2016-01-01T00:00:00.000
+- tags: process
+- source: ps aux
+
+---
+
+〜ログの本文〜</code></pre>
+<p>こちらの方がいいか。</p>
+
+            </div>
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+        <script src="../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    </body>
+</html>

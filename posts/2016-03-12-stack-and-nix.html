@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - stackとNixを使って安定したビルド環境を作る</title>
+        <link rel="stylesheet" type="text/css" href="../css/pure-nr-min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/highlight.css">
+
+
+    </head>
+    <body>
+        <div class="pure-menu pure-menu-horizontal">
+          <a href="../" class="brand pure-menu-heading pure-menu-link">Hash λ Bye</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item">
+              <a href="../" class="pure-menu-link">Home</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../about.html" class="pure-menu-link"></i>About</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../contact.html" class="pure-menu-link">Contact</a>
+            </li>
+            <li class="pure-menu-item">
+              <a href="../archive.html" class="pure-menu-link">Archive</a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="content">
+            <h1 class="title">stackとNixを使って安定したビルド環境を作る</h1>
+
+            <div class="body">
+            <div class="info">
+    Posted on March 12, 2016
+    
+</div>
+
+<h2 id="問題点">問題点</h2>
+<h3 id="stackはいいんだけれど">stackはいいんだけれど</h3>
+<p>私はHaskellを使ったプロジェクトのビルドには<a href="https://github.com/commercialhaskell/stack">stack</a>をよく使います。 <code>stack</code>を使う恩恵としてビルドが安定するのはもちろんあるのですが、 それ以外にも<code>cabal</code>を使っていた頃と比べて煩瑣なコマンドの入力が減っているので ターミナル上の操作も随分楽になりました。(主に<code>cabal configure</code>が邪魔だと思っていた)</p>
+<ul>
+<li><a href="http://qiita.com/tanakh/items/6866d0f570d0547df026">stackについての充分な説明</a></li>
+<li><a href="http://tune.hateblo.jp/entry/2015/07/13/034148">stackの使い方についての充分な説明</a></li>
+</ul>
+<p>Haskellの依存パッケージをビルドするのにこの<code>stack</code>を使うことで快適になりました。 しかしそれでもまだ時々ストレスになることがあります。</p>
+<p>Cの呼び出しを含むようなパッケージをビルドする場合の依存関係の解決です。</p>
+<h3 id="ffiを含むパッケージの依存関係">FFIを含むパッケージの依存関係</h3>
+<p>例えば<a href="https://github.com/hdbc/hdbc-sqlite3">hdbc-sqlite3</a>は<code>sqlite3</code>のヘッダファイルを インポートするようなC呼び出しのコードを含んでいます。 <code>stack</code>ではこの<code>sqlite3</code>のヘッダファイルの解決まではしてくれません。 自分で<code>sqlite3</code>をシステムにインストールするなどしてロードできるようにしてあげる必要があります。</p>
+<p>開発環境のシステムにグローバルにインストールすることでこの依存を解決できるかもしれません。 ただし新しいインストールよってシステム上の他の依存関係が壊れることもあります。 開発目的で必要なライブラリをグローバルにインストールするのは避けたいものです。</p>
+<p>サンドボックスを作ってそのプロジェクトに必要なCライブラリだけを インストールできないものでしょうか。</p>
+<p>解決策の一つに <em>Nixを使う</em> というアプローチがあります。</p>
+<h2 id="解決方法">解決方法</h2>
+<h3 id="nix-パッケージマネージャ">Nix パッケージマネージャ</h3>
+<p><em>“純粋関数型パッケージマネージャ”</em>と呼ばれる<a href="http://nixos.org/nix/">Nix</a>を使うことで こうした外部ライブラリへの依存周りの問題を解決することができます。 (何をもって“純粋関数型”とするかは謎ですが公式はそう自称しています)</p>
+<p><code>Nix</code>はOSX, Linuxディストリビューション上で利用できるパッケージマネージャです。 <code>Nix</code>では新しいパッケージをインストールしても既存のパッケージの <em>依存関係を上書きしない</em> ため、 各パッケージの依存関係が不整合になって壊れることがありません。</p>
+<p>これはパッケージとその依存パッケージが <em>それぞれ分離されてインストールされている</em> ことによる恩恵です。 この <em>分離</em> の特徴によってHaskellプロジェクトが依存する外部ライブラリは、 システムグローバルの領域とは <em>分離</em> されてそのプロジェクト用にインストールされます。</p>
+<p>そして何より<code>Nix</code>は<code>stack</code>と相性がよいです。 <code>stack v0.1.10.0</code>からこの<code>Nix</code>との統合機能が導入されたためです。</p>
+<h3 id="nixの導入">Nixの導入</h3>
+<h4 id="環境情報">環境情報</h4>
+<pre><code>OS: Linux debian-jessie 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt20-1+deb8u3 (2016-01-17) x86_64 GNU/Linux
+Nix: 1.11.2
+ghc: 7.10.3
+stack: 1.0.2
+cabal: 1.22.9.0</code></pre>
+<h4 id="導入手順">導入手順</h4>
+<p><code>Nix</code>と<code>stack</code>を統合するためには</p>
+<p><a href="http://nixos.org/nix/">Nixのトップページ</a>にある「Get Nix」の手順でインストールすることができます。</p>
+<p>Vagrantの仮想マシン<code>debian/jessie64</code>でインストールする例を示します。</p>
+<h4 id="nixのインストール">Nixのインストール</h4>
+<pre><code>$ curl https://nixos.org/nix/install | sh</code></pre>
+<h4 id="nixの提供するコマンドへとパスを通す">Nixの提供するコマンドへとパスを通す</h4>
+<pre><code>$ . /home/vagrant/.nix-profile/etc/profile.d/nix.sh</code></pre>
+<p><code>bashrc</code>や<code>zshrc</code>など、お使いのシェルに応じて ログイン時に上記のコマンドを実行するようにしてください。</p>
+<h4 id="haskell開発に必要な最低限のパッケージをインストール">3. Haskell開発に必要な最低限のパッケージをインストール</h4>
+<pre><code>$ nix-env -iA nixpkgs.ghc nixpkgs.stack nixpkgs.cabal-install</code></pre>
+<p>この時点でGHCをバイナリでインストールできるので、 <code>stack setup</code>は不要になります。</p>
+<h3 id="stackとの統合">stackとの統合</h3>
+<h4 id="ビルド前の準備">ビルド前の準備</h4>
+<p>例えば外部ライブラリに依存するHaskellプロジェクトである<code>hdbc-sqlite3</code>をビルドしたいとしましょう。 今までであれば使い慣れたパッケージマネージャで<code>sqlite3</code>をインストールするのですが、 ここではシステムグローバルにインストールせずにそれをやる方法を考えます。</p>
+<pre><code>git clone https://github.com/hdbc/hdbc-sqlite3.git
+cd hdbc-sqlite3</code></pre>
+<p><code>stack.yaml</code>を生成しましょう。</p>
+<pre><code># 2016/03/12 時点では Nixのパッケージリポジトリに
+# lts-5.5がないのでlts-5.4を明示します。
+
+$ stack init --resolver lts-5.4
+Using cabal packages:
+- HDBC-sqlite3.cabal
+
+Downloaded lts-5.4 build plan.    
+Caching build plan
+Fetched package index.                                                                                    
+Populated index cache.    
+Initialising configuration using resolver: lts-5.4
+Writing configuration to file: stack.yaml
+All done.</code></pre>
+<h4 id="ビルド">ビルド</h4>
+<p>とりあえず何も考えずにビルドしようとすると失敗します。</p>
+<pre><code>$ stack build
+HDBC-sqlite3-2.3.3.1: configure
+Configuring HDBC-sqlite3-2.3.3.1...
+setup-Simple-Cabal-1.22.5.0-ghc-7.10.3: Missing dependency on a foreign
+library:
+* Missing C library: sqlite3
+This problem can usually be solved by installing the system package that
+provides this library (you may need the &quot;-dev&quot; version). If the library is
+already installed but in a non-standard location then you can use the flags
+--extra-include-dirs= and --extra-lib-dirs= to specify where it is.
+
+--  While building package HDBC-sqlite3-2.3.3.1 using:
+      /home/vagrant/.stack/setup-exe-cache/x86_64-linux/setup-Simple-Cabal-1.22.5.0-ghc-7.10.3 --builddir=.stack-work/dist/x86_64-linux/Cabal-1.22.5.0 configure --with-ghc=/home/vagrant/.nix-profile/bin/ghc --with-ghc-pkg=/home/vagrant/.nix-profile/bin/ghc-pkg --user --package-db=clear --package-db=global --package-db=/home/vagrant/.stack/snapshots/x86_64-linux/lts-5.4/7.10.3/pkgdb --package-db=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/pkgdb --libdir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/lib --bindir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/bin --datadir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/share --libexecdir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/libexec --sysconfdir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/etc --docdir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/doc/HDBC-sqlite3-2.3.3.1 --htmldir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/doc/HDBC-sqlite3-2.3.3.1 --haddockdir=/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux/lts-5.4/7.10.3/doc/HDBC-sqlite3-2.3.3.1 --dependency=HDBC=HDBC-2.4.0.1-9022dccb33fa7027f85b22fa779bd1cb --dependency=base=base-4.8.2.0-0d6d1084fbc041e1cded9228e80e264d --dependency=bytestring=bytestring-0.10.6.0-c60f4c543b22c7f7293a06ae48820437 --dependency=mtl=mtl-2.2.1-3af90341e75ee52dfc4e3143b4e5d219 --dependency=utf8-string=utf8-string-1.0.1.1-df4bc704a473da34292b0ea0e21e5412 --enable-tests --enable-benchmarks
+    Process exited with code: ExitFailure 1</code></pre>
+<p><code>sqlite3</code>という外部ライブラリが見つからないというメッセージが出力されています。 まだ<code>Nix</code>との統合が設定されていないためです。</p>
+<h4 id="stack-と-nix-の統合">stack と Nix の統合</h4>
+<p><code>stack.yaml</code>に下記のような設定を追記することで<code>stack</code>は依存性の解決に<code>Nix</code>も使うようになります。</p>
+<pre><code>nix:
+  enable: true
+  packages: [ sqlite ]</code></pre>
+<p><code>packages: [ sqlite ]</code>の部分はこのプロジェクトが依存する外部ライブラリの名前を <em>スペース区切り</em> で列挙します。</p>
+<p><em>注意点</em></p>
+<p>cabalファイルでは<code>sqlite3</code>という名前のライブラリを参照するように宣言していますが、 これをそのまま<code>stack.yaml</code>に記載すると <em>パッケージ名が発見できずエラー</em> となってしまいます。</p>
+<p><code>Nix</code>のパッケージリポジトリ上は<code>sqlite</code>と定義されているためです。 <code>stack.yaml</code>に記述するパッケージ名は<code>Nix</code>パッケージシステム上で有効な<code>sqlite</code>という名前で指定する必要があります。</p>
+<pre><code>$ stack build
+〜略〜
+Preprocessing library HDBC-sqlite3-2.3.3.1...
+[1 of 7] Compiling Database.HDBC.Sqlite3.Types ( Database/HDBC/Sqlite3/Types.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Types.o )
+[2 of 7] Compiling Database.HDBC.Sqlite3.Utils ( .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Utils.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Utils.o )
+[3 of 7] Compiling Database.HDBC.Sqlite3.Statement ( .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Statement.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Statement.o )
+[4 of 7] Compiling Database.HDBC.Sqlite3.ConnectionImpl ( Database/HDBC/Sqlite3/ConnectionImpl.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/ConnectionImpl.o )
+[5 of 7] Compiling Database.HDBC.Sqlite3.Connection ( Database/HDBC/Sqlite3/Connection.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Connection.o )
+[6 of 7] Compiling Database.HDBC.Sqlite3.Consts ( .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Consts.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3/Consts.o )
+[7 of 7] Compiling Database.HDBC.Sqlite3 ( Database/HDBC/Sqlite3.hs, .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/Database/HDBC/Sqlite3.o )
+In-place registering HDBC-sqlite3-2.3.3.1...
+HDBC-sqlite3-2.3.3.1: copy/register
+Installing library in
+/home/vagrant/hdbc-sqlite3/.stack-work/install/x86_64-linux-nix/lts-5.4/7.10.3/lib/x86_64-linux-ghc-7.10.3/HDBC-sqlite3-2.3.3.1-J7BRkfYWClZD8ttodrMiVd
+Registering HDBC-sqlite3-2.3.3.1...
+Completed 8 action(s).</code></pre>
+<p>無事コンパイルできました。</p>
+<p>この過程で<code>sqlite3</code>をインストールしながらビルドされますが、 グローバルにはインストールされません。 このプロジェクトのビルド時にスコープを絞ってロードされます。</p>
+<p>試しに<code>Nix</code>でシステムグローバルにインストールされたパッケージを一覧化します。</p>
+<pre><code>$ nix-env -q
+cabal-install-1.22.9.0
+ghc-7.10.3
+nix-1.11.2
+stack-1.0.2</code></pre>
+<p>明示的にコマンドでインストールしたもののみ列挙されています。 <code>sqlite</code>はあくまでもこのプロジェクト用にインストールされているのが解りました。</p>
+<h4 id="有効なパッケージ名の検索">有効なパッケージ名の検索</h4>
+<p><code>Nix</code>のリポジトリ上でどんなパッケージが有効なのか探すための方法は、 「リポジトリをひたすら検索すること」です。</p>
+<p>自分で書いていて「なんかここは微妙だな」と思えてきました……。</p>
+<p><a href="https://nixos.org/wiki/Howto_find_a_package_in_NixOS#Simple_package_query">公式ページ</a>では<code>.bashrc</code>などに下記の関数を書いて、 パッケージ検索を少し楽にするといいよと言っていました。</p>
+<pre><code>nix? () {
+  nix-env -qa \* -P | fgrep -i &quot;$1&quot;
+}</code></pre>
+<p>このコマンドでは<code>Nix</code>のパッケージをリストアップして特定の文字列で絞り込んでいます。 早速<code>nix?</code>コマンドを使ってみましょう。</p>
+<p>試しに<code>gcc</code>で検索すると…… (結構時間かかります)</p>
+<pre><code>$ nix? gcc
+nixpkgs.avrgcclibc                                                      avr-gcc-libc
+nixpkgs.distccMasquerade                                                distcc-masq-gcc-4.9.3
+nixpkgs.gcc-arm-embedded-4_7                                            gcc-arm-embedded-4.7-2013q3-20130916
+nixpkgs.gcc-arm-embedded-4_8                                            gcc-arm-embedded-4.8-2014q1-20140314
+nixpkgs.gcc-arm-embedded                                                gcc-arm-embedded-4.9-2015q1-20150306
+nixpkgs.gcc_debug                                                       gcc-debug-wrapper-4.9.3
+nixpkgs.gcc44                                                           gcc-wrapper-4.4.7
+nixpkgs.gcc45                                                           gcc-wrapper-4.5.4
+nixpkgs.gcc46                                                           gcc-wrapper-4.6.4
+nixpkgs.gcc48                                                           gcc-wrapper-4.8.5
+nixpkgs.gcc49                                                           gcc-wrapper-4.9.3
+nixpkgs.gcc                                                             gcc-wrapper-4.9.3
+nixpkgs.gcc_multi                                                       gcc-wrapper-4.9.3
+nixpkgs.gcc5                                                            gcc-wrapper-5.3.0
+nixpkgs.gccgo48                                                         gccgo-wrapper-4.8.5
+nixpkgs.gccgo                                                           gccgo49-wrapper-4.9.3
+nixpkgs.xorg.gccmakedep                                                 gccmakedep-1.0.3</code></pre>
+<p>左の列は<code>Nix</code>リポジトリの名前空間上のパッケージ識別子です。 右の列はパッケージの名前です。</p>
+<p>こうしてパッケージを名前で検索できます。 でもなんかコレジャナイ……。</p>
+<p>パッケージの説明はこんな感じで表示できます。</p>
+<pre><code>$ nix-env -qa --description gcc-wrapper-5.3.0
+gcc-wrapper-5.3.0  GNU Compiler Collection, version 5.3.0 (wrapper script)</code></pre>
+<p><code>Nix</code>のコマンドがよく解らないという方は下記のチートシートが参考になるかもしれません。</p>
+<p><a href="https://nixos.org/wiki/Cheatsheet">Nix Cheatsheet</a></p>
+<h2 id="まとめ">まとめ</h2>
+<p><code>stack</code>を使って外部ライブラリに依存するプロジェクトをビルドする場合は、 <code>Nix</code>と統合することでシステム全体にインストールされたパッケージを破壊するリスクをなくすことができます。</p>
+<p><code>stack</code>と<code>Nix</code>の統合はとても簡単ですが、 <code>Nix</code>上での適切なパッケージ名を知らないと正しく依存関係を解決できません。</p>
+<p><em>参考記事</em></p>
+<p><a href="http://www.tweag.io/blog/stack-nix-portable-reproducible-builds">Stack + Nix = portable reproducible builds</a></p>
+
+            </div>
+        </div>
+        <div id="footer">
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+        <script src="../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+    </body>
+</html>
