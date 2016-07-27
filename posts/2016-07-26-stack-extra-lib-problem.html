@@ -85,9 +85,12 @@ AND
 <ol style="list-style-type: decimal">
 <li>いったんsqlite依存を切り離し別のバックエンドを考える(JSONとか？)</li>
 <li>別のバックエンドから後でsqlite3に戻れるだけの抽象化の壁を作っておく</li>
+<li>バックエンドをCDBにするとか？<a href="https://hackage.haskell.org/package/pure-cdb">pure-cdb</a></li>
 </ol>
 <p>うーん、またこれで進まなくはなるけど、実装とインタフェースの分離は haskell書いててもいろいろ設計上の課題を自分なりに抱えているのでいい練習になるかな。</p>
 <p>急がば廻れ。</p>
+<p><strong>追記</strong></p>
+<p>ちょっと考えたけどやっぱりやりたいことを実現するにはsqliteがほしいので、 <code>stack build</code>だけは少なくとも通るように<code>sqlite + Template Haskell</code>の条件を回避することとする。 まずはHDBCで生のSQLを書いて対応する。</p>
 
             </div>
         </div>
