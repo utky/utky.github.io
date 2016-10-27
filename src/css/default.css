@@ -1,34 +1,10 @@
 body {
-    color: #1c1c1c;
+    /* color: #1c1c1c; */
     font-size: 16px;
     margin: 0px auto 0px auto;
-    max-width: 800px;
+    max-width: 1200px;
     font-family: "游ゴシック",YuGothic,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    background-color: #ededed;
-}
-
-/* defualt */
-a {
-  color: #09368d;
-}
-
-/* thick */
-h1, h2, h3, h4, h5 {
-  color: #06296e;
-}
-
-/* light */
-a:hover {
-  color: #285dc6;
-}
-
-/* highlight */
-a:active {
-  color: #4d77cb;
-}
-
-.body a:visited {
-  color: purple;
+    /* background-color: #ededed; */
 }
 
 h1 {
@@ -55,13 +31,8 @@ h5 {
   font-style: bold;
 }
 
-.info {
-  color: #4d77cb;
-}
-
 .title {
   font-size: 2em;
-  color: #09368d;
 }
 
 .body h1 {
