@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - Learning Functional Programming (04)</title>
+        <title>Hash λ Bye - [WIP]ElmのHttp処理部をスタブする</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
@@ -34,37 +34,24 @@
         </nav>
 
         <div id="content" class="container">
-            <h1 class="title">Learning Functional Programming (04)</h1>
+            <h1 class="title">[WIP]ElmのHttp処理部をスタブする</h1>
 
             <div class="body">
             <div class="info">
-    Posted on September 16, 2014
+    Posted on October 17, 2016
     
 </div>
 
-<h2 id="haskell-hdbcでcreate-tableをバッチ処理">Haskell HDBCでCREATE TABLEをバッチ処理</h2>
-<p>こう、コマンドラインから</p>
-<pre><code>unko init</code></pre>
-<p>みたいなので</p>
-<ol style="list-style-type: decimal">
-<li>cabal-packageのdata-fileからスキーマ定義を書いたsqlを読み込み</li>
-<li>規約に従って<code>~/.unko/data</code>にsqlite3のスキーマを作成</li>
-</ol>
-<p>ってやりたかったんです。</p>
-<p>hspecにてin-memoryに上記のSQLを流し込んだら。</p>
-<pre><code>uncaught exception: SqlError (SqlError {seState = &quot;&quot;, seNativeError = 5, seErrorMsg = &quot;disconnect: unable to close due to unfinalised statements&quot;})
-
-Randomized with seed 1361151463
-
-Finished in 0.0150 seconds
-3 examples, 1 failure
-!!!make: *** [test] Error 1!!!</code></pre>
-<p>なんか見たこと無いエラーでました。</p>
-<p>調べてもResultSetの開放漏れじゃね？とか全然関係ないのばかりでした。</p>
-<h2 id="デバッグ">デバッグ</h2>
-<p>とりあえずputStrLnで実行したSQLを印字したけど、別に変なところなし。</p>
-<h2 id="結果">結果</h2>
-<p>CREATE TABLEの構文エラーでした。 いや、自分が悪いんですけど、なんかこう、もっと伝え方ってあるでしょう的な。</p>
+<h2 id="問題">問題</h2>
+<p>Elmでアプリケーション書いていると当然リモートのHTTP APIへリクエストを飛ばす部分がでてくる。 けれどチュートリアルの章を読むと<code>Http</code>パッケージへhard wireしてある。このポリシーに従ってそのまま実装していくと、 <code>elm-reactor</code>で動かした際に、APIのエンドポイントに本当にリクエストを飛ばしてしまう。</p>
+<p>APIの実装がまだない場合や、テストでダミーのJSONを渡したい場合はこれだと困る。</p>
+<h2 id="解法">解法</h2>
+<p>なにか大仰なモックライブラリが必要か、とか悩んでしまったけど、 簡単な話だった。</p>
+<p><strong>高階関数</strong>を使えばいいんだ。</p>
+<h3 id="制御フローのおさらい">制御フローのおさらい</h3>
+<p>簡単のため最初の画面ロード時に<code>hello</code>という文字列を外部から取り出して印字するケースを考える。</p>
+<h2 id="雑感">雑感</h2>
+<p>論旨とずれるけれど、Elmは少ないbuilding blocksと関数型プログラミングだけで本当にだいたいのことができてしまう。 MonadやFunctorなどの概念は一切出てこない（これは<a href="https://groups.google.com/forum/m/#!topic/elm-discuss/1acyOfxvasA">evancのポリシー</a>だと思う)</p>
 
             </div>
         </div>
