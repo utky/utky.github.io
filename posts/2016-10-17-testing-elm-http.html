@@ -42,24 +42,29 @@
     
 </div>
 
+<p><a href="http://qiita.com/advent-calendar/2016/elm">Elm Advent Calendar 2016</a> 2日目の記事です。</p>
 <h2 id="問題">問題</h2>
-<p>Elmでアプリケーション書いていると当然リモートのHTTP APIへリクエストを飛ばす部分がでてくる。 けれどチュートリアルの章を読むと<code>Http</code>パッケージへhard wireしてある。このポリシーに従ってそのまま実装していくと、 <code>elm-reactor</code>で動かした際に、APIのエンドポイントに本当にリクエストを飛ばしてしまう。</p>
-<p>APIの実装がまだない場合や、テストでダミーのJSONを渡したい場合はこれだと困る。</p>
+<p>Elmでアプリケーション書いているとリモートのWeb APIへリクエストを飛ばす部分がでてくる。 けれど<a href="https://www.elm-tutorial.org/en/06-fetching-resources/04-players-cmds.html">チュートリアルの章</a>を読むと<code>Http</code>パッケージの関数を直接埋め込んで埋め込んである。この流儀に従ってそのまま実装していくと、<code>elm-reactor</code>で動かした際に、<strong>Web APIのエンドポイントに本当にリクエストを飛ばしてしまう</strong>。</p>
+<p>Web APIの実装がまだない場合や、テストでダミーのJSONを渡したい場合はこれだと困る。</p>
+<p>できればテスト用に動かす時は<code>Http</code>処理部分のスタブがほしい。</p>
 <h2 id="解法">解法</h2>
 <p>なにか大仰なモックライブラリが必要か、とか悩んでしまったけど、簡単な話だった。</p>
-<p>HTTPリクエスト処理部の関数だけ抜き出して、後から渡せるようにすればいい。つまり <strong>高階関数</strong> で解決する。 <code>Http</code>ライブラリを呼び出す関数またはダミー用データを返す関数、いずれかを後から注入する感じ。</p>
-<ol style="list-style-type: decimal">
-<li>HTTPリクエストを表すメッセージ用update</li>
-<li>その他のイベントを表すメッセージ用update</li>
-</ol>
-<p>update関数を二つに分割する。というか、HTTPリクエスト処理部だけを別関数に分割する。</p>
+<p>HTTPリクエスト処理部の関数だけ抜き出して、呼び出し元から渡せるようにすればいい。つまり <strong>高階関数</strong> で解決する。 <code>Http</code>ライブラリを呼び出す関数またはダミー用データを返す関数、いずれかを後から注入する感じ。</p>
 <h2 id="サンプルケース">サンプルケース</h2>
-<p>たとえば外部のAPIエンドポイントと通信して“Hello”という文字列を取り出してくることを考える。</p>
-<h3 id="モデル">モデル</h3>
+<p>たとえばWeb APIエンドポイントと通信して<code>&quot;Hello&quot;</code>という文字列を取り出してくるようなサンプルを考える。</p>
+<p>サンプルは下記の環境で書いている。</p>
+<div class="sourceCode"><pre class="sourceCode json"><code class="sourceCode json">    <span class="er">&quot;dependencies&quot;:</span> <span class="fu">{</span>
+        <span class="dt">&quot;elm-lang/core&quot;</span><span class="fu">:</span> <span class="st">&quot;4.0.0 &lt;= v &lt; 5.0.0&quot;</span><span class="fu">,</span>
+        <span class="dt">&quot;elm-lang/html&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0 &lt;= v &lt; 2.0.0&quot;</span><span class="fu">,</span>
+        <span class="dt">&quot;evancz/elm-http&quot;</span><span class="fu">:</span> <span class="st">&quot;3.0.1 &lt;= v &lt; 4.0.0&quot;</span>
+    <span class="fu">}</span><span class="er">,</span>
+    <span class="er">&quot;elm-version&quot;:</span> <span class="er">&quot;0.17.0</span> <span class="er">&lt;=</span> <span class="er">v</span> <span class="er">&lt;</span> <span class="er">0.18.0&quot;</span></code></pre></div>
+<p>では前提となるビューやモデルについて提示しておく。</p>
+<h3 id="モデル状態を表す">モデル(状態を表す)</h3>
 <p>外部から受け取った文字列を保存するだけのモデル。</p>
-<pre class="elm"><code>type alias AppState = { out : String }
-
-init : ( AppState, Cmd Msg )
+<pre class="elm"><code>type alias AppState = { out : String }</code></pre>
+<p>初期状態ではただ空の文字列を出力するだけとしておく。</p>
+<pre class="elm"><code>init : ( AppState, Cmd Msg )
 init = ( { out = &quot;&quot; }, Cmd.none )</code></pre>
 <h3 id="ビュー">ビュー</h3>
 <p><code>say hello</code>ボタンを押すと<code>FetchHello</code>というメッセージをトリガする。 モデルが保持する文字列をテキストとして書き出す。</p>
@@ -74,44 +79,162 @@ view model =
           [ text model.out ]
       ]</code></pre>
 <h3 id="メッセージ">メッセージ</h3>
+<p>このあたりから本題。</p>
 <pre class="elm"><code>type Msg
   = FetchHello
-  | GotHello String
-  | FailHello Http.Error</code></pre>
+  | HalloDone String
+  | HelloFail Http.Error</code></pre>
 <ul>
-<li><code>FetchHello</code>: リモートAPIに“Hello”という文字列を送ってもらう要求。<strong>これの応答をスタブしたい</strong></li>
-<li><code>GotHello</code>: 正常に文字列を受信した場合の応答。</li>
-<li><code>FailHello</code>: 文字列を受信に失敗した場合の応答。</li>
+<li><code>FetchHello</code>: Web APIに“Hello”という文字列を送ってもらう要求。<strong>これの応答をスタブしたい</strong>。</li>
+<li><code>HalloDone</code>: 文字列を <strong>正常に</strong> 受信した場合の応答。</li>
+<li><code>HelloFail</code>: 文字列を受信に <strong>失敗した</strong> 場合の応答。</li>
 </ul>
-<h2 id="メッセージのハンドラ-update関数">メッセージのハンドラ: update関数</h2>
+<h3 id="メッセージのハンドラ-update関数">メッセージのハンドラ: update関数</h3>
 <pre class="elm"><code>update : Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
 update msg model =
   case msg of
-    FetchHello -&gt; -- 普通だったらここで Http.get とかやるけど。。。。
-    GotHello s -&gt; { model | out = s } ! []
-    FailHello e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
-<p>ようやく改善したいポイントに到着。 ここにHTTPリクエストの発行を埋め込んでしまうと、呼び出し先のHTTP APIがどこかで起動している必要がある。 開発中は<code>elm-reactor</code>で気軽に動作確認したいのに、外部API呼び出しが走るのは避けたい。</p>
-<p>そこだけ外から制御できるようにしよう。</p>
+    -- FIXME: 普通だったらここで Http.get とかやるけど。。。。
+    FetchHello -&gt; Http.get string &quot;http://hogefuga/hello&quot; |&gt; Task.perform HelloFail HalloDone
+
+    -- ここ以降はWeb APIからのデータ受信後の動作なのであまり重要ではない
+    HalloDone s -&gt; { model | out = s } ! []
+    HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<p><strong>ようやく改善したいポイントに到着。</strong></p>
+<p><code>FetchHello</code>のパターンマッチに注目。 チュートリアルだとここで<code>Http</code>モジュールの関数を呼び出して、 Web APIの呼び出しをおこなう<code>Task</code>が発生する。</p>
+<p>しかしここにHTTPリクエストの発行を埋め込んでしまうと、メッセージを受信した瞬間にWeb APIの呼び出しが走る。 そのため呼び出し先のHTTP APIがどこかで起動している必要がある。<em>これが困る。</em> 開発中は<code>elm-reactor</code>で気軽に動作確認したいのに、外部API呼び出しが走るのは避けたい。</p>
+<p>そこだけ呼び出し元から制御できるようにしよう。</p>
 <pre class="elm"><code>update : Cmd Msg -&gt; Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
-update cmd msg model =
+update helloRequest msg model =
   case msg of
-    FetchHello -&gt; (model, cmd)
-    GotHello s -&gt; { model | out = s } ! []
-    FailHello e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+    FetchHello -&gt; (model, helloRequest)
+    HalloDone s -&gt; { model | out = s } ! []
+    HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<p>updateの第一引数が<code>FetchHello</code>メッセージを受信した時のアクションになる。 そこだけ呼び出し元から受け取れるようにしておく。</p>
 <p>テスト用と実際のAPI呼び出し用の関数を用意する。</p>
 <pre class="elm"><code>-- | 実際に外部APIを呼び出してリモートからデータを受け取る
 fetchHello : Cmd Msg
 fetchHello =
-  Http.get &quot;http://some.endpoint/hello&quot; string
-    |&gt; Task.perform FailHello GotHello
+  Http.get &quot;http://hogefuga/hello&quot; string
+    |&gt; Task.perform HelloFail HalloDone
 
 -- | ダミーのデータを返す
 dummyHello : Cmd Msg
 dummyHello =
   Http.succeed &quot;Hello&quot;
-    |&gt; Task.perform FailHello GotHello</code></pre>
-<h2 id="雑感">雑感</h2>
-<p>論旨とずれるけれど、Elmは少ないbuilding blocksと関数型プログラミングだけで本当にだいたいのことができてしまう。 MonadやFunctorなどの概念は一切出てこない（これは<a href="https://groups.google.com/forum/m/#!topic/elm-discuss/1acyOfxvasA">evancのポリシー</a>だと思う)</p>
+    |&gt; Task.perform HelloFail HalloDone</code></pre>
+<p>Productionで動かす時は</p>
+<pre><code>update fetchHello : Msg -&gt; AppState -&gt; (AppState, Cmd Msg)</code></pre>
+<p>開発環境で動かす時は</p>
+<pre><code>update dummyHello : Msg -&gt; AppState -&gt; (AppState, Cmd Msg)</code></pre>
+<p>のように渡しわけることになる。</p>
+<h2 id="さらなる改善">さらなる改善</h2>
+<h3 id="複数のhttpリクエストに対応するための準備">複数のHTTPリクエストに対応するための準備</h3>
+<p>今までのコードだと<code>FetchHello</code>しかスタブ処理に対応できない。 きっと他にもHTTPリクエストは発生するだろうからこれに対処する。</p>
+<p>なのでちょっとデータ型に調整を入れる。</p>
+<pre class="elm"><code>type Msg
+  = FetchHello
+  | HalloDone String
+  | HelloFail Http.Error</code></pre>
+<p>これを</p>
+<pre class="elm"><code>type Msg
+  = Req Request
+  | Res Response
+
+type Request
+  = FetchHello
+
+type Response
+  = HelloDone String
+  | HelloFail Http.Error</code></pre>
+<p>こうする。</p>
+<ul>
+<li><code>Msg</code>: アプリケーション全体で発生しうるメッセージを表す</li>
+<li><code>Request</code>: HTTPリクエストを発行せよ、という命令を表す</li>
+<li><code>Response</code>: HTTPレスポンスで受け取ったデータを保持するコンテナを表す</li>
+</ul>
+<p>要求を表すメッセージと応答を表すメッセージを<em>データ型として</em>分離している。 これにより今回スタブしたい部分の型をより正確に表現できるようになる。</p>
+<pre class="elm"><code>Request -&gt; Cmd Response</code></pre>
+<p>なんらかのHTTPリクエストを発行する要求を受け取って、HTTPレスポンスを返すような関数だ。</p>
+<p><code>FetchHello</code>以外のメッセージが増えた場合にはこんな風に書けるだろう。</p>
+<pre class="elm"><code>dispatch : Request -&gt; Cmd Response
+dispatch req =
+  case req of
+    FetchHello -&gt; ...
+    FetchHola -&gt; ...
+    FetchHallo -&gt; ...</code></pre>
+<p>上手く複数パターンのHTTPリクエストに対応できそうだ。</p>
+<h3 id="updateの対応">updateの対応</h3>
+<p>これに合わせて<code>update</code>関数はこのように書き直される。</p>
+<pre class="elm"><code>update : (Request -&gt; Cmd Response) -&gt; Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
+update disp msg model =
+  case msg of
+
+    Req request -&gt;
+      (model, (disp request |&gt; Cmd.map Res))
+
+    Res response -&gt;
+      case response of
+        HelloDone s -&gt; { model | out = s } ! []
+        HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<p>大事なポイントを抜粋してみる。</p>
+<pre class="elm"><code>    Req request -&gt;
+      (model, (disp request |&gt; Cmd.map Res))</code></pre>
+<p>何かしらのHTTPリクエストを発行した場合には、この分岐に入る。</p>
+<p>ちょっと型が見えにくいので整理しておこう。</p>
+<pre class="elm"><code>request : Request
+disp : Request -&gt; Cmd Response</code></pre>
+<p><code>request</code>の値は<code>FetchHello</code>かもしれないし<code>FetchHola</code>かもしれない。 いずれにしても<code>disp</code>に<code>request</code>に適用することでHTTPレスポンスを得ることができる。</p>
+<pre class="elm"><code>disp request : Cmd Response</code></pre>
+<p>これだけで終わりではなくて、<code>Cmd.map</code>という関数も使っている。</p>
+<pre class="elm"><code>Cmd.map Res : Cmd Response -&gt; Cmd Msg</code></pre>
+<p><code>Cmd.map Res</code>の型は<code>Cmd Response -&gt; Cmd Msg</code>を返すのでこれで<code>update</code>関数の型に合わせることができる。 これらを組み合わせて適用すると下記のような型になるはずだ。</p>
+<pre class="elm"><code>disp request |&gt; Cmd.map Res : Cmd Msg</code></pre>
+<p>これで<code>update</code>関数の返り値の型に整合したのでコンパイルエラーはなくなる。</p>
+<h3 id="ダミーデータを返す">ダミーデータを返す</h3>
+<p>開発用ではダミーデータを返す必要がある。 これは<code>Task</code>モジュールの関数<code>succeed</code>を活用することで実現できる。</p>
+<pre class="elm"><code>dispatch : Request -&gt; Cmd Response
+dispatch req =
+  case req of
+    FetchHello -&gt; 
+      Task.succeed &quot;Hello&quot;
+        |&gt; Task.perform HelloFail HelloDone</code></pre>
+<p>これで<code>update</code>に渡す関数<code>dispatch</code>が出来上がった。</p>
+<p>本当にHTTPリクエストを発行したい場合は、 同じ型だけど実際に<code>Http</code>モジュールの関数を使ってHTTP通信を行うような新しい関数を用意してあげればいい。</p>
+<h3 id="関数を組み合わせてappを作る">関数を組み合わせてAppを作る</h3>
+<p><code>update</code>と<code>dispatch</code>関数を組み合わせるのは、<code>Program</code>を作る段階で行う。</p>
+<pre class="elm"><code>
+main : Program Never
+main =
+  Html.App.program
+    { init = init
+    , view = view
+    , update = update dispatch
+    , subscriptions = subscriptions
+    }</code></pre>
+<p>今回は<code>Main.elm</code>という1ファイルに全て詰め込んだけれど、 開発用と商用で分けるなら<code>main</code>関数定義だけそれぞれのファイルに書いてやる。</p>
+<ul>
+<li><code>Main.elm</code></li>
+<li><code>Test.elm</code></li>
+</ul>
+<p>それぞれ<code>dispatch</code>関数を開発用と商用で呼び分けるようにしておくといい。</p>
+<h2 id="振り返り">振り返り</h2>
+<p>とりあえずこれで開発用にHTTP通信部をスタブしたり、本当にWeb APIを呼ぶように切り替えたりできるようになった。</p>
+<p>実際に自分がElmのコードを書く時はこんな風にしてスタブを作りながら<code>elm-reactor</code>で表示を確認している。</p>
+<p>こんなこと書いておいて何だけど「いや実はもっとまともなモック用のライブラリがあってね。。。」という情報あったら是非教えてほしい。</p>
+<h3 id="この方法のメリット">この方法のメリット</h3>
+<ul>
+<li>HTTP通信部をスタブ処理で置き換えることができる</li>
+</ul>
+<h3 id="この方法のデメリット">この方法のデメリット</h3>
+<ul>
+<li>直接HTTP通信部を埋め込むよりも1サイクルだけupdate関数の呼び出しが増えるのでもしかしたらパフォーマンスに影響があるかも</li>
+</ul>
+<p>コード全体は<a href="https://gist.github.com/utky/e96db0d4b8845c4bc877b5a3f6b3a2ae">Gist</a>にあげました。</p>
+<h2 id="雑感-読み飛ばしていい">雑感 (読み飛ばしていい)</h2>
+<p>「なんだやってることは当たり前で普通じゃないか」と思うかもしれない。</p>
+<p>普通に高階関数を使っているだけだ。 <strong>でもそれでいい。それがいい</strong>。</p>
+<p>複雑な概念の導入や技法もなく関数を組み合わせるだけで要求を満たせてしまう。 そういう関数型プログラミングの良さを実感できたのが今回の収穫だった。</p>
+<p>もちろんElm Architectureがとても良くできていたおかげでもあるんだけど。</p>
 
             </div>
         </div>
