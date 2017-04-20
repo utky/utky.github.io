@@ -36,4 +36,4 @@ extra-package-dbs: []
 
 nix:
   enable: true
-  packages: [zlib]
+  packages: [gcc, zlib]

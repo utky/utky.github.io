@@ -6,16 +6,16 @@ clean:
 	rm ../*.html && rm -rf ../css ../images ../posts && ./site clean
 
 site: site.hs
-	stack ghc -- --make site.hs
+	stack build
 
 build: site
-	./site build
+	stack exec site build
 
 run: build
-	./site watch
+	stack exec site watch
 
 deploy: site
-	./site deploy
+	stack exec site deploy
 
 latex:
 	sudo docker run --rm -v `pwd`/latex:/latex thii/platex build profile.tex
