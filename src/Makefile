@@ -7,15 +7,16 @@ clean:
 
 site: site.hs
 	stack build
+	cp -p .stack-work/dist/x86_64-linux-nix/Cabal-1.22.5.0/build/site/site .
 
 build: site
-	stack exec site build
+	./site build
 
 run: build
-	stack exec site watch
+	./site watch -p 8080
 
 deploy: site
-	stack exec site deploy
+	./site deploy
 
 latex:
 	sudo docker run --rm -v `pwd`/latex:/latex thii/platex build profile.tex
