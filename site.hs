@@ -49,6 +49,7 @@ main = do
         compile $ do
             linuxCtx <- tocCtx "writings/linux/*"
             pandocCompiler
+              >>= loadAndApplyTemplate "templates/post.html"    linuxCtx
               >>= loadAndApplyTemplate "templates/toc.html"     linuxCtx
               >>= loadAndApplyTemplate "templates/default.html" linuxCtx
               >>= relativizeUrls
@@ -58,6 +59,7 @@ main = do
         compile $ do
             writingsCtx <- tocCtx "writings/*"
             pandocCompiler
+              >>= loadAndApplyTemplate "templates/post.html"    writingsCtx
               >>= loadAndApplyTemplate "templates/toc.html"     writingsCtx
               >>= loadAndApplyTemplate "templates/default.html" writingsCtx
               >>= relativizeUrls
