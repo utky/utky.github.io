@@ -1,1 +1,31 @@
-pre{width:500px;white-space:pre-wrap;white-space:-moz-pre-wrap !important;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word}.info{font-style:italic}h2{border-bottom:solid medium}h2{font-weight:bold}article p, article > ul{font-size:0.9em;color:#333333}pre code{white-space:pre-wrap}
+pre {
+	width: 500px;                          /* specify width  */
+	white-space: pre-wrap;                 /* CSS3 browsers  */
+	white-space: -moz-pre-wrap !important; /* 1999+ Mozilla  */
+	white-space: -pre-wrap;                /* Opera 4 thru 6 */
+	white-space: -o-pre-wrap;              /* Opera 7 and up */
+	word-wrap: break-word;                 /* IE 5.5+ and up */
+	/* overflow-x: auto; */                /* Firefox 2 only */
+	/* width: 99%; */		       /* only if needed */
+}
+
+.info {
+  font-style: italic;
+}
+
+h2 {
+  border-bottom: solid medium;
+}
+
+h2 {
+  font-weight: bold;
+}
+
+article p, article > ul {
+  font-size: 0.9em;
+  color: #333333;
+}
+
+pre code {
+  white-space: pre-wrap;
+}
