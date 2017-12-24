@@ -3,13 +3,12 @@
 import           Data.Monoid (mappend)
 import           Hakyll
 import qualified GHC.IO.Encoding as E
-
+import           Data.List (sortBy)
+import           Data.Ord (comparing)
 
 --------------------------------------------------------------------------------
 main :: IO ()
 main = do
-  --hSetEncoding stdin utf8
-  --hSetEncoding stdout utf8
   E.setLocaleEncoding E.utf8
   hakyllWith config $ do
     match "resources/*" $ do
@@ -32,55 +31,50 @@ main = do
         route   idRoute
         compile compressCssCompiler
 
-    match (fromList ["index.md", "about.md", "contact.md"]) $ do
+    match (fromList ["about.md", "contact.md"]) $ do
         route   $ setExtension "html"
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/default.html" defaultContext
             >>= relativizeUrls
 
---    match "posts/*" $ do
---        route $ setExtension "html"
---        compile $ pandocCompiler
---            >>= loadAndApplyTemplate "templates/post.html"    postCtx
---            >>= loadAndApplyTemplate "templates/default.html" postCtx
---            >>= relativizeUrls
---
---    -- 振り返りとかのレポート
---    match "reports/*" $ do
---        route $ setExtension "html"
---        compile $ pandocCompiler
---            >>= loadAndApplyTemplate "templates/post.html"    postCtx
---            >>= loadAndApplyTemplate "templates/default.html" postCtx
---            >>= relativizeUrls
---
---    create ["archive.html"] $ do
---        route idRoute
---        compile $ do
---            posts <- recentFirst =<< loadAll "posts/*"
---            let archiveCtx =
---                    listField "posts" postCtx (return posts) `mappend`
---                    constField "title" "Archives"            `mappend`
---                    defaultContext
---
---            makeItem ""
---                >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
---                >>= loadAndApplyTemplate "templates/default.html" archiveCtx
---                >>= relativizeUrls
+    match "writings/linux/*" $ do
+        route $ setExtension "html"
+        compile $ pandocCompiler
+            >>= loadAndApplyTemplate "templates/post.html"    postCtx
+            >>= loadAndApplyTemplate "templates/default.html" postCtx
+            >>= relativizeUrls
 
+    match "writings/linux.md" $ do
+        route $ setExtension "html"
+        compile $ do
+            linuxCtx <- tocCtx "writings/linux/*"
+            pandocCompiler
+              >>= loadAndApplyTemplate "templates/toc.html"     linuxCtx
+              >>= loadAndApplyTemplate "templates/default.html" linuxCtx
+              >>= relativizeUrls
 
---    match "index.html" $ do
---        route   $ setExtension "html"
---        compile $ do
---            posts <- recentFirst =<< loadAll "posts/*"
---            let indexCtx =
---                    listField "posts" postCtx (return posts) `mappend`
---                    constField "title" "Home"                `mappend`
---                    defaultContext
---
---            getResourceBody
---                >>= applyAsTemplate indexCtx
---                >>= loadAndApplyTemplate "templates/default.html" indexCtx
---                >>= relativizeUrls
+    match "writings.md" $ do
+        route $ setExtension "html"
+        compile $ do
+            writingsCtx <- tocCtx "writings/*"
+            pandocCompiler
+              >>= loadAndApplyTemplate "templates/toc.html"     writingsCtx
+              >>= loadAndApplyTemplate "templates/default.html" writingsCtx
+              >>= relativizeUrls
+
+    create ["index.html"] $ do
+        route   idRoute
+        compile $ do
+            posts <- recentFirst =<< loadAll "writings/**"
+            let indexCtx =
+                    listField "posts" postCtx (return posts) `mappend`
+                    constField "title" "Contents"            `mappend`
+                    defaultContext
+
+            makeItem ""
+                >>= loadAndApplyTemplate "templates/index.html" indexCtx
+                >>= loadAndApplyTemplate "templates/default.html" indexCtx
+                >>= relativizeUrls
 
     match "templates/*" $ compile templateCompiler
 
@@ -91,9 +85,11 @@ postCtx =
     dateField "date" "%B %e, %Y" `mappend`
     defaultContext
 
+tocCtx :: Pattern -> Compiler (Context String)
+tocCtx p = do
+  is <- sortBy (comparing itemIdentifier) <$> loadAll p
+  return $ listField "contents" postCtx (return is) `mappend` defaultContext
 
 config :: Configuration
-config = defaultConfiguration { deployCommand = cmd }
-    where
-        cmd = "cp -r _site/* .. && ./site clean"
+config = defaultConfiguration
 

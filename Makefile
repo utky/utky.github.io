@@ -1,8 +1,11 @@
-.PHONY: all build clean latex run
+.PHONY: all build clean latex run build_hakyll
 
 all: build
+
+build_hakyll:
+	stack build
 	
-clean:
+clean: build_hakyll
 	stack exec site -- clean
 
 build: clean
