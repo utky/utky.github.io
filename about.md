@@ -6,7 +6,7 @@ title: About
 
 ネットワーク系の仕事をよくしています。
 
-職場探索中 ---- [職務経歴書](/resources/profile.pdf)
+職場探索中 - [職務経歴書](/resources/profile.pdf)
 
 ### やってきたことのサマリ
 
