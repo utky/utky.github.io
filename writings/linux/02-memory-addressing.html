@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - メモリアドレッシング</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html"><span class="glyphicon glyphicon-user"></span> About</a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html"><span class="glyphicon glyphicon-envelope"></span> Contact</a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html"><span class="glyphicon glyphicon-book"></span> Writings</a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/"><span class="glyphicon glyphicon-pencil"></span> Blog</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <article id="content">
+                  <header>
+                    <h1 class="title">メモリアドレッシング</h1>
+                  </header>
+                  <div class="body">
+                  <div class="info">
+  <small><i>Updated on December 24, 2017</i></small>
+</div>
+
+<p>アドレスというのはメモリの番地を指す。 その番地のメモリセルには電気的に記録されたデータが保存されているため、 番地を指定することでデータを読み書きできる。</p>
+<p>論理アドレス</p>
+<p>リニアアドレス</p>
+<p>物理アドレス</p>
+<p>それぞれの違いについて</p>
+<h3 id="segment">Segment</h3>
+<p>メモリの「セグメント」ってなに？</p>
+<p>セグメントとは</p>
+<p>コードセグメント データセグメント</p>
+<p>などの役割をもったメモリ領域のグループを指す。</p>
+<p>セグメントの先頭アドレスとそこからのオフセットによって、 位置を表現する。</p>
+<p>このセグメンテーション方式はプロセッサの要請からくるもので、 Linuxカーネルとして採用しているものではない。</p>
+<p>このセグメントの位置情報を含む論理アドレスが、 ページテーブルの位置情報であるリニアアドレス(仮想アドレス)に 変換され、ページ管理機構がそれを物理アドレスに変換する。</p>
+<p>Linuxカーネルから見ると3つのアドレスを変換しながら メモリが運用されている。</p>
+<p>Linuxカーネルではページング機構を有効的に使うために、 いくつかの決まったセグメントを使って管理している。</p>
+<p>ユーザ用・カーネル用それぞれ2つずつセグメントがあり、 それだけを使っている。 (たしかにどんな単位でセグメントを作るのか謎だったが、 少なくともLinuxでは大雑把な単位でセグメントを作っている、ということらしい)</p>
+<p>Linuxがページ機構を優先するのは、x86の仕様であるセグメンテーション方式に 大きく依存してしまうとRISC系プロセッサとの相性が悪くなるかららしい。 そのためアーキテクチャ依存しないページング機構の方を有効活用している。</p>
+<h3 id="paging">Paging</h3>
+<p>物理メモリをページフレームという区画に分割することから考える。</p>
+<p>とあるメモリ領域を参照する時にはカーネルから ページN番の先頭から数えてM番目を参照せよ という命令を発行することでメモリへとアクセスをする。</p>
+<p>よってメモリアクセスにはページ番号とオフセットが必ずセットになる。</p>
+<p>これは住所でいうと「Nどおりの入り口からM番目の家」 という覚え方をした方が楽だよね、という直感に対応している。</p>
+<p>ページフォルト リニアアドレスで指定されたアドレスを解決して物理メモリを見に行くも、 存在フラグが降りている場合に発生する例外。 プロセスに与えられたリニアアドレス以外のアドレス参照でも起こる。 いわゆるsegfaultだと思うのだが何がちがうのか。</p>
+<p>なるほどページフォルトの中にもいろいろあるらしい。 ページフォルトをトリガとして物理メモリ確保に動くのが大半。 無効アドレスならsegfault扱いになる。 good fault と bad faultがあるということのようだ。</p>
+<h3 id="tlb-cache">TLB Cache</h3>
+<p>リニアアドレスと物理アドレスの変換表をページテーブルというが、 このテーブル自体もメモリに確保されている。 メモリアクセスはCPUの近くにあるキャッシュと比べるととても遅い。 そのためTLBキャッシュという機構を用いて、アドレスの対応をキャッシュすることでアドレス変換を高速化する。</p>
+<p>(このあたりプロセッサを支える技術で勉強したのでいくらかイメージが湧く)</p>
+<p>高速化の基本は空間をコストとして払って時間を縮めるのだな。</p>
+<h3 id="paging-1">Paging</h3>
+<p>Linuxでは原則的に4段テーブルでアドレス管理する。</p>
+<ul>
+<li>global</li>
+<li>upper</li>
+<li>middle</li>
+<li>page table</li>
+</ul>
+<p>の4種類</p>
+<h3 id="todo">TODO</h3>
+<p>何故4段なのか？なにが嬉しいのか？ 初期化時のテーブルの作り方</p>
+
+                  </div>
+              </article>
+              <footer>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2017 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+        <!-- <script src='/js/highlight.pack.js'></script> -->
+        <!-- <script>hljs.initHighlightingOnLoad();</script> -->
+    </body>
+</html>
