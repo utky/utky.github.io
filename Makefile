@@ -1,4 +1,4 @@
-.PHONY: all build clean latex run build_hakyll
+.PHONY: all build clean latex run build_hakyll publish
 
 all: build
 
