@@ -14,10 +14,6 @@ build: clean
 run:
 	stack exec site -- watch
 
-latex:
-	sudo docker run --rm -v `pwd`/latex:/latex thii/platex build profile.tex
-	cp latex/*.pdf resources/
-
 publish:
 	# Temporarily store uncommited changes
 	git stash

@@ -12,7 +12,7 @@
 
 今まで主なネットワーク技術はMPLS, NETCONF, SNMP, BGPです。トラフィックエンジニアリングを活用したVPN構築なども行いました。
 
-職場探索中 - [職務経歴書](/resources/profile.pdf)
+職場探索中 - [職務経歴書](/profile.html)
 
 ### Programming
 
@@ -46,7 +46,7 @@
 2. Zabbixを用いた網内サービス・設備監視インフラの構築
 3. NETCONFを用いたMPLS網の動的制御Web APIの構築
 4. DockerやJenkinsなどを用いてオンプレミスでのCI環境構築
-5. Pythonを使った周辺ツールの開発
+5. Python, Goを使った周辺ツールの開発
 
 SDN技術を用いたサービス構築が多いです。
 
