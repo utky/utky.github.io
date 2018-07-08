@@ -19,8 +19,6 @@ latex:
 	cp latex/*.pdf resources/
 
 publish:
-	# Delete master
-	git branch -D master
 	# Temporarily store uncommited changes
 	git stash
 	
