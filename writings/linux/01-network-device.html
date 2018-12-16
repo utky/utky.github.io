@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - 書物</title>
+        <title>Hash λ Bye - Network Device</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="./css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="./">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="./images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="./about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="./writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="./contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -70,29 +70,51 @@
               </nav>
 
               <main class="content">
-                <section>
-<article id="content">
+                <article id="content">
     <header>
-      <h1 class="title">書物</h1>
-      <small><i>Updated on 2017-12-24</i></small>
+      <h1 class="title">Network Device</h1>
+      <small><i>Updated on December 16, 2018</i></small>
     </header>
     <div class="body">
-      <p>flowで流れていくものは<a href="http://ilyaletre.hatenablog.com/">ブログ</a>に。</p>
-<p>残しておきたい情報はここに。</p>
+      <p>ネットワークデバイスを表す構造体は<code>include/linux/netdevice.h</code>にある<code>net_device</code>という名前で定義されている。</p>
+<p>怪物のような構造体。低レベルなデータと高レベルなデータが混ざった複雑な構造をしている。 やばい。 プロトコル固有データが詰め込まれており、すごく混沌としている。</p>
+<h2 id="ライフサイクル">ライフサイクル</h2>
+<ol type="1">
+<li>init : デバイスの登録</li>
+<li>open : デバイスのup</li>
+<li>stop : デバイスのdown</li>
+<li>uninit : デバイスの削除</li>
+</ol>
+<h2 id="デバイスの作成">デバイスの作成</h2>
+<p>物理デバイスの場合はデバイスドライバにより作成される。 ここではサンプルとして平田豊さんの「Linuxカーネル解析入門」でも触れられていた Realtekの8139チップ用ドライバの実装をのぞいてみる</p>
+<p><code>drivers/net/ethernet/realtek/8139cp.c</code></p>
+<p>ドライバの初期化処理においてデバイス構造体のメモリ領域を確保している。</p>
+<pre><code>static int cp_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
+&lt;snip&gt;
+	struct net_device *dev;
+	struct cp_private *cp;
+&lt;snip&gt;
+	dev = alloc_etherdev(sizeof(struct cp_private));</code></pre>
+<pre><code>	rc = register_netdev(dev);</code></pre>
+<p>このアロケーションはLinux本体で定義されている。 デバイス固有の構造体のサイズに加えて共通的な構造体のサイズも確保する。</p>
+<p><code>etherdevice.h</code></p>
+<pre><code>#define alloc_etherdev(sizeof_priv) alloc_etherdev_mq(sizeof_priv, 1)
+#define alloc_etherdev_mq(sizeof_priv, count) alloc_etherdev_mqs(sizeof_priv, count, count)</code></pre>
+<p>送受信キューの数に応じてメモリサイズが変わるためこの時点でキューの数を渡している。</p>
+<p><code>net/ethernet/eth.c</code></p>
+<pre><code>struct net_device *alloc_etherdev_mqs(int sizeof_priv, unsigned int txqs,
+				      unsigned int rxqs)</code></pre>
+<p><code>core</code>の汎用関数で実際のメモリ確保を行う。</p>
+<p><code>net/core/dev.c</code></p>
+<pre><code>struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
+		unsigned char name_assign_type,
+		void (*setup)(struct net_device *),
+		unsigned int txqs, unsigned int rxqs)</code></pre>
+<h2 id="デバイスの登録">デバイスの登録</h2>
+<pre><code>int register_netdevice(struct net_device *dev);</code></pre>
+<p><code>net/dev.c</code></p>
     </div>
 </article>
-
-</section>
-<section>
-Contents
-  <ul class="archives">
-      
-          <li>
-              <a href="./writings/linux.html">ネットワーキングから探るLinux Kernel</a> - December 16, 2018
-          </li>
-      
-  </ul>
-</section>
 
               </main>
 
@@ -135,7 +157,7 @@ Contents
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="./js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">
