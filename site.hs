@@ -11,19 +11,8 @@ main :: IO ()
 main = do
   E.setLocaleEncoding E.utf8
   hakyllWith config $ do
-    match "resources/*" $ do
-        route   idRoute
-        compile copyFileCompiler
 
-    match "images/*" $ do
-        route   idRoute
-        compile copyFileCompiler
-
-    match "js/*" $ do
-        route   idRoute
-        compile copyFileCompiler
-
-    match "fonts/*" $ do
+    match ("resources/*" .||. "images/*" .||. "js/*" .||. "fonts/*") $ do
         route   idRoute
         compile copyFileCompiler
 
@@ -64,8 +53,8 @@ main = do
               >>= loadAndApplyTemplate "templates/default.html" writingsCtx
               >>= relativizeUrls
 
-    create ["index.html"] $ do
-        route   idRoute
+    match "index.md" $ do
+        route $ setExtension "html"
         compile $ do
             posts <- recentFirst =<< loadAll "writings/**"
             let indexCtx =
@@ -73,8 +62,9 @@ main = do
                     constField "title" "Contents"            `mappend`
                     defaultContext
 
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/index.html" indexCtx
+            getResourceBody
+                >>= applyAsTemplate indexCtx
+                >>= renderPandoc
                 >>= loadAndApplyTemplate "templates/default.html" indexCtx
                 >>= relativizeUrls
 
