@@ -71,12 +71,12 @@
 
               <main class="content">
                 <article id="content">
-    <header>
-      <h1 class="title">Network Device</h1>
-      <small><i>Updated on December 16, 2018</i></small>
-    </header>
-    <div class="body">
-      <p>ネットワークデバイスを表す構造体は<code>include/linux/netdevice.h</code>にある<code>net_device</code>という名前で定義されている。</p>
+  <header>
+    <h1 class="title">Network Device</h1>
+    <small><i>Updated on 2018-12-16</i></small>
+  </header>
+  <div class="body">
+    <p>ネットワークデバイスを表す構造体は<code>include/linux/netdevice.h</code>にある<code>net_device</code>という名前で定義されている。</p>
 <p>怪物のような構造体。低レベルなデータと高レベルなデータが混ざった複雑な構造をしている。 やばい。 プロトコル固有データが詰め込まれており、すごく混沌としている。</p>
 <h2 id="ライフサイクル">ライフサイクル</h2>
 <ol type="1">
@@ -113,7 +113,14 @@
 <h2 id="デバイスの登録">デバイスの登録</h2>
 <pre><code>int register_netdevice(struct net_device *dev);</code></pre>
 <p><code>net/dev.c</code></p>
+<h2 id="フレームの送受信">フレームの送受信</h2>
+  </div>
+  <footer>
+    <div>
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
     </div>
+  </footer>
 </article>
 
               </main>
