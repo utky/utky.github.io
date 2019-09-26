@@ -1,6 +1,12 @@
+<div class="container">
+
+<section class="row">
+
 # Hash λ Bye
 
 関数型プログラミングのことやLinuxのことなどについて書いたりします。
+
+</section>
 
 <section class="row">
 
@@ -49,3 +55,5 @@ $endfor$
 : バーチャルアイドルのときのそらさんが好き過ぎて書いたイメージソング。
 
 </section>
+
+</div>
