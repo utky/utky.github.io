@@ -1,6 +1,7 @@
 ---
 title: Network Device
 date: 2018-12-16
+tags: linux, network
 ---
 
 ネットワークデバイスを表す構造体は`include/linux/netdevice.h`にある`net_device`という名前で定義されている。

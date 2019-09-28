@@ -13,4 +13,3 @@ Linux Kernelのネットワーク機能を辿っていきます。
 * ブリッジ
 * 仮想デバイス(veth, tap)
 * namespace
-

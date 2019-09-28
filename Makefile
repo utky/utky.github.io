@@ -5,10 +5,10 @@ all: build
 build_hakyll:
 	stack build
 
-clean: build_hakyll
+clean:
 	stack exec site -- clean
 
-build: clean
+build: build_hakyll
 	stack exec site -- build
 
 run:
