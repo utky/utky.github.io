@@ -10,9 +10,6 @@
     <h2><span class="glyphicon glyphicon-flash"></span> Updates</h2>
     $partial("templates/post-list.html")$
   </section>
-  
-  <section class="row">
-  </section>
 
   <section class="row">
     <h2><span class="glyphicon glyphicon-book"></span> Writings</h2>
@@ -20,7 +17,7 @@
     <dl>
 
       <dt>
-        <a href="./writings/linux.html">Linux Kernel</a>
+        <a href="./posts/linux.html">Linux Kernel</a>
       </dt>
       <dd>
         <p>
@@ -73,5 +70,12 @@
         </p>
       </dd>
     </dl>
+  </section>
+  
+  <section class="row">
+    <h2>Tags</h2>
+    <div>$tagList$</div>
+    <h2>Categories</h2>
+    <div>$categoryList$</div>
   </section>
 </div>

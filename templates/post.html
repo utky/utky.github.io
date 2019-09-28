@@ -2,9 +2,14 @@
   <header>
     <h1 class="title">$title$</h1>
     <small>
-    $date$ - 
-    $if(tags)$
-    [ $tags$ ]
+    $date$
+     / 
+    $if(tagList)$
+    [ $tagList$ ]
+    $endif$
+     / 
+    $if(categorylist)$
+    [ $categoryList$ ]
     $endif$
     </small>
   </header>

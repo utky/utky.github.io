@@ -5,7 +5,6 @@ import           Hakyll
 import qualified GHC.IO.Encoding as E
 import           Data.List (sortBy)
 import           Data.Ord (comparing)
-
 --------------------------------------------------------------------------------
 main :: IO ()
 main = do
@@ -26,35 +25,28 @@ main = do
         >>= loadAndApplyTemplate "templates/default.html" defaultContext
         >>= relativizeUrls
 
-    tags <- buildTags "writings/**" (fromCapture "tags/*.html") 
+    tags <-       buildTags       postsGlob (fromCapture "tags/*.html") 
+    categories <- buildCategories postsGlob (fromCapture "categories/*.html") 
 
-    tagsRules tags $ \tag pattern -> do
-        let title = "Posts tagged \"" ++ tag ++ "\""
-        route idRoute
-        compile $ do
-            posts <- recentFirst =<< loadAll pattern
-            let ctx = constField "title" title
-                      `mappend` listField "posts" postCtx (return posts)
-                      `mappend` defaultContext
+    let postCtx' = postCtx `mappend` tagCtx tags `mappend` categoryCtx categories
+    tagged tags       ("Posts tagged: " ++)     "templates/tag.html"
+    tagged categories ("Posts categoried: " ++) "templates/category.html"
 
-            makeItem ""
-                >>= loadAndApplyTemplate "templates/tag.html" ctx
-                >>= loadAndApplyTemplate "templates/default.html" ctx
-                >>= relativizeUrls
-
-    posts (postCtx `mappend` tagCtx tags) "writings/linux/*"
-
-    toplevel postCtx "writings/linux.md" "writings/linux/*"
-
-    toplevel postCtx "writings.md" "writings/*"
+    posts postCtx' "posts/linux/*"
+    toplevel postCtx' "posts/linux.md" "posts/linux/*"
+    toplevel postCtx' "writings.md" "posts/*"
 
     match "index.html" $ do
       route idRoute
       compile $ do
-        let posts = recentFirst =<< loadAll "writings/**"
+        tagListContent <- renderTagList tags
+        categoryListContent <- renderTagList categories
+        let posts = recentFirst =<< loadAll "posts/**"
             indexCtx =
-              listField "posts" postCtx posts `mappend`
-              constField "title" "Contents"            `mappend`
+              listField "posts" postCtx' posts              `mappend`
+              constField "title" "Contents"                 `mappend`
+              constField "tagList" tagListContent           `mappend`
+              constField "categoryList" categoryListContent `mappend`
               defaultContext
         getResourceBody
           >>= applyAsTemplate indexCtx
@@ -64,13 +56,19 @@ main = do
     match "templates/*" $ compile templateCompiler
 
 --------------------------------------------------------------------------------
+postsGlob :: Pattern
+postsGlob = "posts/**.md"
+
 postCtx :: Context String
 postCtx =
   dateField "date" "%Y-%m-%d" `mappend`
   defaultContext
 
 tagCtx :: Tags -> Context String
-tagCtx tags = tagsField "tags" tags
+tagCtx tags = tagsField "tagList" tags
+
+categoryCtx :: Tags -> Context String
+categoryCtx categories = tagsField "categoryList" categories
 
 tocCtx :: Pattern -> Compiler (Context String)
 tocCtx p = do
@@ -99,3 +97,18 @@ toplevel ctx source children =
         >>= loadAndApplyTemplate "templates/toc.html"     ctx'
         >>= loadAndApplyTemplate "templates/default.html" ctx'
         >>= relativizeUrls
+
+tagged :: Tags -> (String -> String) -> Identifier -> Rules ()
+tagged tags mkTitle templatePath = 
+  tagsRules tags $ \tag pattern -> do
+    route idRoute
+    compile $ do
+      let posts = recentFirst =<< loadAll pattern
+          ctx = constField "title" (mkTitle tag)
+                `mappend` listField "posts" postCtx posts
+                `mappend` defaultContext
+
+      makeItem ""
+          >>= loadAndApplyTemplate templatePath ctx
+          >>= loadAndApplyTemplate "templates/default.html" ctx
+          >>= relativizeUrls

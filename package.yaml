@@ -4,6 +4,7 @@ license: UnspecifiedLicense
 dependencies:
 - base
 - hakyll
+- blaze-html
 executables:
   site:
     main: site.hs
