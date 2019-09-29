@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Lycopeneで作っていく機能について</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,9 +72,9 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Lycopeneで作っていく機能について</h1>
     <small>
-    2018-12-16
+    2014-11-04
      / 
     
     [  ]
@@ -84,15 +84,67 @@
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <p><a href="https://github.com/utky/lycopene">Lycopene</a></p>
+<p>うあーちなみにリポジトリ名もろかぶりしてるHerokuアプリがあった。 かえよう。</p>
+<p>もっと短くLycoとかにしよう</p>
+<h2 id="このpostで解決したいこと">このpostで解決したいこと</h2>
+<p>何を優先して作るか。</p>
+<p>何を重要視して作るか。</p>
+<p>どれくらいの作業があるのか。</p>
+<h2 id="列挙">列挙</h2>
+<p>Agileにおけるバックログ（というかユーザストーリーだっけ？）</p>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li>Infrastructure
+<ul>
+<li>define global configuration</li>
+<li>define preference</li>
+<li>establish database session</li>
+</ul></li>
+<li>Application
+<ul>
+<li>Show appication version</li>
+<li>provide configuration as Reader Monad</li>
+<li>provide database session as Reader Monad</li>
+<li>enable to signal error to contextual monad</li>
+<li>transform domain model to JSON and vice-versa</li>
+</ul></li>
+<li>Pure Domain
+<ul>
+<li>Statistics
+<ul>
+<li>calculate velocity</li>
+</ul></li>
+<li>Project
+<ul>
+<li>create</li>
+<li>modify</li>
+<li>delete</li>
+<li>list current issues</li>
+</ul></li>
+<li>Release
+<ul>
+<li>create</li>
+<li>modify</li>
+<li>delete</li>
+</ul></li>
+<li>Issue
+<ul>
+<li>create</li>
+<li>modify</li>
+<li>delete</li>
+</ul></li>
+<li>Record
+<ul>
+<li>create</li>
+<li>modify</li>
+<li>delete</li>
+</ul></li>
+</ul></li>
+<li>Command line interface</li>
+<li>RESTful interface
+<ul>
+<li>export statistics as JSON</li>
+</ul></li>
 </ul>
   </div>
   <footer>
@@ -138,7 +190,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

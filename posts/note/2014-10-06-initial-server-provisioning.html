@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - サーバ構築時の初期設定について</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,9 +72,9 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">サーバ構築時の初期設定について</h1>
     <small>
-    2018-12-16
+    2014-10-06
      / 
     
     [  ]
@@ -84,16 +84,30 @@
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
-<ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
-</ul>
+    <p>ある開発環境でベアメタルサーバやVMサーバを追加することはよくある。 （今そんなんばっか）</p>
+<p>そして、その時に行う初期設定作業にはBoilerplateが多すぎる。</p>
+<h2 id="初期設定のboiler-plate">初期設定のBoiler Plate</h2>
+<ol type="1">
+<li>共有されるadmin的なユーザの追加</li>
+<li>パッケージの更新</li>
+<li>ssh鍵のデプロイ</li>
+<li>鍵認証のみに限定</li>
+<li>NTPサーバの指定</li>
+<li>DNSサーバの指定</li>
+</ol>
+<h2 id="プロビジョニングにあたっての懸念">プロビジョニングにあたっての懸念</h2>
+<p>上記の定型作業をこなすためには、ansibleなどを使いたい、となるのが人情。</p>
+<p>でも、あれ……？</p>
+<p>ansibleでは鍵を使った認証にしてなかったっけ？</p>
+<p>その鍵の配給や生成はじゃあ、どうすんの？</p>
+<h2 id="ansibleのドキュメント読んでみた">Ansibleのドキュメント読んでみた</h2>
+<p>なんだ、ちゃんとInventoryにpassword定義したり、実行時にaskさせたりできるじゃん。</p>
+<p><a href="http://docs.ansible.com/intro_inventory.html#list-of-behavioral-inventory-parameters">List of Behavioral Inventory Parameters</a></p>
+<p>Inventoryファイルにパスワードを書いておくのもあれなので、</p>
+<pre><code>--ask-pass</code></pre>
+<p>のオプションをつけてplaybookを実行するのがいいそうな。</p>
+<p>Paasになんかデプロイする場合は、この辺りの工程をすっとばしているはずなのであまり気にしないけど、社内で開発サーバデプロイする時とか、いちいちめんどくてめっちゃ「うがー」ってなってた。</p>
+<p>真面目な解法に取り組みたい。</p>
   </div>
   <footer>
     
@@ -138,7 +152,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

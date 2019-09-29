@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Ansible でCIサーバを構築する</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,9 +72,9 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Ansible でCIサーバを構築する</h1>
     <small>
-    2018-12-16
+    2014-10-04
      / 
     
     [  ]
@@ -84,16 +84,54 @@
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <h2 id="ansible-でciサーバを構築する">Ansible でCIサーバを構築する</h2>
+<p>ansibleでjenkinsをインストールすればいい。</p>
+<p>本当にそれだけです。</p>
+<h2 id="それだけではない">それだけではない</h2>
+<p>重要なポイントがあります。</p>
+<p>それは</p>
+<p><strong>Dockerのコンテナを使って各ビルド+テストプロセスを分離する</strong></p>
+<p>ということです。</p>
+<p>そして</p>
+<p><strong>Jenkins自体もDockerコンテナとして動作させる</strong></p>
+<p>ということです。</p>
+<h2 id="必要な登場人物コンテナの整理">必要な登場人物（コンテナ）の整理</h2>
+<p>Jenkins</p>
+<p>Jenkins home (各Jobなどのvariableなものはこちら）</p>
+<p>各Job用環境</p>
+<h2 id="ユースケース">ユースケース</h2>
+<p>自分の会社とかでホストしてるGitLab的なものがあるとする。</p>
+<ol type="1">
+<li>gitプロジェクトを作る</li>
+<li>jenkinsにそのプロジェクト用のビルドjobを作る</li>
+<li>git push発生</li>
+<li>web hookでJenkinsのサービスに通知</li>
+<li>更新のあったプロジェクトのjob起動</li>
+<li>docker run実行 ★</li>
+<li>テスト実行</li>
+<li>レポートをjenkinsのworkspaceに書き込み</li>
+<li>ビルド実行</li>
+<li>成果物をjenkinsのworkspaceに書き込み</li>
+<li>docker run終了 exit codeがjenkinsに返りビルドの結果が判定される</li>
+</ol>
+<p>ポイントは★のところです。</p>
+<p>疑問が湧いてきます。</p>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li><ol type="A">
+<li><strong>jenkinsはコンテナなので、ホストOS側にインストールされたdockerコマンドは使えません。</strong></li>
+</ol></li>
+<li><ol start="2" type="A">
+<li><strong>走らせるdockerコンテナのイメージはどこからくるのでしょうか。</strong></li>
+</ol></li>
 </ul>
+<h2 id="解決">解決</h2>
+<p>の方法はまだ考え中です（ごめんなさい）。</p>
+<p>問題Aはcontainer -&gt; host の方向でdocker APIが呼べれば解決かもしれないと思っています。</p>
+<p>あー、イメージの作成時にDockerfile渡すのとかも、このAPIでいけるのでしょうか。</p>
+<p>ということでこれからDocker APIの可能性を調査してみます。</p>
+<h2 id="追記">追記</h2>
+<p>ほかにもいろいろ解決するべき問題があるなー。</p>
+<p>そもそもJenkinsのworkspaceにcloneされたソースをrun対象のコンテナに転送しないといけないし。</p>
   </div>
   <footer>
     
@@ -138,7 +176,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Manage page state and sub-components with React.js</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,28 +72,59 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Manage page state and sub-components with React.js</h1>
     <small>
-    2018-12-16
+    2015-09-25
      / 
     
-    [  ]
+    [ <a href="../../tags/js.html">js</a>, <a href="../../tags/react.html">react</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <p><em>注意事項</em></p>
+<p>下記の投稿ではReactにおけるComponentのstateの所在を求めて ぐだぐだと書いています。</p>
+<p>が2015/10現在ではほとんどアプローチに決着がついており、 下記のフレームワークでそれぞれにそのアプローチが表現されています。</p>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li><a href="https://github.com/facebook/flux">flux</a></li>
+<li><a href="https://github.com/rackt/redux">redux</a></li>
 </ul>
+<p>とりあえず使ってみて思想を感じるのがよいと思います。</p>
+<h2 id="問題の発見">問題の発見</h2>
+<p>React.jsでUIを組み上げる過程ですごく悩んだのが、 複数のComponentを組み合わせて一つのページを作成するときに どこにstateを持たせておくか、ということです。</p>
+<pre><code>Home.js
+  LoginForm.js</code></pre>
+<p>という包含関係だった場合に、stateを<code>Home</code>と<code>LoginForm</code>のどちらで 管理させるかという問題です。</p>
+<p>Reactは原則的に「<em><code>state</code>は最小限にして、できる限り全てを<code>props</code>として入力せよ</em>」というような哲学を推奨しているようです。</p>
+<p>これを極端に推し進めるとトップレベルのComponentが保持するstateをowneeのpropsに渡していく方法が正解ということになります。 公式の解説は下記のリンクをご参照ください。</p>
+<p><a href="https://facebook.github.io/react/docs/multiple-components.html#data-flow">Multiple Components</a></p>
+<p><a href="http://mizchi.hatenablog.com/entry/2015/08/24/233919">Reactのprops/stateとFluxのStore</a></p>
+<p>ここでポイントとなるのは<em>owneeで起こる入力イベントをどうハンドルするか</em>です。</p>
+<p>React上でpropsを伝搬させていく上でのポイントは下記の三点だと理解していますが、 特にイベントのハンドルで重要なのは3です。</p>
+<ol type="1">
+<li>データは常にOwnerからOwneeへと流れます。</li>
+<li>Owneeは常に<code>props</code>しか受け取らず<code>state</code>を持ちません。</li>
+<li>Owneeはローカル<code>state</code>を持つ代わりに変更のイベントを上位コンポーネントを通知します。</li>
+</ol>
+<h2 id="データフロー">データフロー</h2>
+<p>React.jsではTwo-way bindingの項でこれに言及していました。 <a href="https://facebook.github.io/react/docs/two-way-binding-helpers.html">Two-Way Binding Helpers</a></p>
+<p>たぶんこんな感じでデータが流れるのが <em>React-way</em> なのだと理解しています。</p>
+<pre><code>    Data Flow
+
+      props       
+Home ----&gt; LoginForm
+              | onChange
+  &lt;-----------+
+
+    Event Flow</code></pre>
+<p>上位から下位へとデータをパスしていきDOMを生成する一種のストリーム処理みたいですね。</p>
+<p>fluxの有無に関わらずReactに閉じて考えてもデータのデータのフローが一方向になります。</p>
+<h2 id="よりよい方法">よりよい方法</h2>
+<p>とにかく内部的な状態を可能な限り排除して、ReactComponentを純粋関数のように仕上げていくことが、より堅牢なUIを構築するためには必要なようです。</p>
+<p>つまりトップレベルのComponentですらstateを持たないということになります。</p>
+<p>現時点では「Fluxアーキテクチャを導入した上でStoreに全ての状態を集約するのかな」と想像していますがまだ答えを見つけていません。</p>
   </div>
   <footer>
     
@@ -138,7 +169,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

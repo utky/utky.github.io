@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Process</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,9 +72,9 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Process</h1>
     <small>
-    2018-12-16
+    2017-12-24
      / 
     
     [  ]
@@ -84,16 +84,22 @@
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
-<ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
-</ul>
+    <p>プロセスディスクリプタとは, <code>task_struct</code>, のこと</p>
+<p>PDは, <code>thread_info</code>, とスタック情報をもった2ページ(8KB)の領域へのポインタを持っている。 espレジスタはこのスタックの現在位置を常に保持している。 <code>thread_info</code>, をスタックが決まったレイアウトになっていることにより、 espのアドレスにマスクをかけることでPDへのアドレスを参照することができるようになっている。</p>
+<p>よくできているなー。</p>
+<p>###, スレッドグループ</p>
+<p><em>, リーダ , , , , +, pid, a , , , , +, tgid, a </em>, フォロワー , , , , +, pid, b , , , , +, tgid, a</p>
+<p>のようにtgid, (thread, group, id) には最初のスレッドであるリーダーのPIDが入るようになっている。</p>
+<p><code>ps, -eLf</code>, うつとこんな感じ</p>
+<pre><code>ilyalet+, , 2080, , , , , 1, , 2080, , 0, , , , 1, Oct07, ?, , , , , , , , 00:00:00, /usr/bin/zsh
+ilyalet+, , 2181, , 2080, , 2181, 38, , , 61, Oct07, ?, , , , , , , , 08:45:57, /usr/lib/firefox/firefox
+ilyalet+, , 2181, , 2080, , 2210, , 0, , , 61, Oct07, ?, , , , , , , , 00:00:00, /usr/lib/firefox/firefox
+ilyalet+, , 2181, , 2080, , 2211, , 0, , , 61, Oct07, ?, , , , , , , , 00:07:08, /usr/lib/firefox/firefox
+ilyalet+, , 2181, , 2080, , 2212, , 0, , , 61, Oct07, ?, , , , , , , , 00:00:00, /usr/lib/firefox/firefox</code></pre>
+<p>PID, PPID, LWP の順でIDが並ぶ。</p>
+<p>firefoxとしてのPIDが2181 zshからforkしているもとのPPIDが2080そして firefox内のスレッドが2181や2210といった軽量プロセスの番号になっている。 一番上のPIDがstimeが長いスレッドのリーダらしい。 これはPIDとLWPのIDが同じことからも推察できる。</p>
+<p>###, Task, struct</p>
+<p>include/linux/sched.h に定義されている</p>
   </div>
   <footer>
     
@@ -138,7 +144,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

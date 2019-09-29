@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - プロセッサを支える技術</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,28 +72,61 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">プロセッサを支える技術</h1>
     <small>
-    2018-12-16
+    2016-07-13
      / 
     
-    [  ]
+    [ <a href="../../tags/reading.html">reading</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <p><a href="https://www.amazon.co.jp/dp/4774145211/">プロセッサを支える技術</a></p>
+<h2 id="はじめに">はじめに</h2>
+<p>ぐわー難しい。登場人物が何かは説明されるので解るが、動作は文章だけではなかなか追えない。 特に全然理解できてないなと思うのは3章。もっともディープな解説がなされるところだが、そこが解ってないという体たらく……。 下記は特によく解ってない。</p>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li>キャッシュの3つの方式</li>
+<li>演算器</li>
+<li>メモリアクセス</li>
 </ul>
+<h2 id="パイプライン">パイプライン</h2>
+<p>基本的なパイプラインの構造はとても泥臭くて面白かった。 パイプラインを効率的に実行するための障害となるのが、</p>
+<ul>
+<li>構造的ハザード</li>
+<li>データハザード</li>
+<li>制御ハザード</li>
+</ul>
+<h3 id="構造的ハザード">構造的ハザード</h3>
+<p>パイプライン上の命令がハードウェア資源の競合を起こすこと。 メモリの書き込みと読み込み処理をする際に衝突するなど。</p>
+<h4 id="解決">解決</h4>
+<p>ハードウェアは増やしスーパースカラ化して命令処理を並列化する。</p>
+<h3 id="データハザード">データハザード</h3>
+<p>直前の命令がレジスタに書き込んだ演算結果を使って別の演算を行うような命令のデータ依存が発生すること。</p>
+<h4 id="解決-1">解決</h4>
+<p>Out-of-Orderにより命令の順序を一部的に組み替えて効率的に処理することでブロックする処理のコストを相殺する。</p>
+<h3 id="制御ハザード">制御ハザード</h3>
+<p>条件分岐を行う処理において、条件判定が完了するまでは後続の<code>then</code>や<code>else</code>の命令をパイプライン実行できないこと。</p>
+<h4 id="解決-2">解決</h4>
+<p>条件判定の結果を統計として保存しておき、<em>確率の高い命令を予め実行する</em>分岐予測という手段がある。 見込みがはずれた場合はレジスタをロールバックさせる。</p>
+<p><em>T.B.D.</em></p>
+<h2 id="キャッシュ">キャッシュ</h2>
+<p><em>T.B.D.</em></p>
+<h2 id="演算器">演算器</h2>
+<p><em>T.B.D.</em></p>
+<h2 id="ページ方式">ページ方式</h2>
+<p><em>T.B.D.</em></p>
+<h2 id="armかx86でアセンブリ言語fizzbuzz">ARMかx86でアセンブリ言語FizzBuzz</h2>
+<p><em>T.B.D.</em></p>
+<h2 id="メモ">メモ</h2>
+<h3 id="コモンバス">コモンバス</h3>
+<p>ルータの内部アーキテクチャに踏み入るとGrant,Requestという用語が出てくるが、 これがプロセッサと入出力をつなぐコモンバスの命令であることがわかった。</p>
+<h3 id="x86はcisc">x86はCISC?</h3>
+<p>x86命令はCISCよりの複雑な命令体系を持っているが、結局ハードがRISCっぽい命令に変換して パイプランに送り込んでいるらしい。命令の構造が単純なRISCの方が効率いいね、という話になったのだろう。</p>
+<h3 id="回りくどいvmmへの委譲方法">回りくどいVMMへの委譲方法</h3>
+<p>VMMによる仮想化はゲストOSから特権命令を発行した時に発生する例外を捕まえてVMMにインターセプトさせるらしく なんだかものすごく効率悪そうに感じた。イベント駆動っぽいので他のやり方よりももしや性能がいいという理由から選ばれているのかもしれない。</p>
   </div>
   <footer>
     
@@ -138,7 +171,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

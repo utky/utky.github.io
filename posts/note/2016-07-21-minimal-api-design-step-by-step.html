@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - 小さくプロトタイピングする</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,28 +72,38 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">小さくプロトタイピングする</h1>
     <small>
-    2018-12-16
+    2016-07-21
      / 
     
-    [  ]
+    [ <a href="../../tags/haskell.html">haskell</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <p>Haskellでアプリケーションを作る時にどんな順番で部品を組んでいくかについての雑感。</p>
+<h2 id="進め方の整理">進め方の整理</h2>
+<h3 id="前提となるイメージ">前提となるイメージ</h3>
+<p>オニオンアーキテクチャのようなものをいつも頭に描くようにしている。 中心から順番に</p>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li>Core: 純粋なドメインモデル</li>
+<li>Infrastructure: ミドルウェアや外部APIへの操作的意味論</li>
+<li>Application: ユーザに提供するインタフェース</li>
 </ul>
+<p>となる。</p>
+<h3 id="駄目っぽいやりかた">駄目っぽいやりかた</h3>
+<p>ドメインモデルを実装しきる。</p>
+<p>ドメイン上の命令を組み合わせて抽象構文木を作るために必要。 抽象構文木の正しさを確認しながらドメインモデルに矛盾がないことを確認していく。</p>
+<p>しかし、ドメインを充実させるのには結構時間がかかる。 結構モチベーションんを維持するのが大変で、ユーザからみて動くものができないことに対するフラストレーションが溜まりがち。</p>
+<p>割とウォーターフォール的な考え方だと思う。 やってみようとしたけど途中で結構飽きる。</p>
+<h3 id="トライしたいやりかた">トライしたいやりかた</h3>
+<p>とりあえず最小限のドメインのみでレイヤを結合して動作するアプリケーションを得る。 新しいドメインは適宜追加してまたレイヤを結合していく。</p>
+<p>短期間にドメインの知識、ミドルウェアの知識、ユーザインタフェースの知識などを使うので、 職能横断的なスキルで立ち向かわないと進まない。 <em>(逆説的にウォーターフォールは分業制に最適化した人材調達のしやすいモデルなんだな、とか脱線する)</em></p>
+<p>こうして反復的なドメインの増築をすることで、 変更しにくいアーキテクチャかどうかに早く気づけるメリットはある。</p>
+<p>とか思った。</p>
   </div>
   <footer>
     
@@ -138,7 +148,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

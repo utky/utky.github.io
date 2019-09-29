@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Elmの設計で悩むところメモ</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,28 +72,49 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Elmの設計で悩むところメモ</h1>
     <small>
-    2018-12-16
+    2017-01-22
      / 
     
-    [  ]
+    [ <a href="../../tags/programming.html">programming</a>, <a href="../../tags/elm.html">elm</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
-<ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
-</ul>
+    <p>View Modelのあるべき姿が解らなくなってきたので整理。</p>
+<h2 id="view-modelとは何か">View Modelとは何か</h2>
+<p>何なのだろう。Viewの状態を表すものだと考えるとする。</p>
+<p>つまりViewに依存したデータモデルということになる。 はじめからViewありきのデータ構造だということだ。</p>
+<p>ということはViewと密結合していてむしろ良いわけだ。 Viewが変わればView Modelも変わる。そういうものだと考える。</p>
+<h2 id="いままで">いままで</h2>
+<p>Viewの構造とは切り離された、もっとPureなドメインを View Modelで表現するのだと思っていた。</p>
+<p>でもこれはいずれ、検討を進めるに従って違和感を生んだ。</p>
+<p>まずリモートサーバには既に蒸留されて丁寧に整理されたドメインがあるということ。 これと同じ質のデータをブラウザ側で保持することには何の意味もない。 だからブラウザ側が持つView Modelはリモートのpureなドメインと比べて、 何らかの付加情報がなければいけない。</p>
+<h2 id="view-modelに付加されるもの">View Modelに付加されるもの</h2>
+<p>付加情報とはViewの状態だ。</p>
+<p>ユーザとのインタラクションを保存する。 バッファみたいなものだ。ユーザの意志とか意図をView Modelに溜めてあげる。 ユーザの短期記憶の代わりとなってあげる。 今までの操作の過程を視覚化してユーザにフィードバックする。 ユーザがそれを受けて次のアクションを想起する。</p>
+<p>そんな感じだ。ユーザに寄り添うモデルであるべきだ。</p>
+<p>その一例は</p>
+<p><em>ユーザがチェックを入れた選択肢</em></p>
+<p>とか</p>
+<p><em>ユーザが捨てると決めてゴミ箱に入れたチケット</em></p>
+<p>とかそういうものが状態としてView Modelに保存される。</p>
+<p>これはリモートのドメインからすれば過渡的な状態に過ぎない。 コミットしていない操作だから永続化する前の状態だ。 だからリモートのドメインはこのような半端な状態について感知する必要がない。</p>
+<p>View Modelはそういう過渡的な状態を保存するのだろう。 だとすると、View Modelはどのように決定されるのか。</p>
+<p>Viewの設計が前提としてそこから導かれるだろう。そのはず。</p>
+<h2 id="結論">結論</h2>
+<p>まずはViewの設計をしよう。</p>
+<p>そしてViewの設計とはどうするのだろう。</p>
+<p>UI/UXの分野は逃げてきたのでからっきしだ。まさかElmを触っているうちにUI/UXから逆襲くらうことになるとは。</p>
+<h2 id="懸念">懸念</h2>
+<p>Viewの設計をおこなうにはユーザの中にあるメンタルモデルの整理とか、 ユーザがデータを捉える視座の学習とかが必要になる。</p>
+<p>これってドメインモデリングと何が違うのだろう。</p>
+<p>みたいな謎が浮かぶ。</p>
+<p>単純なスコープの違いなのだろうか？</p>
+<p>ちょっとUI/UXの学習をしないと見えてこなさそうだ。</p>
   </div>
   <footer>
     
@@ -138,7 +159,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

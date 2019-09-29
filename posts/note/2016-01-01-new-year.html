@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - New Year Protocol 2016</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,27 +72,47 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">New Year Protocol 2016</h1>
     <small>
-    2018-12-16
+    2016-01-01
      / 
     
-    [  ]
+    [ <a href="../../tags/note.html">note</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <p>技術関連での2015まとめ。</p>
+<h2 id="年-振り返り">2015年 振り返り</h2>
+<p>ポイントを絞って。</p>
+<h3 id="haskell">Haskell</h3>
+<p>Freeモナドベースの設計パターンを覚える。</p>
+<pre><code>-- f: 問題領域上での操作を表すDSLのAST
+-- a: DSLを評価した結果生成される値の型
+Free f a</code></pre>
+<p>特定の目的を持ったモジュールを作る場合は、とにかく<code>f :: * -&gt; *</code>に適用される データ型を定義していくのが設計のメイン作業になる。</p>
+<p><a href="http://www.haskellforall.com/2012/07/purify-code-using-free-monads.html">Purify code using free monads</a></p>
+<p><a href="http://functor.tokyo/blog/2015-11-20-testing-db-access">5 Ways to Test Applications that Access a Database in Haskell</a></p>
+<p>さらにfp in scalaでは自然変換を用いて<code>f</code>を別の意味論<code>g</code>へと変換することで、<code>f</code>に拡張性を持たせていく手段を学んだ。</p>
+<p>下記の例だと<code>List</code>や<code>Option</code>が<code>Free f a</code>の<code>f</code>に相当し、<code>List a -&gt; Option a</code>は<code>f a -&gt; g a</code>という自然変換を構成する。</p>
+<p><a href="http://eed3si9n.com/learning-scalaz/ja/Natural-Transformation.html">自然変換(Natural Transformation)</a></p>
+<pre><code>List a -&gt; Option a
+↓
+f a -&gt; g a</code></pre>
+<p>AST定義をする流れでGADTの効果を実感する。</p>
+<p><a href="https://en.m.wikibooks.org/wiki/Haskell/GADT">GADT</a></p>
+<h3 id="react.js">React.js</h3>
+<p>社内向けのプロダクトで導入。サポートするユースケースが増えていくに連れてStoreが複雑になっていく。 自然とReduxアーキテクチャが正しいように思いはじめる。</p>
+<h3 id="数学">数学</h3>
+<p>まずは基礎となる記号と論理を学ぶ。 「数学は言葉」という素晴らしい本に出会ったのです！（テンション上がる）</p>
+<p><a href="http://www.amazon.co.jp/dp/4489020538">数学は言葉</a></p>
+<h2 id="年-抱負">2016年 抱負</h2>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li><p>家計を管理するための自前アプリがほしいので、Haskellで書いてる。 データの解析と可視化はPythonのツールチェインを使いたいので……<strong>PythonのpandasやNumPyを使う。</strong></p></li>
+<li><p>データの入力部分はElmで行きたい。</p></li>
+<li><p>「型システム入門」を読み切る。（無理かな……）</p></li>
 </ul>
   </div>
   <footer>
@@ -138,7 +158,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

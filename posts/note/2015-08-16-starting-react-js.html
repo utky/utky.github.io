@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - ネットワーキングから探るLinux Kernel</title>
+        <title>Hash λ Bye - Starting React.js</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
 
     </head>
     <body>
@@ -26,21 +26,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -60,7 +60,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -72,28 +72,40 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">ネットワーキングから探るLinux Kernel</h1>
+    <h1 class="title">Starting React.js</h1>
     <small>
-    2018-12-16
+    2015-08-16
      / 
     
-    [  ]
+    [ <a href="../../tags/js.html">js</a>, <a href="../../tags/react.html">react</a> ]
     
      / 
     
     </small>
   </header>
   <div class="body">
-    <p>ネットワーク技術が好きなのでソースコードと書籍を片手に、 Linux Kernelのネットワーク機能を辿っていきます。</p>
+    <h2 id="今抱えている問題">今抱えている問題</h2>
+<p>jQueryベースのDHTMLによるDOM Manipulationをおもに使っていた。 Viewとデータが完全に結合しておりほぼテストが難しい。 テストが存在しないためAPIが増えていくにつれてどんどん変更するモチベーションが減っている。</p>
+<p>データ構造としてのModelとそのDOM表現としてのViewで分離する。</p>
+<h2 id="解決策">解決策</h2>
 <ul>
-<li>ネットワークデバイス</li>
-<li>フォワーディングテーブル</li>
-<li>ルーティングテーブル</li>
-<li>netlink</li>
-<li>ブリッジ</li>
-<li>仮想デバイス(veth, tap)</li>
-<li>namespace</li>
+<li>Vue.js</li>
+<li>Knockout.js</li>
+<li>Ractive.js</li>
+<li>React.js</li>
 </ul>
+<p>Fluxアーキテクチャだとある程度ロールが整理されているので、 自分で考える必要がなくなっている。 省エネでいきたいのでReactにする。 データフローが一方向なのでテストパタンも減りそうだしいいかなと思っているのもある。</p>
+<h2 id="reactを使う場合">Reactを使う場合</h2>
+<h3 id="環境の準備">環境の準備</h3>
+<p>JS周りは環境準備に一苦労する（という所感）。 でも基本となる原則はあまり難しくないかもしれない。</p>
+<p>まず処理系としてnode.jsとnpmを揃える。 プロジェクトのライフサイクル管をおこなうもろもろのエントリポイントは全部npmに任せてしまうのが正しい。 webpackやgulpなどの各種ツールチェインが生成する実行ファイルはすべて node_modulesにインストールさせてそれらを<code>npm run XXX</code>から叩く。</p>
+<p>必要なツールはpackage.jsonに宣言しておけばいいので、 開発者が自分でインストールするべきはnpmのみでよい、という整理になる。beautiful。</p>
+<h3 id="まずはfluxを整理する">まずはFluxを整理する</h3>
+<p>Componentの設計の流れは下記の記事である程度整理される。</p>
+<p><a href="https://facebook.github.io/react/docs/thinking-in-react.html">Thinking in React</a></p>
+<p>Storeがイベントを受信するためのコールバックはDispatcherに登録する。 これによってComponentが発行したActionを受信できるようになる。</p>
+<p>ComponentはStoreからデータを引いてきてStateのsourceとする。</p>
+<p>UIの大枠を組み上げて、部品に分解。</p>
   </div>
   <footer>
     
@@ -138,7 +150,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">
