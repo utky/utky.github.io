@@ -5,6 +5,7 @@ import           Hakyll
 import qualified GHC.IO.Encoding as E
 import           Data.List (sortBy)
 import           Data.Ord (comparing)
+import           Data.Functor ((<&>))
 --------------------------------------------------------------------------------
 main :: IO ()
 main = do
@@ -32,22 +33,33 @@ main = do
     tagged tags       ("Posts tagged: " ++)     "templates/tag.html"
     tagged categories ("Posts categoried: " ++) "templates/category.html"
 
-    posts postCtx' "posts/linux/*"
+    posts postCtx' postsGlob
     toplevel postCtx' "posts/linux.md" "posts/linux/*"
     toplevel postCtx' "writings.md" "posts/*"
+
+    create ["archive.html"] $ do
+      route idRoute
+      compile $ do
+        let posts = loadAll "posts/**" >>= recentFirst
+            archiveCtx =
+              listField "posts" postCtx' posts
+              `mappend` defaultContext
+        makeItem ""
+          >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
+          >>= loadAndApplyTemplate "templates/default.html" archiveCtx
 
     match "index.html" $ do
       route idRoute
       compile $ do
         tagListContent <- renderTagList tags
         categoryListContent <- renderTagList categories
-        let posts = recentFirst =<< loadAll "posts/**"
+        let posts = loadAll "posts/**" >>= recentFirst <&> take 10
             indexCtx =
-              listField "posts" postCtx' posts              `mappend`
-              constField "title" "Contents"                 `mappend`
-              constField "tagList" tagListContent           `mappend`
-              constField "categoryList" categoryListContent `mappend`
-              defaultContext
+              listField "posts" postCtx' posts
+              `mappend` constField "title" "Contents"
+              `mappend` constField "tagList" tagListContent
+              `mappend` constField "categoryList" categoryListContent
+              `mappend` defaultContext
         getResourceBody
           >>= applyAsTemplate indexCtx
           >>= loadAndApplyTemplate "templates/default.html" indexCtx
