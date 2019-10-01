@@ -53,7 +53,7 @@ main = do
       compile $ do
         tagListContent <- renderTagList tags
         categoryListContent <- renderTagList categories
-        let posts = loadAll "posts/**" >>= recentFirst <&> take 10
+        let posts = loadAll "posts/**" >>= recentFirst <&> take 5
             indexCtx =
               listField "posts" postCtx' posts
               `mappend` constField "title" "Contents"
