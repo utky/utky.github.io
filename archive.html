@@ -11,7 +11,16 @@
         <!-- <link rel="stylesheet" type="text/css" href="/css/highlight.css"> -->
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/css/default.css" />
-
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
     </head>
     <body>
         <div class="container">
@@ -80,7 +89,7 @@
     <ul class="archives">
   
   <li>
-    2019-10-01 - <a href="/posts/linux/99-working-with-netlink-in-haskel.html">WIP - HaskellでNetlinkを操作する</a>
+    2019-10-01 - <a href="/posts/linux/99-working-with-netlink-in-go.html">WIP - GoでNetlinkを操作する</a>
   </li>
   
   <li>
