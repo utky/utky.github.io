@@ -34,6 +34,7 @@ main = do
     tagged categories ("Posts categoried: " ++) "templates/category.html"
 
     posts postCtx' postsGlob
+    toplevel postCtx' "posts/note.md" "posts/note/*"
     toplevel postCtx' "posts/linux.md" "posts/linux/*"
     toplevel postCtx' "writings.md" "posts/*"
 
