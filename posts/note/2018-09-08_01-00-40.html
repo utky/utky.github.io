@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - Haskellの型クラスを活用してサブシステムとのやりとりをDSL化したかった</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">Haskellの型クラスを活用してサブシステムとのやりとりをDSL化したかった</h1>
+    <small>
+    2018-09-08
+     / 
+    
+    [  ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <h2 id="概要">概要</h2>
+<p>Webアプリケーションでもやっぱり避けられない外部システムとのIO。</p>
+<p>そうしたIOをメインコードから分離して扱うために、型クラスを活用するアプローチを試してみた。 しかし、型クラスが提供するインタフェースの実装を個別に作ってみたものの、それらを合成する方法に悩んだ。苦しんだ。</p>
+<p>大きい機構を持ち込まずに解決しようとしたが、結果的に泥臭くなってしまった感の否めない解法となった。</p>
+<h2 id="はじめに">はじめに</h2>
+<p>いまSpockを使ってWeb <a href="http://d.hatena.ne.jp/keyword/API">API</a>を作ってみている。</p>
+<p>一般的なWeb <a href="http://d.hatena.ne.jp/keyword/API">API</a>を持つサービスではユーザからのリク<a href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを受け取ると、 だいたいの場合そのアプリケーションの外部のシステムに保管されているデータを参照・更新する。</p>
+<p>典型的なのは</p>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/RDBMS">RDBMS</a></li>
+<li>別のWeb <a href="http://d.hatena.ne.jp/keyword/API">API</a>エンドポイント</li>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%A1%A5%A4%A5%EB%A5%B7%A5%B9%A5%C6%A5%E0">ファイルシステム</a></li>
+</ul>
+<p>など。</p>
+<p>こうした外部システムとの相互作用をメインとなるコードからうまく分離する方法について模索した。</p>
+<h3 id="ショートカット">ショートカット</h3>
+<p>実は既にlotzさんがそのことについて書いている。 Tagless FinalとExtensible Effectという手法を組み合わせることで外部システムとの作用のみ後から注入できるようになっている。すぐに解決方法が知りたいならばlotzさんの記事を読めば充分と思う。</p>
+<p><a href="https://qiita.com/lotz/items/a903d3b2aec0c1d4f3ce">Extensible EffectsとTagless Finalで実装するDI</a></p>
+<p>この記事ではlotzさんが提案しているExtensible Effectをサボる方向で解決しにいく。</p>
+<h2 id="問題">問題</h2>
+<p>Webアプリケーションからみた外部システム (前述の<a href="http://d.hatena.ne.jp/keyword/RDBMS">RDBMS</a>とか) とコミュニケーションをとるための<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>を各外部システムごとに定義する。 この<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>におけるコマンドを型クラスで表現する。</p>
+<p>が、それらをミックスして一つのデータ型 (<a href="http://d.hatena.ne.jp/keyword/%A5%E2%A5%CA%A5%C9">モナド</a>) などで表現するのが面倒くさいし難しい、という話。</p>
+<h2 id="参考">参考</h2>
+<p><a href="http://www.parsonsmatt.org/2018/03/22/three_layer_haskell_cake.html">Three Layer Haskell Cake</a></p>
+<p>のLayer2相当を実装していて気づいた。</p>
+<h2 id="モデルケース">モデルケース</h2>
+<p>なにかユーザのプロファイルを参照したり保存したりするサービスを考える。 プロファイルの中身が何か、ということはどうでもいいので捨象しておく。</p>
+<ol type="1">
+<li>ユーザのプロファイルをストレージから取り出す</li>
+</ol>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%A1%A5%A4%A5%EB%A5%B7%A5%B9%A5%C6%A5%E0">ファイルシステム</a>上の<a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>ファイルから取り出す</li>
+</ul>
+<ol start="2" type="1">
+<li>ユーザの新しいプロファイルをストレージに保存する</li>
+</ol>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%A1%A5%A4%A5%EB%A5%B7%A5%B9%A5%C6%A5%E0">ファイルシステム</a>上の<a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>ファイルに保存し、さらに履歴を時系列DBに保存する</li>
+</ul>
+<h3 id="インタフェース">インタフェース</h3>
+<p>今回はTagless Finalという抽象化アプローチを用いている。 このアプローチでは抽象化層を型クラスで提供する。</p>
+<p>前述のモデルケースを見返してみると、</p>
+<ol type="1">
+<li>ユーザのプロファイルをストレージから取り出す</li>
+<li>ユーザの新しいプロファイルをストレージに保存する</li>
+</ol>
+<p>という2つの操作を型クラスとして<a href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%F3%A5%B3%A1%BC%A5%C9">エンコード</a>する必要があることがわかる。</p>
+<p><em>(<a href="http://d.hatena.ne.jp/keyword/Java">Java</a>のインタフェー<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D7%A5%ED%A5%B0">スプログ</a>ラミング慣れている人にとっては、 比較的慣れやすい手法なので、個人的に最近推している。)</em></p>
+<h4 id="ユーザのプロファイルをストレージから取り出す">ユーザのプロファイルをストレージから取り出す</h4>
+<p>プロファイルの状態のスナップショットを取得</p>
+<pre><code>class GetProfile m where getProfile :: UserId -\&gt; m (Maybe Profile)</code></pre>
+<h4 id="ユーザの新しいプロファイルをストレージに保存する">ユーザの新しいプロファイルをストレージに保存する</h4>
+<p>プロファイルの状態のスナップショットを保存</p>
+<pre><code>class PutProfile m where putProfile :: UserId -\&gt; Profile -\&gt; m ()</code></pre>
+<p>時系列データとして履歴の保存</p>
+<pre><code>-- | Alias of UTCTImetype Time = UTCTime-- | Time tagged datadata History a = History !Time aclass AppendHistory m where appendHistory :: UserId -\&gt; History Profile -\&gt; m ()</code></pre>
+<h2 id="実装を与える">実装を与える</h2>
+<p>インタフェースを定義したので実装を与えよう。</p>
+<p>これらのインタフェースに実装を与えるために、型変数 <code>m</code> にあてはめる具体的な型を考えていく。 この場合3つの型クラスに対する<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>となるデータ型を検討する。</p>
+<h3 id="ストレージを表すデータ型">ストレージを表すデータ型</h3>
+<p>アプリケーションの外部に存在するストレージとして以下を使うと想定する。</p>
+<ul>
+<li>状態のスナップショットを保存するために
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>ファイル</li>
+</ul></li>
+<li>履歴を保存するために
+<ul>
+<li>時系列DBとしてInfluxDB</li>
+</ul></li>
+</ul>
+<p>つまり<a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>ファイルのストレージ、InfluxDBのストレージそれぞれをデータ型として表現し、<code>m</code> にあてはめていくことになる。</p>
+<h3 id="こんな感じで">こんな感じで</h3>
+<p>3つの型クラスに対して2つの実装に対応する<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>を作る。 具体的な実装は <code>...</code> と書いて省略する。</p>
+<pre><code>instance GetProfile File where...instance PutProfile File where...
+
+instance Appendhistory InfluxDB where...</code></pre>
+<h2 id="困ったこと">困ったこと</h2>
+<p>さて、では例えばこんな<a href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>を実現してみよう。</p>
+<ol type="1">
+<li>Profileを取り出す</li>
+<li>取り出したProfileを履歴として保存する</li>
+</ol>
+<p>素直にdo式を使う。</p>
+<pre><code>usecase = do profile \&lt;- getProfile appendHistory profile</code></pre>
+<p>これに型として実装を与えるとどうなるだろうか。</p>
+<pre><code>usecase :: File () usecase = do profile \&lt;- getProfile appendHistory profile -- !!! Fileはここのインスタンスになれない</code></pre>
+<p>_だめだ。_FileはGetProfileの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>だけれども、AppendHistoryの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>ではない。</p>
+<p>薄々感づいているがInfluxDBだと仮定すると。</p>
+<pre><code>usecase :: InfluxDB () usecase = do profile \&lt;- getProfile -- !!! InfluxDBはここのインスタンスになれない appendHistory profile</code></pre>
+<p>_だめだ。_InfluxDBはAppendHistoryの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>だけれども、GetProfileの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>ではない。</p>
+<p><strong>つんだ</strong></p>
+<h3 id="そうつんだ">そう、つんだ</h3>
+<p>ということで組み合わせたい全ての<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>を満たすたった一つのデータ型を用意しない限りこれは解決できない。</p>
+<p>Godオブジェクトというのを<a href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>でよく聞く。 この場合はGod代数的データ型を欲しているわけだ。これは<a href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%F3%A5%C1%A5%D1%A5%BF%A1%BC%A5%F3">アンチパターン</a>なのか？</p>
+<p><em>このTagless Finalアプローチはよく拡張性に優れる、などともてはやされるが、 拡張と謳って追加され続けた型クラスの呪いを一身に受けるデータ型を御供しなければならなくなる。よくもまあ軽々と拡張性などと言えたものだ。きっちり別のところで返済しなければいけないわけだ。</em></p>
+<p>いずれにしても面倒くさいので代替案を考えないといけない。</p>
+<h2 id="各実装を集約する">各実装を集約する</h2>
+<h3 id="集約型を定義する">集約型を定義する</h3>
+<p>FileとInfluxDB、それぞれの特徴に従って型クラスを実装している。 が、データ型が分離されているため、一つのコンテキストにまとめられない。</p>
+<p>まとめるためには、やはり単一のデータ型を集約用に定義する必要がある。</p>
+<pre><code>data AppF a = FileF (File a) | InfluxF (InfluxDB a)</code></pre>
+<p>こんな感じで直和型上にそれぞれの実装固有データを埋め込む。</p>
+<h3 id="freeを使う準備する">Freeを使う準備する</h3>
+<p><code>AppF</code> という集約用のデータ型を定義したが、 これが <code>Functor</code> や <code>Applicative</code> 、 <code>Monad</code> になっているとdo記法を使えるので後々便利。</p>
+<p>でもいちいちこれらの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>定義をするのは面倒だしサボりたいので <code>Free</code> を使う。</p>
+<pre><code>import Control.Monad.Free (Free, liftF)</code></pre>
+<p>freeのパッケージから必要なものだけimportした。 更にFreeを<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>の<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>にしておく。</p>
+<pre><code>instance (AppendHistory f, Functor f) =\&gt; AppendHistory (Free f) where appendHistory u h = liftF $ appendHistory u h
+
+instance (GetProfile f, Functor f) =\&gt; GetProfile (Free f) where getProfile u = liftF $ getProfile u
+
+instance (PutProfile f, Functor f) =\&gt; PutProfile (Free f) where putProfile u p = liftF $ putProfile u p</code></pre>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

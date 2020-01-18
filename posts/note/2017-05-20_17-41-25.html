@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - Haskellの代数データ型をJava的なインタフェースと捉える</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">Haskellの代数データ型をJava的なインタフェースと捉える</h1>
+    <small>
+    2017-05-20
+     / 
+    
+    [ <a href="../../tags/haskell.html">haskell</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>の代数データ型は僕にとって<a href="http://d.hatena.ne.jp/keyword/Java">Java</a>のインタフェースに近い。</p>
+<p>データ型がインタフェースでそのデータを受け取る関数がインタフェースのメソッドに相当する。 データをパターンマッチで分解して値コンストラクタ別の関数定義をするのは、 インタフェースに対する実装を与えているものだと考えている。</p>
+<pre><code>data Maybe a mapMaybe :: (a -\&gt; b) -\&gt; Maybe a -\&gt; Maybe b</code></pre>
+<p><code>Maybe a</code>というデータ型があるとする。これがインターフェース。</p>
+<p><code>mapMaybe</code>という関数があるとする。これがメソッド。</p>
+<p>インタフェースに実装を与えていく。</p>
+<p>まずはデータ構造としてのインタフェース実装を与える。</p>
+<pre><code>data Maybe a = Just a | Nothing mapMaybe :: (a -\&gt; b) -\&gt; Maybe a -\&gt; Maybe b</code></pre>
+<p>ここでは <code>Just a</code> と <code>Nothing</code> という2種類の実装が <code>Maybe a</code> というインタフェースに対して与えられた。</p>
+<p>次に関数としてのインタフェース実装を与える。</p>
+<pre><code>data Maybe a = Just a | Nothing mapMaybe :: (a -\&gt; b) -\&gt; Maybe a -\&gt; Maybe b mapMaybe f (Just x) = Just (f x) mapMaybe f Nothing = Nothing</code></pre>
+<p><code>mapMaybe</code> の具体的な定義が各インタフェース実装ごとに記述できた。</p>
+<p><code>mapMaybe</code> のユーザから見れば、 <code>Maybe a</code> の実態が <code>Just a</code> なのか <code>Nothing</code> なのかは意識する必要がない。 これが抽象化されているということ。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%D6%A5%B8%A5%A7%A5%AF%A5%C8%BB%D8%B8%FE%B8%C0%B8%EC">オブジェクト指向言語</a>ではvirtualmethodなどを定義して、実行時に実装へと <em>ディスパッチ</em> する。 それと同じように上記の例ではパターンマッチを使って値コンストラクタを判定し、 <em>ディスパッチ</em> している。</p>
+<p>この考え方で割りと上手くいく。ライブラリでも作らない限りはこの考え方で多くのことが抽象化できる。 しかしユーザが拡張可能なインタフェースを定義しようと思うと、問題もあったりする。</p>
+<p><a href="http://maoe.hatenadiary.jp/entry/20101214/1292337923">Expression Problem</a></p>
+<p><code>Maybe a</code> の値コンストラクタを増やした、つまり <code>Maybe a</code> インタフェースに新しい実装を与えたときに、<code>Maybe a</code> にパターンマッチをかけている関数も修正しなければならくなるし、再<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>が必要になってしまう、という問題。</p>
+<p>これを解くために型クラスを使ったインタフェースの定義をしていくことになる。</p>
+<p>で、tagless finalってなんだろうというところが今。</p>
+<p>追記</p>
+<p>先日「型クラスはインタフェースなのか否か」みたいな議論があった。 型クラスを正しく捉えようという目線からは、「インタフェースじゃない」という意見があった。 型クラスをファーストステップとしてアナロジーで理解しようという目線からは、「インタフェースみたいなもの」という意見があった。</p>
+<p>視点が違えば違う言い方になるよな、というだけなのでどちらでもいい。</p>
+<p>僕は <a href="http://fumieval.hatenablog.com/entry/2015/06/22/162833">fumieval</a> さんの記事にあるように 「性質の表現」くらいにしか考えていないので、あんまりアナロジーとして見ていない。</p>
+<p>といいながらこの記事ではADTとインタフェースのアナロジーを語っているところに何か破綻があるような気もするけれど。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

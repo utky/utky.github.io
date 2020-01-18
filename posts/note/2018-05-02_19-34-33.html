@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - コードを書く時の生産性の低さに気付く</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">コードを書く時の生産性の低さに気付く</h1>
+    <small>
+    2018-05-02
+     / 
+    
+    [  ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>大して複雑なコードでもないのに、<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>書くのに3時間もかかった話。</p>
+<h2 id="問題">問題</h2>
+<p>仕事で必要になりそうな<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を書いてた。 公開できないけど。</p>
+<p>以降に説明するような処理をする<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>の<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を書いていたが、 あらかた満足に動くようになるまで3時間もかかってしまった。</p>
+<p>時間かかりすぎ、と思った。 ちゃんと設計や実装の戦略を仕込んでおけば半分の時間でできそうだなと、雑ながら感じている。</p>
+<h3 id="概要">概要</h3>
+<p>ログの解析をおこなう。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>形式で出力されるログを走査して、 各種データの処理開始と処理終了のログを見つけたら、 そのログをペアリングして経過時間を計算する。</p>
+<p>そのように各種データがそれぞれどのくらい時間かかっているのかをログから集計する。</p>
+<h3 id="一般的な処理ステップ">一般的な処理ステップ</h3>
+<ul>
+<li>ログを読んで<a href="http://d.hatena.ne.jp/keyword/JSON">JSON</a>データ構造に復元</li>
+<li>データの正規化</li>
+<li>処理の開始、終了にまとめる</li>
+<li>集計処理</li>
+</ul>
+<p>シンプルだ</p>
+<h2 id="分析">分析</h2>
+<p>どこに時間がかかっているのか？</p>
+<h3 id="体感">体感</h3>
+<p>ソースにしているログのデータにばらつきがあったので、意外とコーナーケースの発見に時間がかかった。 pring<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>しながらやっていたのでそれで時間くった気がする。</p>
+<p>なのでログの解析(parsing)だけで2時間かかってたかもしれない。</p>
+<h3 id="何故時間がかかったのか">何故時間がかかったのか？</h3>
+<p>なんでだろう。</p>
+<ol type="1">
+<li>ゴミデータ、はずれデータが原因で動かない時の<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a></li>
+<li><a href="http://d.hatena.ne.jp/keyword/API">API</a>誤解したまま使って、predicateが逆に動いていたり</li>
+</ol>
+<p>ふーん。</p>
+<p>あ、あともう一個。</p>
+<p><strong>比較的大きめに関数を組んでから実行して、動かなくて部品に分解しなおして<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a></strong></p>
+<p>これはかなりやり方よくなかったなと思う。 つい小さなパーツでの確認をとばして、どんどん大きい方に結合してから<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>しちゃう。</p>
+<h3 id="小さいスコープ合成">小さいスコープ＆合成</h3>
+<p>ということで、いま明確に認識しているのは、 この <strong>小さな部品に分解したあとの小さなテストをしていなかった</strong> ところ。</p>
+<p>リクスヘッジしてなかったなー。</p>
+<p><em>(ちなみにすごい人はこういうところの<a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%B9%A5%AF%A5%D8%A5%C3%A5%B8">リスクヘッジ</a>しなくても流れるように正しいコードを書くので基本スキルが違う気がしている)</em></p>
+<h3 id="どうするべきだったのか">どうするべきだったのか</h3>
+<p>実際のデータを使って入出力しつつ、 最小限の部品を入力と出力の間に挟むようにして動作確認していくべきだった。</p>
+<h4 id="step-1">Step 1</h4>
+<pre><code>input ---\&gt; [json parsing] ---\&gt; output</code></pre>
+<h4 id="step-2">Step 2</h4>
+<pre><code>input ---\&gt; [json parsing] \&gt; [normalize] ---\&gt; output</code></pre>
+<h4 id="step-3">Step 3</h4>
+<pre><code>input ---\&gt; [json parsing] \&gt; [normalize] \&gt; [accumlate] ---\&gt; output</code></pre>
+<p>こんな感じでpipelineのpassを増やしていくようにして動きを見ていければよかったなーと。 テスト自体もプログラム本体の成長に従って修正されていくTDD的なやり方だったらよかったのかもしれない。</p>
+<h2 id="次のアクション">次のアクション</h2>
+<h3 id="計測">計測</h3>
+<p>時間を測ろう。</p>
+<p>なんの機能あるいはどのステップの実装にどれくらい時間がかかっているかを知る必要がある。</p>
+<p>gitのcommitのタイムスタンプから測れるかな。 でもsquashすると解らなくなるので、割とこまめに計測した方が良さそう。</p>
+<p>pomodoro techniqueベースで時間管理することが多いから、 pomodoro timerの終わりでcommitするのが良いか。</p>
+<h3 id="練習">練習</h3>
+<p>もっとたくさんプログラミングの練習をしたいな、と思った。</p>
+<p>プログラムの速度よりは、振る舞いを実現できるか、というような機能要件にフォーカスしたい。 プログラムの効率・性能はそれから改善していけるので、まずはナイーブでも短い時間で実装できるスキルを磨きたい。</p>
+<h4 id="どんな問題を解くか">どんな問題を解くか？</h4>
+<p>どんな問題がいいかなー。</p>
+<p>と考えた結果、手元にあってある程度現実的な問題を含む、『珠玉のプログラミング』でも読んで解いてみようかな。</p>
+<h3 id="読書">読書</h3>
+<p>『<a href="http://d.hatena.ne.jp/keyword/%A5%C6%A5%B9%A5%C8%B6%EE%C6%B0%B3%AB%C8%AF">テスト駆動開発</a>』もういちど読みつつ、 実践交えてやりたいな。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

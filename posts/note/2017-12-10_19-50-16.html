@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - GHCの中間言語Coreへの脱糖を覗き見る</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">GHCの中間言語Coreへの脱糖を覗き見る</h1>
+    <small>
+    2017-12-10
+     / 
+    
+    [ <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/ghc.html">ghc</a>, <a href="../../tags/programming.html">programming</a>, <a href="../../tags/compiler.html">compiler</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="https://qiita.com/advent-calendar/2017/haskell3">Haskell (その3) Advent Calendar 2017</a> 11日目の記事。(予約投稿知らなかったのでフライングになった)</p>
+<p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>が<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>の途中で中間表現として用いるCoreの生成っぷりを観察する。</p>
+<p>観察して、あーはいはいなるほどね(わかってない)、と言うだけになりそう。</p>
+<h2 id="はじめに">はじめに</h2>
+<p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>は<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>の<a href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>を低レベルなコードへと<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>する過程で様々なpass(<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>のステージ)を通じてプログラムデータを変換する。 俯瞰図は下記のリンクに詳しい。</p>
+<p><a href="https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/HscMain">Compiling one module: HscMain</a></p>
+<p>僕が<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>の話をどこかで聞きかじってかっこいいな、と思ったのは、<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>が<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%E9">コンパイラ</a>の<a href="http://d.hatena.ne.jp/keyword/%C3%E6%B4%D6%B8%C0%B8%EC">中間言語</a>として定義しているCoreを知った時。</p>
+<p>このCoreと名付けられた<a href="http://d.hatena.ne.jp/keyword/%C3%E6%B4%D6%B8%C0%B8%EC">中間言語</a>はDesugar passにて生成され、下記のような性質を持っている。</p>
+<ul>
+<li>小さな構文
+<ul>
+<li>3つのデータ型と15の値コンストラクタ</li>
+</ul></li>
+<li>束縛変数には全て型がついている
+<ul>
+<li>前段で推論されている</li>
+</ul></li>
+<li>全て型がついているため高速に型検査ができる
+<ul>
+<li>もう推論は終わっているので検査が高速</li>
+</ul></li>
+<li>単純だが大きな表現力を持つ
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のソー<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D7%A5%ED%A5%B0">スプログ</a>ラムがこれに変換される</li>
+</ul></li>
+</ul>
+<p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>はリリースのたびに様々な言語拡張が増えていて、 表面上の構文は多様になってきている。 それにも関わらずこのCoreという<a href="http://d.hatena.ne.jp/keyword/%C3%E6%B4%D6%B8%C0%B8%EC">中間言語</a>は下記のような小ささを保っている。</p>
+<ul>
+<li>3つのデータ型</li>
+<li>15の値コンストラクタ</li>
+</ul>
+<p><a href="https://downloads.haskell.org/~ghc/8.2.2/docs/html/libraries/ghc-8.2.2/CoreSyn.html">ghc-8.2.2 CoreSyn</a></p>
+<pre><code>data Expr b = Var Id | Lit Literal | App (Expr b) (Arg b) | Lam b (Expr b) | Let (Bind b) (Expr b) | Case (Expr b) b Type [Alt b] | Cast (Expr b) Coercion | Tick (Tickish Id) (Expr b) | Type Type | Coercion Coercion deriving Datadata AltCon = DataAlt DataCon | LitAlt Literal | DEFAULT deriving (Eq, Data)data Bind b = NonRec b (Expr b) | Rec [(b, (Expr b))] deriving Datatype Arg b = Expr btype Alt b = (AltCon, [b], Expr b)</code></pre>
+<p>各値コンストラクタが依存している更に細かいデータ型はあるにせよ、<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>の<a href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>は<a href="http://d.hatena.ne.jp/keyword/%BE%E5%B5%AD">上記</a>のデータ型にdesugar(脱糖)されて単<a href="http://d.hatena.ne.jp/keyword/%BD%E3%B2%BD">純化</a>される。</p>
+<p>正直、僕もすべてのコンストラクタの意味が解っているわけではない。 しかしあの多彩な表現力を持った<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>の構文が <em>この小さなCoreに変換可能である</em> ことに大きく驚いた。</p>
+<p>ここではこれらのデータ型の詳細には立ち入らず、 実際に<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のプログラム書きながらこのdesugarされたCoreがどう変化しているかを見てみようと思う。</p>
+<h2 id="観察してみる">観察してみる</h2>
+<p>この節では<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>の<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>オプションを使って、 parseされたプログラムがDesugar passを経た後の結果を確認してみる。</p>
+<p>どんな感じで見えるんだろ。</p>
+<h3 id="setup">Setup</h3>
+<p>stack.<a href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>にオプションをつけておこう。</p>
+<pre><code>ghc-options: &quot;\*&quot;: -ddump-to-file -ddump-ds -ddump-simpl -dsuppress-idinfo -dsuppress-coercions -dsuppress-uniques -dsuppress-module-prefixes</code></pre>
+<p>長い。長いけれどポイントは <code>-ddump-ds</code> のみ。<code>-dsuppres</code> 系は冗長な出力を減らすために指定しているだけ。</p>
+<p>このオプションをつけておくとstackのビルドの成果物を格納する <code>.stack-work</code> <a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リの下にレポートが出力される。</p>
+<p>今回 <code>src/Lib.hs</code> に定義を書き下しているため出力結果は</p>
+<p><code>.stack-work/dist/x86_64-linux-nix/Cabal-1.24.2.0/build/src/Lib.dump-ds</code></p>
+<p>というファイルに出力される。</p>
+<h3 id="定数">定数</h3>
+<pre><code>stringConst :: String stringConst = &quot;Hello&quot;
+
+-- RHS size: {terms: 2, types: 0, coercions: 0}stringConst :: String stringConst = unpackCString# &quot;Hello&quot;#</code></pre>
+<p>まあ、なんか、うん。そうだよね。</p>
+<h3 id="関数適用">関数適用</h3>
+<pre><code>falsy :: Bool falsy = not True
+
+-- RHS size: {terms: 2, types: 0, coercions: 0}falsy :: Bool falsy = not True</code></pre>
+<p>変化なし。単純過ぎたか。</p>
+<h3 id="infix">Infix</h3>
+<pre><code>two :: Int two = 1 + 1
+
+-- RHS size: {terms: 6, types: 1, coercions: 0}two :: Int two = + $fNumInt (I# 1#) (I# 1#)</code></pre>
+<p>なにか起きた。。。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>も結局は関数なので、<code>+ 1 1</code> のようなS式っぽい見た目になるのはわかる。</p>
+<p><code>$fNumInt</code> という謎のシンボルが出てきた。</p>
+<p>後でも出てくるが型クラス <code>Num</code> の <code>Int</code> <a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>定義を渡している模様。</p>
+<h3 id="関数合成">関数合成</h3>
+<pre><code>notNot :: Bool -\&gt; Bool notNot = not . not
+
+-- RHS size: {terms: 3, types: 3, coercions: 0}notNot :: Bool -\&gt; Bool notNot = . @ Bool @ Bool @ Bool not not</code></pre>
+<p><code>x . y</code> が <code>. x y</code> に変換された。 これもまた<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>が2引数の関数に変換されている。</p>
+<p>だけではなくて <code>@ Bool</code> なる記号が出てくる。 これは <code>.</code> が持つ多相性に関連する。 次で説明。</p>
+<h3 id="多相関数">多相関数</h3>
+<pre><code>identity :: a -\&gt; a identity x = x
+
+-- RHS size: {terms: 3, types: 3, coercions: 0}identity :: forall a. a -\&gt; a identity = \ (@ a) (x :: a) -\&gt; x</code></pre>
+<p>ちょっと形が変わった。大事なところにきた。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>で匿名関数と作る時は</p>
+<pre><code>\ x -\&gt; x</code></pre>
+<p>とする。</p>
+<p>なので</p>
+<pre><code>\ (x :: a) -\&gt; x</code></pre>
+<p>となるなら解る。 「aという型を持つxという値を受けとり、そのxを返す」というような意味で読める。</p>
+<p>しかし実際は</p>
+<pre><code>\ (@ a) (x :: a) -\&gt; x</code></pre>
+<p>こう。</p>
+<pre><code>(@ a)</code></pre>
+<p>匿名関数に引数が増えている。</p>
+<p>これは <em>型変数が関数の仮引数として定義されている</em> ことを表す。</p>
+<p>とても不思議。</p>
+<pre><code>-- 型 値\ (@ a) (x :: a) -\&gt; x</code></pre>
+<p>型と値が同列の引数として扱われていることになる。</p>
+<p><em>Coreでは型の引数と値の引数が同列に扱われて関数に適用される。</em></p>
+<p>なのでこの関数に引数を適用する場合は、</p>
+<pre><code>identity Int 1</code></pre>
+<p>のようにして型引数が決定され、値引数が決定されているものと思われる。</p>
+<h4 id="補足-forall-について">補足: forall について</h4>
+<pre><code>identity :: forall a. a -\&gt; a</code></pre>
+<p><code>forall</code> が表れるが意味的にはもとの <code>a -&gt; a</code> となんら変わらない。 糖衣構文として <code>forall</code> の省略が許容されていたものが、 脱糖を経て明示化されただけ。</p>
+<h4 id="補足-core上の表現">補足: Core上の表現</h4>
+<p>この関数がCore上でどう表現されているかというと</p>
+<pre><code>Lam (TyVar &quot;a&quot;) (Lam (Id &quot;x&quot;) (Var (Id &quot;x&quot;)))</code></pre>
+<p>ラムダ計算っぽく書くと</p>
+<pre><code>λ a. λ x: a. x </code></pre>
+<p>こんな感じ? (解らないけど a にはkindとして <code>*</code> でもつくのかな？)</p>
+<p>1つめのラムダ抽象の引数は型で、 2つめのラムダ抽象の引数はa型の値xとなる。</p>
+<p>この2つの引数はCore言語内で <code>Var</code> という型を持つ。</p>
+<p><a href="https://downloads.haskell.org/~ghc/8.2.2/docs/html/libraries/ghc-8.2.2/Var.html#t:Var">Var</a></p>
+<p>型と値が同列で引数になる仕組みは簡単で、 関数の引数に束縛されるデータ型 <code>Var</code> が下記のようになっているから。</p>
+<pre><code>data Var = TyVar ...-- 型レベルの変数| TcTyVar ... -- 不明 &quot;Used for kind variables during inference&quot; らしい| Id ...-- 値レベルの変数</code></pre>
+<p>この関数の引数に与えられるデータが</p>
+<ul>
+<li><code>TyVar</code>: 型</li>
+<li><code>Id</code>: 値</li>
+</ul>
+<p>どちらも受け付けるようになっている。</p>
+<h3 id="多相関数の適用-型変数が決定されるのか">多相関数の適用 (型変数が決定されるのか？)</h3>
+<p>本当に型も引数として関数に適用されているのかを観察。 先程の多相関数に引数を適用してみる。</p>
+<pre><code>one :: Int one = identity 1
+
+-- RHS size: {terms: 3, types: 1, coercions: 0}one :: Int one = identity @ Int (I# 1#)</code></pre>
+<p>予想通り。</p>
+<p><code>@ Int</code> で確かに型を適用している。</p>
+<h3 id="高階関数"><a href="http://d.hatena.ne.jp/keyword/%B9%E2%B3%AC%B4%D8%BF%F4">高階関数</a></h3>
+<p>おなじみの関数合成。</p>
+<pre><code>comp :: (b -\&gt; c) -\&gt; (a -\&gt; b) -\&gt; a -\&gt; c comp f g x = f (g x)
+
+-- RHS size: {terms: 9, types: 11, coercions: 0}comp :: forall b c a. (b -\&gt; c) -\&gt; (a -\&gt; b) -\&gt; a -\&gt; c comp =\ (@ b) (@ c) (@ a) (f :: b -\&gt; c) (g :: a -\&gt; b) (x :: a) -\&gt; f (g x)</code></pre>
+<p>引数がお化け。。。。</p>
+<p>だけれど、型変数の抽出ルールはやはり明確だ。</p>
+<p>型変数は <code>b</code> <code>c</code> <code>a</code> の順で登場する。 それに合わせて <code>forall b c a</code> の順で定義される。</p>
+<p>さらに <code>forall</code> に続く型変数はCoreのラムダ抽象で引数になる。</p>
+<h3 id="パターンマッチ">パターンマッチ</h3>
+<pre><code>hasValue :: Maybe a -\&gt; Bool hasValue (Just \_) = True hasValue Nothing = False
+
+-- RHS size: {terms: 8, types: 7, coercions: 0}hasValue :: forall a. Maybe a -\&gt; Bool hasValue =\ (@ a) (ds :: Maybe a) -\&gt;case ds of \_ { Nothing -\&gt; False; Just \_ -\&gt; True }</code></pre>
+<p>関数定義部におけるパターンパッチはcase of構文に変換されている。</p>
+<p>CoreのCaseコンストラクタに変換されているらしい。</p>
+<pre><code>Case (Expr b) b Type [Alt b]</code></pre>
+<p>実はこのコンストラクタ <code>b</code> と <code>Type</code> の部分がまだ何者か判明していない。</p>
+<p><code>b</code> が <code>Expr b</code> を束縛しており、 <code>Type</code> が <code>[Alt b]</code> の式の型を注釈している？</p>
+<h3 id="型クラス制約">型クラス制約</h3>
+<p>型クラスつきの関数を定義するとどうなるだろうか。</p>
+<pre><code>join :: (Monad m) =\&gt; m (m a) -\&gt; m a join = (\&gt;\&gt;= id)
+
+-- RHS size: {terms: 8, types: 17, coercions: 0}join :: forall (m :: \* -\&gt; \*) a. Monad m =\&gt; m (m a) -\&gt; m a join =\ (@ (m :: \* -\&gt; \*)) (@ a) ($dMonad :: Monad m) (ds :: m (m a)) -\&gt;\&gt;\&gt;= @ m $dMonad @ (m a) @ a ds (id @ (m a))</code></pre>
+<p>斬新な変数が出てきた。 引数部分を分解して一つ一つ読み解こう。</p>
+<pre><code>(@ (m :: \* -\&gt; \*)) -- Monadのインスタンスとなるべき型(@ a) -- mで修飾された入力値の型の一部($dMonad :: Monad m) -- 型クラスを満たすインスタンスの定義(ds :: m (m a)) -- 実際の関数の入力値</code></pre>
+<p><code>join</code> に表れる型変数は <code>m</code> と <code>a</code> 。</p>
+<p>なのでその2つは最初に <code>(@ (m :: * -&gt; *))</code> と <code>@ a</code> として束縛される。<code>(ds :: m (m a))</code> は実際の関数の引数なので疑問なし。 問題は <code>($dMonad :: Monad m)</code> というどこから出てきたのか解らない束縛。</p>
+<p>これは型クラスの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>も関数の引数として受け取るための束縛らしい。</p>
+<p>ということは、型クラスの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>を渡しているところも見られるかもしれない。。。</p>
+<h3 id="型クラスのインスタンス適用">型クラスの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>適用</h3>
+<p>さきほど定義した <code>join</code> を使ってみよう。</p>
+<pre><code>maybeOne :: Maybe Int maybeOne = join (Just (Just 1))
+
+-- RHS size: {terms: 6, types: 5, coercions: 0}maybeOne :: Maybe Int maybeOne = join -- (@ (m :: \* -\&gt; \*))@ Maybe -- (@ a)@ Int -- ($dMonad :: Monad m)$fMonadMaybe -- (ds :: m (m a)) (Just @ (Maybe Int) (Just @ Int (I# 1#)))</code></pre>
+<p>コメントで先程の <code>join</code> の定義と対照してみた。</p>
+<p><code>Monad</code> の<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>定義を受け取る部分には</p>
+<pre><code>$fMonadMaybe</code></pre>
+<p>が。</p>
+<p>名前から察するにどうやらMaybeの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>定義が渡されているようだ。 (<a href="http://d.hatena.ne.jp/keyword/Scala">Scala</a>が型クラスの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>としてimplicitパラメータで渡しているものと、ほぼ同じものだと思われる。)</p>
+<h3 id="monad"><a href="http://d.hatena.ne.jp/keyword/Monad">Monad</a></h3>
+<p>最後に<a href="http://d.hatena.ne.jp/keyword/%A5%E2%A5%CA%A5%C9">モナド</a>を含むdo記法がどのようにCoreに変換されるのかを見てみる。</p>
+<pre><code>printArgs :: IO () printArgs = do args \&lt;- System.Environment.getArgs print args
+
+-- RHS size: {terms: 7, types: 8, coercions: 0}printArgs :: IO () printArgs =\&gt;\&gt;=@ IO $fMonadIO @ [String] @ () getArgs (\ (args :: [String]) -\&gt; print @ [String] $dShow args)</code></pre>
+<p>doは糖衣構文なので脱糖後は <code>&gt;&gt;=</code> を使った式に変換されるのは予想できた。</p>
+<p>型周りは思ったよりいろいろ混ざってきて混乱。 上から見ていく。</p>
+<p>bind関数の定義。(型制約は除く)</p>
+<pre><code>\&gt;\&gt;= :: m a -\&gt; (a -\&gt; m b) -\&gt; m b</code></pre>
+<p>これは <code>forall</code> つきで表現すると</p>
+<pre><code>\&gt;\&gt;= :: forall m a b. m a -\&gt; (a -\&gt; m b) -\&gt; m b</code></pre>
+<p>となる。</p>
+<p>よって</p>
+<pre><code>(@ (m :: \* -\&gt; \*)) (@ a) (@ b)</code></pre>
+<p>が型変数として関数の引数に抽出される。 実際の対応をみてみると</p>
+<pre><code>-- (@ (m :: \* -\&gt; \*))@ IO-- ここはMonadのインスタンスとしてIOの定義を渡している$fMonadIO-- (@ a)@ [String]-- (@ b)@ ()</code></pre>
+<p>これらを使うと <code>&gt;&gt;=</code> は下記のように具象化される。</p>
+<pre><code>-- getArgsより printより\&gt;\&gt;= :: IO [String] -\&gt; ([String] -\&gt; IO ()) -\&gt; IO ()</code></pre>
+<p>型変数だった部分全てに具体的な型が当てはまった。</p>
+<h2 id="まとめ">まとめ</h2>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のプログラムはdesugar(脱糖)後にCoreという<a href="http://d.hatena.ne.jp/keyword/%C3%E6%B4%D6%B8%C0%B8%EC">中間言語</a>に変換される。</p>
+<p>Coreは基本的に型付きラムダ計算(の変種)なので</p>
+<ul>
+<li>変数</li>
+<li>関数の定義</li>
+<li>関数の適用</li>
+<li>その他 Let, Case …</li>
+</ul>
+<p>などのわずかな定義で構成される。</p>
+<p>さらに値と型が同レベルで束縛されるラムダ抽象を用いることで</p>
+<ul>
+<li>型クラスの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>渡し</li>
+<li>具象型の決定</li>
+</ul>
+<p>などの操作が <em>ただの関数適用</em> で実現されている。</p>
+<p>少ない規則で多彩な<a href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>を実現している好例が<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>の中に潜んでいることを知ることができてよかった。</p>
+<p>Less is more.</p>
+<p>Yoshiko is Yohane.</p>
+<h2 id="reference">Reference</h2>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=uR_VzYxvbx">Simon Peyton Jones Into The Core</a></li>
+<li><a href="https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/HscMain">GHC Compiler pass</a></li>
+<li><a href="https://downloads.haskell.org/~ghc/8.2.2/docs/html/libraries/ghc-8.2.2/CoreSyn.html">CoreのAPI Document in GHC 8.2.2</a></li>
+<li><a href="https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/debugging.html">GHCのデバッグオプション</a></li>
+<li><a href="https://haskell.jp/blog/posts/2017/12-ghc-show-info.html">GHCにおける多彩な情報の出力方法</a></li>
+<li><a href="http://www.stephendiehl.com/posts/ghc_03.html">もっと踏み込んだ解析 Dive into GHC: Targeting Core</a></li>
+<li><a href="http://alpmestan.com/posts/2013-06-27-ghc-core-by-example-episode-1.html">この記事よりもちゃんと調べている: GHC Core by example, episode 1: Hello, Core!</a></li>
+</ul>
+<p>下記、余談</p>
+<h2 id="モチベーション">モチベーション</h2>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a> Day 2016が日本で開催された時にSimon Peyton Jonesさんが“Into the Core”というタイトルでプレゼンされたらしい。 残念ながら僕は都合がつかず聞きにいけなかったけれど、同じテーマの講演が動画に収められていたのでそれをリンクしておく。</p>
+<p><a href="https://www.youtube.com/watch?v=uR_VzYxvbxg">Into the Core - Squeezing Haskell into Nine Constructors by Simon Peyton Jones</a></p>
+<p>早口過ぎて99%何を言っているのか僕には解らない。 けれどところどころなんとなく伝わる気がする。</p>
+<p>プレゼンで使ったスライドは <a href="http://www.erlang-factory.com/static/upload/media/1488806820775921euc2016intothecoresimonpeytonjones.pdf">こちら</a></p>
+<p>これをぼんやり聞いていて「Coreってなんだか面白いな」と思ったのがきっかけ。</p>
+<h2 id="これから">これから</h2>
+<p>Coreの理論的背景になっている<a href="http://d.hatena.ne.jp/keyword/SystemF">SystemF</a>というラムダ計算の一種が何者なのか気になる。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>で用いられているSystemFCという変種については下記のリンクが参考になりそうだけど。</p>
+<p><a href="https://www.microsoft.com/en-us/research/publication/system-f-with-type-equality-coercions/">System F with type equality coercions</a></p>
+<p>僕はそもそもラムダ計算素人なので下記の書籍を読み進める必要がありそう。</p>
+<p><a href="https://www.amazon.co.jp/dp/4274069117">型システム入門 プログラミング言語と型の理論</a></p>
+<p>最短で</p>
+<ul>
+<li>3章: 型無し算術式</li>
+<li>8章: 型付き算術式</li>
+<li>9章: 単純型付きラムダ計算</li>
+<li>23章: 全称型</li>
+</ul>
+<p>を読めば辿り着けるように見える。</p>
+<p>いやーほんとかなあ。。。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

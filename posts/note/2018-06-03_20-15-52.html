@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - fight against happy conflict</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">fight against happy conflict</h1>
+    <small>
+    2018-06-03
+     / 
+    
+    [  ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>lexerはだいぶ整ってきたのでparserを書いている。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>でのパーサジェネレータ周りのツールチェインだとほぼalex + happy一択っぽいし 知見が多そうなのでそれを使っている。 (<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>でも使われている道具なので使いっぷりで困ったことがあれば<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>のソース見るという逃げ道もあってお得)</p>
+<p>この記事では僕のように今までlex/<a href="http://d.hatena.ne.jp/keyword/yacc">yacc</a>を使ったことがないにもかかわらず、<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のalex/happyを使い出してしまうような死に急いでいる人向けの参考になれば、と思うことを書く。</p>
+<h2 id="conflict万歳">conflict万歳</h2>
+<p>構文を定義してパーサ作っていたら思ったように解析してくれなかったり、 解析そのものに失敗することが増えてきた。</p>
+<p>なんだろうなと思って入力を変えてみて解ったのだけれど、 とっととreduceしてもらいたいところなのに次の<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンを待つ(shift待ち)パターンが選ばれて 期待した入力がこないためにfailしていた。</p>
+<p>reduceしてほしいのにshiftが動く、みたいな問題をshift/reduce conflictと呼ぶらしい。</p>
+<p>happyが出力する.info拡張子のレポートを見ていると、 スタックに積まれた<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ン列に対して発行できるreduceがいくつもあり得るという、 いわゆるreduce/reduce conflictのパターンも検出されていた。</p>
+<p>こういうconflictを放置するとあとで大きな<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%CC%DA">構文木</a>を作ろうとするときの<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>で苦労しそうなので今のうちに倒しておこうと思う。</p>
+<h2 id="conflictのデバッグ">conflictの<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a></h2>
+<p>王道なし、ということらしい。 なので.infoファイル読みながら闘うことになる。</p>
+<h3 id="conflictを見つける">conflictを見つける</h3>
+<p>happyのユーザガイドに何も書いてなかったので手探りでやる。</p>
+<p>こんな感じで出てくる。</p>
+<pre><code>----------------------------------------------------------------------------- Info file generated by Happy Version 1.19.5 from src/Ily/Parser.y ----------------------------------------------------------------------------- state 2 contains 2 shift/reduce conflicts. state 8 contains 1 shift/reduce conflicts. state 14 contains 1 shift/reduce conflicts. state 15 contains 7 shift/reduce conflicts and 6 reduce/reduce conflicts.</code></pre>
+<p>r/r conflictがstate 15に見つかったらしい。</p>
+<h3 id="state-15">state 15</h3>
+<pre><code>State 15 dec -\&gt; val . seq(tyvar) valbinds (rule 72) dec -\&gt; val . valbinds (rule 73) int shift, and enter state 6 (reduce using rule 107) string shift, and enter state 22 (reduce using rule 107) char shift, and enter state 23 (reduce using rule 107) and reduce using rule 127 (reduce using rule 107) end reduce using rule 127 (reduce using rule 107) in reduce using rule 127 (reduce using rule 107) op shift, and enter state 26 (reduce using rule 107) '(' shift, and enter state 94 (reduce using rule 107) '{' shift, and enter state 44 (reduce using rule 107) '\_' shift, and enter state 45 (reduce using rule 107) id reduce using rule 107 (reduce using rule 19) longid reduce using rule 107 (reduce using rule 19) tyvarid shift, and enter state 38 %eof reduce using rule 127 (reduce using rule 107) scon goto state 39 tyvar goto state 87 ope goto state 40 atpat goto state 41 pat goto state 88 valbinds goto state 89 valbind goto state 90 sep(valbind,and)goto state 91 seq(tyvar) goto state 92 rev\_sep(valbind,and)goto state 93</code></pre>
+<p>見分け方</p>
+<p>shiftが適用されているけどreduceの可能性も示唆されているもの。</p>
+<p>shift/reduce conflict</p>
+<pre><code> int shift, and enter state 6 (reduce using rule 107)</code></pre>
+<p>reduceが適用されているけど別のreduce ruleの可能性も示唆されているもの。</p>
+<p>reduce/reduce conflict</p>
+<pre><code> id reduce using rule 107 (reduce using rule 19)</code></pre>
+<p>意外と見つけやすかった。</p>
+<h3 id="stateは構文規則の何と対応づいているのか">Stateは構文規則の何と対応づいているのか</h3>
+<p>conflictが起きている事実を確認できた。 これを修正しようといったいどの規則を直せばいいのか調べる必要がある。</p>
+<p>これがわからない。</p>
+<p>そもそも何故これが起きるのかを知るためには、 もとの構文規則とこのinfoファイルの中で言われていることの対応が明確でないといけない。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

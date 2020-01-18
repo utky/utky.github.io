@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - プログラミングClojureにおける「データ」とは何か</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">プログラミングClojureにおける「データ」とは何か</h1>
+    <small>
+    2018-01-01
+     / 
+    
+    [ <a href="../../tags/clojure.html">clojure</a>, <a href="../../tags/programming.html">programming</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>プログラミング<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>は僕が読んだ二冊目の<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>の本で、<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>がどんな機能を備えているのか、どんな<a href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%E9%A5%C0%A5%A4%A5%E0">パラダイム</a>なのかを 教えてくれるとても良い本。</p>
+<p>読み終わった今でも時々、「あそこどう書いてたっけな」と気になってはすぐに読み返してしまう。</p>
+<p>しかしながら、何度読んでも“具体的なオブジェクト”と“データ”という記述の違いが解らなかった。 その後、ひとりで悩んだり、人に相談してようやく理解できた。</p>
+<p>この記事ではその理解をなんとか噛み砕いて説明しようと思う。</p>
+<h2 id="データ">「データ」</h2>
+<p>どんなワークフローでプログラムを組んでいくのがよいか</p>
+<p>プログラミング<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>ではそれについて説明している箇所がある。 誰もが気になるところだ。文法や言語の機能が解ったところで、「実際どうやるの？」が解らなければ勇気をもって実装に踏み出せないものだ。</p>
+<p>例えばこんな文章で説明されている。</p>
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>での設計の肝は、いつでもどこでも具体的なオブジェクトで溢れさせるのではなく、データそのものについて考えることだ。</p>
+<p>引用元: <cite>10.1 Clojurebreaker ゲームのスコアの計算 p.222</cite></p>
+</blockquote>
+<p><strong>これが解らなかった</strong></p>
+<p>「データそのもの」とはなんだろうか。 具体的なオブジェクトとの違いは何だ？</p>
+<p>さらに<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>プログラミングの原則として下記のようなことが書いてある。</p>
+<blockquote>
+<p>・領域特有の具体物を持ち込まない（データはデータとして扱う）。</p>
+<p>引用元: <cite>10.1 Clojurebreaker ゲームのスコアの計算 p.224</cite></p>
+</blockquote>
+<p><strong>これも解らなかった</strong></p>
+<p>「データはデータ」？ データは具体物ではないのか？ では何なんだ？</p>
+<h3 id="何が難しいのか">何が難しいのか</h3>
+<ul>
+<li>具体的なオブジェクト/具体物</li>
+<li>データ</li>
+</ul>
+<p>この違いが解っていないから混乱する。もう一度文章をよく睨んでみよう。</p>
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>での設計の肝は、いつでもどこでも具体的なオブジェクトで溢れさせるのではなく、データそのものについて考えることだ。</p>
+</blockquote>
+<p>データそのものについて考える。 それは具体的な何かの概念について考えることになるだろう。</p>
+<p>そう思った。というか、そう連想した。</p>
+<p>なので</p>
+<pre><code>データそのものについて考える＝具体的なオブジェクトを設計する</code></pre>
+<p>ではないの？</p>
+<blockquote>
+<p>・領域特有の具体物を持ち込まない（データはデータとして扱う）。</p>
+</blockquote>
+<p>領域特有の具体物を持ち込まないプログラミング、というのが想像できなかった。</p>
+<p>データが具体的でないのなら、いったいどんな形をしているのか、まったく解らない。 データは「扱われる」のだから何らかの意味で具体的になっているはずだろう。</p>
+<h2 id="教えてもらった">教えてもらった</h2>
+<p>ずっと考えていても解決する兆しが無いので、直接訳者の方に質問してみた。</p>
+<h2 id="解ったこと">解ったこと</h2>
+<p>頂いた回答をもとにまとめると。。。。</p>
+<h3 id="具体物">具体物</h3>
+<pre><code>{ :name &quot;津島善子&quot; :blood-type O :birth-day [Jul 13] }</code></pre>
+<h3 id="データ-1">データ</h3>
+<pre><code>{ :name &quot;津島善子&quot; :blood-type O :birth-day [Jul 13] }</code></pre>
+<h3 id="section">!?!?!?</h3>
+<p>同じっ！？</p>
+<p><em>記法は同じ！！</em></p>
+<p><strong>しかし意味が異なる！！</strong></p>
+<p>どちらも同じMapだが、</p>
+<ul>
+<li>具体物としてそれを捉えた場合: <em>それは<a href="http://d.hatena.ne.jp/keyword/%C4%C5%C5%E7%C1%B1%BB%D2">津島善子</a>という人の情報を表す</em></li>
+<li>データとしてそれを捉えた場合: <em>それはkey-<a href="http://d.hatena.ne.jp/keyword/value">value</a> pairsを表す</em></li>
+</ul>
+<p>「どう捉えるか」という解釈が問題。</p>
+<p>それは確かに人を表す情報かもしれないけど、 <em>それはいったん忘れて</em> Map (key-<a href="http://d.hatena.ne.jp/keyword/value">value</a> pairs) という <strong>データ</strong> として関数を適用しよう。</p>
+<h3 id="再咀嚼">再咀嚼</h3>
+<blockquote>
+<p><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>での設計の肝は、いつでもどこでも具体的なオブジェクトで溢れさせるのではなく、データそのものについて考えることだ。</p>
+<p>・領域特有の具体物を持ち込まない（データはデータとして扱う）。</p>
+</blockquote>
+<p>これらは何を言っているか。</p>
+<p>対象の具体的な意味は忘れて、Map, Seq, <a href="http://d.hatena.ne.jp/keyword/Vector">Vector</a>としてデータを変換するような<a href="http://d.hatena.ne.jp/keyword/API">API</a>を設計しよう、ということだ。 そして幸いにも <code>clojure.core</code> にそういった関数が膨大にある。 それを使えばいいじゃないか。</p>
+<p>そう、それが再利用性ということ。</p>
+<p>必要であれば自分で少し拡張しないといけないかもしれない。</p>
+<h4 id="具体的なオブジェクト">具体的なオブジェクト</h4>
+<p>たとえばこれは明らかに具体物だ。</p>
+<pre><code>(defrecord AqoursMember [name blood-type birth-day])</code></pre>
+<p>だって <code>AqoursMember</code> と書いてある。 それが見たまんま <a href="http://www.lovelive-anime.jp/uranohoshi/">ラブライブ サンシャイン</a> に出てくるスクールアイドルを示す何かであることは疑いようもない。</p>
+<h4 id="データ-2">データ</h4>
+<p>一方でそれは</p>
+<pre><code>IPersistentMap</code></pre>
+<p>だ。</p>
+<p>それは key と <a href="http://d.hatena.ne.jp/keyword/value">value</a> の対が収まった不変データそのもの。 歌ったり汗をかいたりはしない。</p>
+<p>ただ <code>assoc</code> や <code>map</code> や <code>reduce</code> に渡せるインタフェースを満たすデータ構造だと考えることができる。</p>
+<p>意味を忘れるとはつまり、それが僕達の仕事の中でどんな意味を持つかではなく、<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のプリミティブとして何であるかだけを考える、ということ。</p>
+<p>データが何を意味するかは気にする必要ない。一般化して考えよう。</p>
+<p>それが<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>における<a href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%E0%A5%A2%A5%C3%A5%D7">ボトムアップ</a>プログラミングのスタイルである、ということらしい。</p>
+<h2 id="現実的な問題に立ち向かう">現実的な問題に立ち向かう</h2>
+<p>そうは言っても僕達は具体物・具象から離れてはアプリケーションを作れない。 アプリケーションが特定の問題解くものである以上、絶対に避けられない。</p>
+<p>そこで、<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のプログラミングではデータという抽象を扱うたくさんの<a href="http://d.hatena.ne.jp/keyword/API">API</a>の <strong>上に</strong> あるいは <strong>その外側</strong> に領域特有(Domain Specific)のプログラムを構築する。</p>
+<p>僕個人としてはこの考え方は結構衝撃的だった。</p>
+<h3 id="ドメインがいる場所"><a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がいる場所</h3>
+<p>DDDを少しかじってみるとHexagonal Architectureというものに出くわす。</p>
+<p>僕はアプリケーションの俯瞰図をそのイメージで考えることが多い。</p>
+<figure>
+<img src="https://speakerd.s3.amazonaws.com/presentations/de8629f0bf520131c2e20239d959ba18/slide_11.jpg" alt="Hexagonal Architecture" /><figcaption>Hexagonal Architecture</figcaption>
+</figure>
+<p>この図だと、<a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>つまり具体的なオブジェクトの集まりはアプリケーションの中核にいる。</p>
+<p>でも<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のワークフローに従うとこの中と外が <strong>逆転</strong> する。</p>
+<figure>
+<img src="https://cdn-ak.f.st-hatena.com/images/fotolife/i/ilyaletre/20180101/20180101120422.jpg" title="f:id:ilyaletre:20180101120422j:plain" alt="f:id:ilyaletre:20180101120422j:plain" /><figcaption>f:id:ilyaletre:20180101120422j:plain</figcaption>
+</figure>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>固有のオブジェクトは外側になる。</p>
+<p>代わりに中核に居座るのは抽象データを操作する関数だけになる。</p>
+<h3 id="ボトムアップでコアを作っていく"><a href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%E0%A5%A2%A5%C3%A5%D7">ボトムアップ</a>でコアを作っていく</h3>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%E0%A5%A2%A5%C3%A5%D7">ボトムアップ</a>プログラミングと口にする時、それはこの抽象データ用の中核を作っていくことに他ならない。 定義する関数が <code>Person</code> だとか <code>AqoursMember</code> だとか、そういうことは一切気にしないでプログラミングする。</p>
+<p>勿論REPLでテストデータを渡すために仮のレコードを定義して使うことはあるかもしれないが、 呼び出される関数はそれらをただの <code>Map</code> として認識して操作する。</p>
+<p>この一般化された関数を“ボトム”として、その上に少しずつ具体的な“トップ”を作っていく。</p>
+<p>あるいは</p>
+<p>この一般化された関数を“内側”として、その“外側”に少しずつ具体的なオブジェクトを作っていく。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>プログラミング<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>における“具体”と“データ”の違いを見てきた。</p>
+<ul>
+<li>具体/具象: <a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>固有オブジェクトとしてそれを捉えた時の呼び方</li>
+<li>データ/抽象: <a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>をいったん忘れてただの<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のデータ構造としてそれを捉えた時の呼び方</li>
+</ul>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%E0%A5%A2%A5%C3%A5%D7">ボトムアップ</a>プログラミングとは、</p>
+<ul>
+<li>データを操作する関数を最初に作り、</li>
+<li>そこから具体的な意味を扱う関数をその上に作る</li>
+</ul>
+<p>ようなワークフローである。</p>
+<p>ということが解った。</p>
+<h3 id="謝辞">謝辞</h3>
+<p>訳者の<a href="http://d.hatena.ne.jp/keyword/%C0%EE%B9%E7%BB%CB%CF%AF">川合史朗</a>さんの適切なアド<a href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>を受けてなんとかこの理解を得ることができました。 ありがとうございました。</p>
+<h2 id="ところで">ところで</h2>
+<p><a href="https://pragprog.com/book/shcloj3/programming-clojure-third-edition">原著の第三版</a> が出ている。</p>
+<p>transducerとspecについての内容が追加されているらしく、もう原著で買うか、という気分になっている。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

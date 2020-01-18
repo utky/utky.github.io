@@ -4,15 +4,15 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Hash λ Bye - Posts tagged: programming</title>
+        <title>Hash λ Bye - Clojureでの副作用の表現について</title>
 
         <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
         <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/highlight/agate.css">
-        <script src="../js/highlight.pack.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
-        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
         <script>
@@ -37,21 +37,21 @@
                       <span class="icon-bar"></span>
                       <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="../">
+                    <a class="navbar-brand" href="../../">
                       <span>
-                      <img src="../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                     <ul class="nav navbar-nav">
                       <li>
-                        <a href="../about.html">
+                        <a href="../../about.html">
                           <span class="glyphicon glyphicon-user"></span> About
                         </a>
                       </li>
                       <li>
-                        <a href="../writings.html">
+                        <a href="../../writings.html">
                           <span class="glyphicon glyphicon-book"></span> Writings
                         </a>
                       </li>
@@ -71,7 +71,7 @@
                         </a>
                       </li>
                       <li>
-                        <a href="../contact.html">
+                        <a href="../../contact.html">
                           <span class="glyphicon glyphicon-envelope"></span> Contact
                         </a>
                       </li>
@@ -83,44 +83,41 @@
               <main class="content">
                 <article id="content">
   <header>
-    <h1 class="title">Posts tagged: programming</h1>
+    <h1 class="title">Clojureでの副作用の表現について</h1>
+    <small>
+    2017-04-20
+     / 
+    
+    [ <a href="../../tags/clojure.html">clojure</a> ]
+    
+     / 
+    
+    </small>
   </header>
   <div class="body">
-    <ul class="archives">
-  
-  <li>
-    2019-07-14 - <a href="../posts/note/2019-07-14_15-45-26.html">『リーダブルコード』を読んだ</a>
-  </li>
-  
-  <li>
-    2018-05-28 - <a href="../posts/note/2018-05-28_22-49-55.html">プログラミング言語学習の助走</a>
-  </li>
-  
-  <li>
-    2018-01-01 - <a href="../posts/note/2018-01-01_12-05-43.html">プログラミングClojureにおける「データ」とは何か</a>
-  </li>
-  
-  <li>
-    2017-12-10 - <a href="../posts/note/2017-12-10_19-50-16.html">GHCの中間言語Coreへの脱糖を覗き見る</a>
-  </li>
-  
-  <li>
-    2017-07-17 - <a href="../posts/note/2017-07-17_20-16-39.html">小さく作ることとモチベーション</a>
-  </li>
-  
-  <li>
-    2017-01-29 - <a href="../posts/note/2017-01-29-write-tool-in-go.html">Goでツールを作る</a>
-  </li>
-  
-  <li>
-    2017-01-22 - <a href="../posts/note/2017-01-22-view-model-in-elm.html">Elmの設計で悩むところメモ</a>
-  </li>
-  
-</ul>
-
+    <p>自分が悩んでることを拙い語彙でぽつぽつ綴るので、誰にも伝わらないと思う。</p>
+<p>DBアクセスする機能を実装したいとする。</p>
+<p><code>java.jdbc</code> を使ってDBアクセスレイヤを実装することになるのが普通かなと思う。<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>は<a href="http://d.hatena.ne.jp/keyword/%B4%D8%BF%F4%B7%BF%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0">関数型プログラミング</a>言語なので、組み立てに使う部品(関数)はできるだけ純粋な方がいい。 DBからのデータ取得やデータ更新を行う手続きもできるだけ副作用のない関数で組み立てたい。</p>
+<p>DBアクセスする手続きなのにそんなことできるのか？ と思う。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のように独自ASTと<a href="http://d.hatena.ne.jp/keyword/interpreter">interpreter</a>のパターンならそれができる。<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>でも同じような構成になるのだろうか。</p>
+<p>いくつかアプローチがありそうだ。</p>
+<ol type="1">
+<li>副作用を起こす関数は<a href="http://d.hatena.ne.jp/keyword/%B9%E2%B3%AC%B4%D8%BF%F4">高階関数</a>で受け取る</li>
+<li>副作用を起こすコマンドを生成する純粋関数を合成し、<a href="http://d.hatena.ne.jp/keyword/interpreter">interpreter</a>で副作用を発行する</li>
+</ol>
+<p>基本的には<a href="http://d.hatena.ne.jp/keyword/%B9%E2%B3%AC%B4%D8%BF%F4">高階関数</a>で解けるのが一番低コストでよいと思う。<a href="http://d.hatena.ne.jp/keyword/%B9%E2%B3%AC%B4%D8%BF%F4">高階関数</a>を使ったDIだと捉えるとわかりやすい。</p>
+<p>ただ適用する関数が色々な種類の副作用関数を要求するようになると突然複雑になる。DIで言えば注入する依存が肥大化している状態。 気軽に依存が満たせなくなるので、とても腰の重いインタフェースができる。</p>
+<p>それを補うために関数の辞書を渡すことになってしまう。しかしインタフェースが抱える複雑さは変わらないので、実はあまり解決になってない。</p>
+<p>2案</p>
+<p>あるパラメータを渡すと「印字せよ」とか「INSERT文を発行せよ」という命令を返す関数を中心に組み合わせる。 命令は実行されるまで何の副作用も生まない。なので、その関数を呼び出しても、何か副作用が起きるわけではない。 実行すれば副作用が起こる命令が手元にあるだけだ。</p>
+<p>これはDIとは完全に切れ離された、より純粋な設計になる。 しかし一方で、命令を実行する別の機能が必要になるため複雑さはそちらになお宿っている。</p>
+<p>が、ビジネス<a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の記述に徹することができるのは保守上のメリットがある。</p>
+<p>対して、命令と実行を受け持つ関数はなかなか軽くもシンプルにもならないだろうと思う。</p>
+<p>それでも<a href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を純粋に保てるのなら2案になるのかな。</p>
+<p>設計プランは後ほど追記 - 4/23 まだできてない <a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>で遊んでいる場合ではない感じに。。。</p>
   </div>
-</article>
-
+  <footer>
+    
               </main>
 
               <footer>
@@ -162,7 +159,7 @@
         </div>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/bootstrap.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
         <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">

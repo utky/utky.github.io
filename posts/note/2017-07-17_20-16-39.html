@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - 小さく作ることとモチベーション</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">小さく作ることとモチベーション</h1>
+    <small>
+    2017-07-17
+     / 
+    
+    [ <a href="../../tags/programming.html">programming</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="https://en.wikipedia.org/wiki/Minimum_viable_product">Minimum viable product - Wikipedia</a></p>
+<p>小さく作りながら進めるのがうまい人は作業ステップの分割ではなくてゴールの分割に優れているなあ、と思う。 最低限のユーザが試すことができる機能のみを搭載したプロダクトをMVP(Minimum Viable Product)というらしい。</p>
+<p>ユーザス<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC">トー</a>リ<a href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0">マッピング</a>の本にも書いてあった。</p>
+<p>僕が実例で見て痛感したのはRui Ueyamaさんの動画。</p>
+<iframe width="459" height="344" src="https://www.youtube.com/embed/JAtN0TGrNE4?feature=oembed" frameborder="0" allowfullscreen>
+</iframe>
+<p><cite class="hatena-citation"><a href="https://www.youtube.com/watch?v=JAtN0TGrNE4">www.youtube.com</a></cite></p>
+<p>小さいけれど動くものを作る。 できたものをテストして、また機能をリッチにしていく。</p>
+<p><a href="https://rebuild.fm/153/">Rebuild.fm #153</a>にUeyamaさんが出ていた回では「インクリメンタル」と表現していたアプローチ。</p>
+<h2 id="なんでこれが良いのか">なんでこれが良いのか</h2>
+<p>僕自身のモチベーションが維持できる。 小さくてもフィードバックが得られるから。</p>
+<p>小さくても動くという達成感がいかに大きいか、最近<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>でコード書いていてつくづく思う。 少し書いたら小さなテストを作って確認していく。</p>
+<p>「ここまでは動きそうだな」というのが安心感として得られる。</p>
+<p><em>安心！</em></p>
+<p>安心が大事だ。モチベーションは精神性に根ざすので、安心という心の状態がモチベーションに寄与するのは、なんとなくreasonableな気がする。</p>
+<p>安心して進めたい。うんうんと頷きながら進めたい。わけがわからなくなって疲れて飽きてやめたくない。</p>
+<p>そのためにゴールを小さく分割して作っていこうよ、という活動が僕なりのMVPの効用だ。</p>
+<h2 id="はまりがちなこと">はまりがちなこと</h2>
+<p>頭にあるものを一気に吐き出そうとすると、前述の進め方を忘れてしまうことがある。</p>
+<p>とにかく全部一度作りきろうとするのだ。</p>
+<p>すると一気に作ったあと一気に動作を検証していくことになる。 一気に作ったものがきれいに動作することは大抵なくて、長い<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>が始まることを意味する。</p>
+<p>フィードバックを得る機会は先延ばしになり、モチベーションは消費されるだけになってくる。</p>
+<p>今度はだんだん<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%D0%A5%C3%A5%B0">デバッグ</a>が辛くなってきて腰が重くなってくる。 こうなるともう赤信号だ。</p>
+<p>今までこういう隘路にはまって続かないことが多かった。</p>
+<h2 id="小さくゴールを分割するということ">小さくゴールを分割するということ</h2>
+<p>これは難しい課題だ。</p>
+<p>問題領域がよく解っているならゴールの分割はわけないだろう。 でもインクリメンタルにモノを作っていく時、大概の場合は作ろうとしているモノの全体像はわからない。 自然と探索的にゴールを切り取っていくことになる。</p>
+<p>これに定石があるようには思えない。なので都度頭を悩ませながらゴールを切り取っていくのだろう。</p>
+<p>けれど、間違った判断をしていることに気づけるかもしれない。 例えば、ゴールを分割するのではなく、作業工程を分割するような間違いだ。 ユーザース<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC">トー</a>リー<a href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0">マッピング</a>の本では、とても大きなケーキを作る作業を例えにだしていた。</p>
+<p>ゴールを小さく区切るMVPの考え方に従うと、小さなゴールとは例えば1/16くらいのサイズのカップケーキのようなものだという。</p>
+<p>誤った分割をしている場合は、大きなスポンジを作ることだという。</p>
+<p>大きなケーキを工程で分割してしまうと後者の過ちを踏むことになる。 対照的にMVPに従ってゴールを分割すると、前者のように小さいけれどユーザにデリバリできる単位が成果になる。</p>
+<p>フィードバックを得やすいのは明らかに前者、ということだ。大きなスポンジだけ渡されても、それはケーキではないから誰も評価できない。 一方小さなケーキは小さくてもケーキだ。食べてケーキとしての出来栄えの感想を述べることができる。</p>
+<p>幸いにしてソフトウェアは小さな部品を合成して大きな部品を構築できる性質を備えている。 小さなケーキを合成すると大きなケーキが作れる。</p>
+<p>これを利用しない手はない、ということらしい。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>小さいけれど充分に動作する機能を反復的に作っていく。 これはモチベーションを維持していくことにとても効果がありそうだと思った。</p>
+<p>もちろん難しいのはゴールの分割する思考法だ。</p>
+<p>それでも<a href="http://d.hatena.ne.jp/keyword/%BB%B0%C6%FC%CB%B7%BC%E7">三日坊主</a>になりがちな僕でもモノを作り続けられるかもしれない唯一のアプローチではないかと思っている。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

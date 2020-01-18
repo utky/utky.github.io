@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - SMLの関数適用を構文解析する時の問題</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">SMLの関数適用を構文解析する時の問題</h1>
+    <small>
+    2017-09-30
+     / 
+    
+    [ <a href="../../tags/standardml.html">standardml</a>, <a href="../../tags/sml.html">sml</a>, <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/compiler.html">compiler</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>まだ<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>器で苦労している。 今回も詰まっているのは構文のconflict。</p>
+<h2 id="問題">問題</h2>
+<p>これが関数適用</p>
+<pre><code>app : exp exp</code></pre>
+<p>これが<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>適用</p>
+<pre><code>infixapp : exp vid exp</code></pre>
+<p>この時に入力を</p>
+<pre><code>x y z</code></pre>
+<p>とすると２つの解釈ができてしまうことになる。</p>
+<pre><code>((x y) z)</code></pre>
+<p>とするネストした関数適用なのか</p>
+<pre><code>x y z</code></pre>
+<p>とする<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>の適用なのかParserが判断つけられない。</p>
+<p>前者ならreduceするが後者ならshiftする。 なのでこれはshift/reduce conflictが起きていると言える。 happyはデフォルトでshiftするので<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>として解釈される。</p>
+<p>これを解消したい。</p>
+<h2 id="解決">解決</h2>
+<p>sml-njやmltonのgrmファイルの定義を覗いたところ</p>
+<pre><code>FlatAppExp : exp list</code></pre>
+<p>のようなデータコンストラクタを使ってとりあえずシンボルのリストとしていったん読み込んでしまうらしい。 なぜ関数適用と<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>適用は全然違う構造にも関わらず峻別せずに扱うのだろうと疑問に思った。</p>
+<h2 id="なぜだろう">なぜだろう</h2>
+<p>SMLではfixityを自分で定義して<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>を作れる。</p>
+<p>左結合か右結合かをどこかのテーブルに保存しておくことになる。(おそらくEnv的なもの？まだそのあたり解らない) こういう動的にassociativityが定義される<a href="http://d.hatena.ne.jp/keyword/%C6%F3%B9%E0%B1%E9%BB%BB%BB%D2">二項演算子</a>はパーサジェネレータでは扱えないっぽい。</p>
+<p>なので一度解析しきってから、後でsanityチェックして弾くっぽい。</p>
+<p>解析の途中でこのfixityのテーブルを更新しながら進めば別に解析の完了を待たなくてもいいじゃんとも思った。 けれど、それだとfixityの定義が必ず<a href="http://d.hatena.ne.jp/keyword/%B1%E9%BB%BB%BB%D2">演算子</a>の使用よりも前に定義済みである必要がある。 それは不便だろう。</p>
+<p>ということで<a href="http://d.hatena.ne.jp/keyword/Flat">Flat</a>なんたらという構造を導入してなんとか解決はできた。</p>
+<p>追記</p>
+<p><a href="http://dev.stephendiehl.com/fun/008_extended_parser.html">http://dev.stephendiehl.com/fun/008_extended_parser.html</a></p>
+<p>ここを見るとinfix operatorを動的に定義していく方法が提示されているが、やはりparsecだな。<a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>はどうやっているのか見てみる必要ありかな。。。</p>
+<h2 id="納得いってない">納得いってない</h2>
+<p>悪手かなと思うのは、こうした<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>上の問題のために抽象的なデータ構造にコンストラクタを追加しなければならないという点。 せっかくきれいにsyntax objectを定義できたのにノイズが入ってしまうみたいでイマイチだなと思う。</p>
+<p>これだと</p>
+<pre><code>1 + 2 + 3</code></pre>
+<p>みたいな入力は</p>
+<pre><code>[&quot;1&quot;, &quot;+&quot;, &quot;2&quot;, &quot;+&quot;, &quot;3&quot;]</code></pre>
+<p>のようにreduceされる。</p>
+<p>parsecならこれをexpression builder的な<a href="http://d.hatena.ne.jp/keyword/API">API</a>でうまく<a href="http://d.hatena.ne.jp/keyword/%CC%DA%B9%BD%C2%A4">木構造</a>に変換できるのだが。。。 まあ、部分的にparsec使うのはありかもしれない。</p>
+<h2 id="これから">これから</h2>
+<p>あとはモジュール系の<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>が作れればとりあえず<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>のステージは終わりだろう。 と、言いたいところだがshift/reduceやreduce/reduceのconflictがわんさか残っている。</p>
+<p>どうしよう。。。問題ないならこのまま進めてしまいたい。 正直conflictの解消法は未だにわかってない。</p>
+<p>あとまだわかってないこと。</p>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>終わった後のsyntax objectに位置情報を顕に保存していないけれどtype checkエラーの時に位置情報含めてレポートできるのか？</li>
+<li>そもそもエラーレポートがすごくわかりにくい。後で苦労するので早めにverboseなレポート出せるようにしたい。</li>
+</ul>
+<p>やりながら良かったと思うこと。</p>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/haskell">haskell</a>のhappy使ってるけどmlyaccや<a href="http://d.hatena.ne.jp/keyword/yacc">yacc</a>ととても似ているため他のツールチェイン使った時もこのノウハウは活きるだろう</li>
+<li>テストはこまめに書いているので「ここまでは動く」という証左が得られる安心感はやっぱり良い。<a href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>としてこの感覚は大事にしたい。</li>
+</ul>
+<h2 id="その他近況メモぼやき">その他近況メモ(ぼやき)</h2>
+<h3 id="カーネル"><a href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%CD%A5%EB">カーネル</a></h3>
+<p>詳解<a href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><a href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%CD%A5%EB">カーネル</a>読んでる。 メモリアドレッシングからいきなりハードル高い。</p>
+<p>特にページングテーブルの初期化のところとか全然解らない。</p>
+<h3 id="clojure"><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a></h3>
+<p><a href="http://d.hatena.ne.jp/keyword/Scala">Scala</a>勉強しなきゃ、からマッハで脱線して<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>の情報ばかり漁っている。</p>
+<p>どっかの記事で「<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>は大規模プロジェクトになるとメンテナンスが難しくなってきてスケールしない」みたいなこと言ってた。 そうだろうなと思う。<a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>はそれほど気軽にできないだろう。</p>
+<p>specが出てきてチェック機構は揃ってきているけれど、 それでもやはり「実行しないと結果が解らない」という制約は残る。</p>
+<p>REPLで探索しながら直すべきところは見つけられるよ、という意見もあるかもしれないけれど<a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>の過程で影響のあるところ全部を検査する仕組みはやっぱり無いではなかろうか。 というか<a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%D5%A5%A1%A5%AF%A5%BF%A5%EA%A5%F3%A5%B0">リファクタリング</a>して壊れたところを<a href="http://d.hatena.ne.jp/keyword/%B5%A1%B3%A3%C5%AA">機械的</a>に見つける手段が無い、と言うべきか。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>もそうだけど、<a href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>や<a href="http://d.hatena.ne.jp/keyword/Python">Python</a>やJS使っている人たちどうしているのだろう。素朴に疑問。</p>
+<p>とかぐだぐだ言いながらもなんか<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>好きなので勉強を続けてしまう。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

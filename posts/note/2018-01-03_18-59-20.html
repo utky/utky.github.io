@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - Haskellで抽象構文木 (AST) にメタデータを付与する</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">Haskellで抽象構文木 (AST) にメタデータを付与する</h1>
+    <small>
+    2018-01-03
+     / 
+    
+    [ <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/ghc.html">ghc</a>, <a href="../../tags/compiler.html">compiler</a>, <a href="../../tags/elm.html">elm</a>, <a href="../../tags/sml.html">sml</a>, <a href="../../tags/standardml.html">standardml</a>, <a href="../../tags/parsec.html">parsec</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>2018-01-04 追記: ここで全部語り尽くされている気がしたので、<a href="https://www.reddit.com/r/haskell/comments/4x22f9/labelling_ast_nodes_with_locations/">Labelling AST Nodes with locations</a> なにもこんなブログ読むことはないのかもしれない。</p>
+<p><a href="https://hackage.haskell.org/package/megaparsec-5.3.1">megaparsec</a>を使って<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>器を書いている。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>やっているとASTにソースファイルの位置情報とかを<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>として乗せたくなるが、 どんな感じで実装するのか調べた。</p>
+<p>僕自身はどのアプローチをとるのか決まっていない。</p>
+<h2 id="問題">問題</h2>
+<h3 id="やりたいこと">やりたいこと</h3>
+<p>megaparsec, parsecなどの<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D3%A5%CD%A1%BC%A5%BF">コンビネータ</a>ライブラリはジェネレータ系のalex + happyと比べると幾分まともなエラーメッセージを吐くようになっている。(alex + happyがえげつないほどterseなだけ)</p>
+<p>しかし、<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>が終わった後のα変換によるshadowingの回避や<a href="http://d.hatena.ne.jp/keyword/%B7%BF%BF%E4%CF%C0">型推論</a>のフェーズで<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%E9">コンパイラ</a>がエラーを見つけた場合に、 その<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンの位置が保存されていないと、エラーメッセージとして不親切に思う。</p>
+<p>なので、ASTに位置 <a href="https://hackage.haskell.org/package/megaparsec-5.3.1/docs/Text-Megaparsec-Pos.html#t:SourcePos">SourcePos</a> のようなものを乗せたい。</p>
+<h3 id="解きたいこと">解きたいこと</h3>
+<p>しかし、単純に既存のデータ構造に埋め込むと、値コンストラクタのArityが変わったり、コンストラクタのパターンが増えたりしてせっかく書いたhspecのテストも盛大に直さなければならない。</p>
+<p><strong>それは嫌だ。</strong></p>
+<p>僕がやりたいのは 「ASTに<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>として位置情報を乗せたい」 のであって 「ASTの意味を変えたい」 訳では断じて無い。 僕がやりたいことを簡潔にデータ型として表現したい。</p>
+<p>おい、<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>お前ならできるはずだろ！？</p>
+<p>夢を見させてくれよ！</p>
+<p>お前そういうの得意だろ！？</p>
+<h2 id="アプローチ">アプローチ</h2>
+<p>少し既存の<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>器を調べた。</p>
+<p>下記の調査をまとめると。</p>
+<ol type="1">
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するための値コンストラクタをASTのブランチとして定義する</li>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するラッパーを定義する</li>
+</ol>
+<p>の2種類のアプローチを観測した。</p>
+<h2 id="astにブランチを追加するパターン">1. ASTにブランチを追加するパターン</h2>
+<p>下記の2言語で発見。</p>
+<ul>
+<li><a href="https://github.com/dhall-lang/dhall-haskell">dhall-haskell</a></li>
+<li><a href="https://www.smlnj.org/">SML/NJ</a></li>
+</ul>
+<h3 id="dhall-haskell">dhall-<a href="http://d.hatena.ne.jp/keyword/haskell">haskell</a></h3>
+<p><code>Note</code> というコンストラクタをメインのASTにブランチとして定義して、<code>s</code> にメタ情報を格納しているらしい。</p>
+<pre><code>-- | \&gt; Note s x ~ e| Note s (Expr s a)</code></pre>
+<p><code>s</code> が位置情報を含んでいる模様。</p>
+<p>ASTが<a href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>の構文を定義するのだとすると、 こういったメタ情報がコンストラクタに表れるのはやはりノイズでしかないので できれば排除したいなーという思い。</p>
+<h3 id="smlnj">SML/NJ</h3>
+<p><code>fixitem</code> というデータ型を定義している</p>
+<pre><code>type 'a fixitem = {item: 'a, fixity: symbol option, region: region}</code></pre>
+<p>この <code>region</code> というのが場所を保存している。</p>
+<p>でそれをASTのコンストラクタに埋め込んでいる。</p>
+<pre><code>| FlatAppExp of exp fixitem list (\* expressions before fixity parsing \*)</code></pre>
+<p>あるいは位置保存用のコンストラクタを各サブツリーのデータ型に定義している。</p>
+<pre><code>| MarkExp of exp \* region (\* mark an expression \*) |</code></pre>
+<p>この <code>MarkXXX</code> とつくコンストラクタは全て位置情報を確保しておくためだけにある、 メタな何かだ。</p>
+<p>式やパターンなどのASTごとにこういった <code>MarkXXX</code> というコンストラクタを定義している。</p>
+<p>これはdhallと同じアプローチのようだ。</p>
+<h2 id="astにラッパーをかぶせるパターン">2. ASTにラッパーをかぶせるパターン</h2>
+<p>下記の2言語で発見。</p>
+<ul>
+<li><a href="https://github.com/ghc/ghc">ghc</a></li>
+<li><a href="https://github.com/elm-lang/elm-compiler">elm-compiler</a></li>
+</ul>
+<h3 id="ghc"><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a></h3>
+<p>概ね知りたいことが<a href="http://d.hatena.ne.jp/keyword/Wiki">Wiki</a>に書いてあった。</p>
+<p><a href="https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/HsSynType#SourceLocations">The HsSyn types</a></p>
+<p><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>マジ天使。</p>
+<ul>
+<li><code>SrcLoc</code> というのが位置情報を持っている。</li>
+<li><code>SrcSpan</code> というのが位置から位置までのブロックを表している</li>
+<li><p><code>Located e</code> で <code>e</code> の実際のブロックを保存する</p>
+<p>– | We attach SrcSpans to lots of things, so let’s have a datatype for it.data GenLocated l e = L l e deriving (…)type Located e = GenLocated SrcSpan e</p></li>
+</ul>
+<p><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>ではなんらかのASTを構築したら、これを <code>Located</code> で包むことによって、 位置情報を付加している。</p>
+<p>この場合、ASTそれ自体 (この場合HsSyn) の定義は変わらないので 関心事は上手く分離されているといえる。</p>
+<h3 id="elm-compiler">elm-compiler</h3>
+<p><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>と同様の方式を選んでいるように見える。</p>
+<p>これは式のASTの例だが、</p>
+<pre><code>-- EXPRESSIONS type Expr def = A.Located (Expr' def) data Expr' def = Literal Literal.Literal ...</code></pre>
+<p><code>Expr'</code> が実際のAST。( <code>def</code> はbinderっぽいので気にしなくてよし)</p>
+<p>それに <code>Located</code> というデータをかぶせている。</p>
+<p>これは何かというと、</p>
+<pre><code>-- ANNOTATION type Located a = Annotated R.Region a</code></pre>
+<p><code>Located</code> は<a href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A4%A5%ED%A1%BC%A5%C9">ペイロード</a>として <code>a</code> この場合は <code>Expr'</code> とともに、<code>Region</code> を持つようになっている。</p>
+<pre><code>data Region = Region { start :: !Position , end :: !Position } deriving (Eq, Show)</code></pre>
+<p><code>Region</code> がまさしく位置情報。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>と同じアプローチを感じる。</p>
+<h2 id="発展的話題-なんか色々言ってる人がおる">(発展的話題) なんか色々言ってる人がおる</h2>
+<p>おもむろに怪しい道具 <code>Fix</code> を持ち出す海外勢の様子。</p>
+<p><a href="https://stackoverflow.com/questions/38462563/how-to-work-with-ast-with-cofree-annotation">How to work with AST with Cofree annotation?</a></p>
+<p><a href="http://blog.callcc.name/posts/free-sourcepos.html">Adding source positions to AST nodes for free</a></p>
+<p>何やってるのかわからない。</p>
+<p>どいつもこいつも <code>Fix</code> 大好きだなおい。 本気で言っているのか。</p>
+<p>それは本当にお前たちの問題領域を簡潔に保っているのか。</p>
+<p>という疑念が晴れない。 というか、ここにわざわざFree<a href="http://d.hatena.ne.jp/keyword/%A5%E2%A5%CA%A5%C9">モナド</a>を導入する必要はあるのか。 ぶっちゃけ使いたいだけじゃないのか。</p>
+<p>ダークパワーを使いたくない僕としてはまだこのアプローチにだいぶ抵抗感がある。</p>
+<h2 id="どうするどうする">どうするどうする</h2>
+<p>どうしよう。</p>
+<p>ASTそのものは定義を変えずにいける<a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>方式をとるかもしれない。</p>
+<p><em>だいぶ素人なので詳しい人いたらアド<a href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>ください。。。</em></p>
+<h2 id="まとめ">まとめ</h2>
+<p>ASTに位置情報を付与したい場合は</p>
+<ol type="1">
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するための値コンストラクタをASTのブランチとして定義する</li>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するラッパーを定義する</li>
+</ol>
+<p>という方法があるらしい。</p>
+<p>(その他、識別子から位置情報を引くハッシュテーブルを作るみたいなのもあった気がする)</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

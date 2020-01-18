@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - 左再帰を含む構文解析むずい</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">左再帰を含む構文解析むずい</h1>
+    <small>
+    2017-07-03
+     / 
+    
+    [ <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/sml.html">sml</a>, <a href="../../tags/standardml.html">standardml</a>, <a href="../../tags/parsec.html">parsec</a>, <a href="../../tags/compiler.html">compiler</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <h2 id="やろうとしていること">やろうとしていること</h2>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>のparsecを使ってSMLの構文を解析し<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%CC%DA">構文木</a>を生成する。</p>
+<h2 id="やっていること">やっていること</h2>
+<p>SMLの<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>はいろいろステップがある。</p>
+<ol type="1">
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%C6%A5%E9%A5%EB">リテラル</a> (special constants)</li>
+<li>識別子 (identifier)</li>
+<li>型注釈 !!イマココ!!</li>
+<li>パターンマッチ</li>
+<li>式</li>
+<li>宣言</li>
+<li>モジュール構文</li>
+</ol>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%C6%A5%E9%A5%EB">リテラル</a>や識別子はなんとか倒して、いま型注釈の解析に取り組んでいるところ。</p>
+<h2 id="苦戦しているところ">苦戦しているところ</h2>
+<p>この型注釈の<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>で例の問題に突き当たった。</p>
+<p>左<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>問題だ。</p>
+<p>SMLの型注釈の構文はこんな感じ。</p>
+<pre><code>ty ::= tyvar { \&lt;tyrow\&gt; } tyseq longtycon ty -\&gt; ty' ( ty ) tyrow ::= lab : ty \&lt;, tyrow\&gt;</code></pre>
+<p>上記の中でもいま苦戦しているのが、</p>
+<pre><code>tyseq longtycon</code></pre>
+<p>というところ。</p>
+<pre><code>tyseq</code></pre>
+<p>とは0回以上tyにマッチするtype constructorへの引数を表す。最後にtype constructorにマッチさせる。</p>
+<p>0回以上tyにマッチするかどうか検査するためには、<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的にtyを呼び出すが、これが無限<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>を起こす。 つまり<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%CC%DA">構文木</a>の左側をぐんぐん掘り進めていってしまう。</p>
+<p>これは素朴な数値演算式でも起きうる問題だ。</p>
+<pre><code>expr ::= expr + expr</code></pre>
+<p>などでも<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に解析が走るためparserが停止しないというよく知られた問題。</p>
+<p>今回のケースではlongtyconがoperatorとなりtyseqがoperandとなるため<a href="http://d.hatena.ne.jp/keyword/%A5%DD%A1%BC%A5%E9%A5%F3%A5%C9%B5%AD%CB%A1">ポーランド記法</a>のようなものと捉えることができる。</p>
+<p>幸いにしてText.Parsec.Exprにはこのようにoperatorが<a href="http://d.hatena.ne.jp/keyword/postfix">postfix</a>として出現するケースを式として解析する技がある。 しかしこのlongtyconは解析の過程で動的に発見される。果たして素直に使うことができるのだろうか。。。</p>
+<p>市井の例を見るとpredefinedな算術<a href="http://d.hatena.ne.jp/keyword/%B1%E9%BB%BB%BB%D2">演算子</a>のみを扱っているケースが多くてあまり参考にならない。</p>
+<h2 id="この先">この先</h2>
+<p>parsecでこのままくのか。</p>
+<p>それとも、Alex + Happyでparser generateするのか。</p>
+<p>このあたりがわからなくなってきている。</p>
+<p>IdrisやElmはparser combinatorをある程度自前で実装して<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%B2%F2%C0%CF">構文解析</a>しているのを見ると、やはりparsecでも左<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>を解決しつつ解析できそうな気がするのだけれど。</p>
+<h2 id="追記">追記</h2>
+<p><a href="https://wespiser.com/writings/wyas/02_parsing.html">Adam Wespiser Parsing</a></p>
+<blockquote>
+<p>If our language required a lot of left-recursive parsing, Alex &amp; Happy would probably be a better choice.</p>
+</blockquote>
+<p>こんな記述があった。 この記事では<a href="http://d.hatena.ne.jp/keyword/scheme">scheme</a>は比較的構文がシンプルなのでparsecでいくよ、と言っていた。</p>
+<p>はて、僕が解析しようとしているSMLはどうだろう。とても左<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>が多い構文だ。</p>
+<p>diehlさんも最初にparsec使っておいて結局Alex + Happy使っていたな。</p>
+<p><a href="http://dev.stephendiehl.com/fun/008_extended_parser.html">Write You a Haskell ( Stephen Diehl )</a></p>
+<p>いまはparsingの技術を掘り下げるよりも前に進むことを考えよう！</p>
+<p>ということで、再びAlexでの字句解析をインクリメンタルに進めよう。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - Strongly static types, not for every task なのは何故なんだ</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">Strongly static types, not for every task なのは何故なんだ</h1>
+    <small>
+    2017-06-02
+     / 
+    
+    [ <a href="../../tags/clojure.html">clojure</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="https://clojure.org/about/rationale">Clojure Rationale</a></p>
+<p>このページにこんな文があった。</p>
+<blockquote>
+<p>Pure functional languages <a href="http://d.hatena.ne.jp/keyword/tend">tend</a> to strongly static types * Not for everyone, or every task</p>
+</blockquote>
+<p>「静的型付けは全てのタスクに適しているわけではない。」</p>
+<p>そのタスクとは何を想定しているのか、ここでは語られていない。</p>
+<p>僕は<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>が好きだし、<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>の型システムがとても好きだ。<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%E9">コンパイラ</a>に怒られながら、<a href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%E9">コンパイラ</a>と協力してプログラムを組み上げていくのはとても楽しい。 データの構造や関数の要求する仮定・制約を忘れっぽい僕にはとてもいいシステムだ。 だから静的型付けは好きだ。</p>
+<p>だからこそ、静的型付けがふさわしくないケースを知りたい。</p>
+<p>Richがここで言っているように、静的型付けではふさわしくない領域があるはずなのだろう。 それが何なのか知りたい。</p>
+<h2 id="関数の再利用性のために">関数の再利用性のために</h2>
+<p><a href="https://softwareengineering.stackexchange.com/questions/199217/what-did-rich-hickey-mean-when-he-said-all-that-specificity-of-interfaces-cla">この辺</a> が背景なのかな。</p>
+<p>Rich的には関数の再利用性を促進させるために、具象型に関数を縛り付けないということなのだろうか。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>ではユーザ定義型を定義するよりも、リストやマップを頻用して、 関数の再利用性を上げることができるから型が不要ということ？</p>
+<p>それでもやっぱり静的型付けではふさわしくない問題が何なのかはまだわからない。</p>
+<h2 id="python書いている時"><a href="http://d.hatena.ne.jp/keyword/Python">Python</a>書いている時</h2>
+<p><a href="http://d.hatena.ne.jp/keyword/Python">Python</a>も静的型検査がない。 比較的<a href="http://d.hatena.ne.jp/keyword/Python">Python</a>で<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を書く機会があるので自分の感覚を思い出してみる。</p>
+<p>「これは<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>だと無理だなー」って思うようなことがあっただろうか。</p>
+<h3 id="小さなスクリプトを書く">小さな<a href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">スクリプト</a>を書く</h3>
+<p><a href="http://d.hatena.ne.jp/keyword/bash">bash</a>の延長だと思って書捨てる時に静的型検査は要らないと思うことはある。 そういう時ってあまり問題の構造とか考えなくって、 頭にある「手続き」を<a href="http://d.hatena.ne.jp/keyword/Python">Python</a>のコードに書き下しているだけ。</p>
+<p>そんなふうに、問題の分析を飛ばして動くものを書いている時、確かに静的型付けが必要だとは思わない。</p>
+<h3 id="中規模のwebアプリを書く">中規模のWebアプリを書く</h3>
+<p>データモデルを考えて、適切なクラスを定義、ってなる。 もう問題の構造を捉えようとしている。</p>
+<p>この時初めて型による名前付けが欲しくなる。</p>
+<p>付けた名前は<a href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>間で共有することで、意図や意味を伝えていく必要がある。</p>
+<p>そのために型注釈が必要になってくるし、それらの意図や意味に沿わない操作を禁止するために静的型検査が必要になってくる。</p>
+<p>やっぱり規模が増せば自然と静的型検査を要請してしまう。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/Python">Python</a>でWebアプリを書いていた時、やっぱりそう感じたのを思い出した。</p>
+<h2 id="clojureでも同じように感じるか"><a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>でも同じように感じるか？</h2>
+<p>感じると思う。</p>
+<p>少なくとも僕はデータの構造をすぐ忘れてしまう。</p>
+<blockquote>
+<p>Land of <a href="http://d.hatena.ne.jp/keyword/Lisp">Lisp</a>読んでても、自分で<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>書いてても思うけど、結構頻繁に扱っているデータの構造を忘れる。<a href="http://d.hatena.ne.jp/keyword/Lisp">Lisp</a>書く人は関数に渡されるデータの構造覚えてるのが普通なんだろうか。</p>
+<p>— iM2R::<a href="http://d.hatena.ne.jp/keyword/UTC">UTC</a> (<span class="citation" data-cites="ilyaletre">@ilyaletre</span>) <a href="https://twitter.com/ilyaletre/status/846712870310064129">2017年3月28日</a></p>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p>だから長らく自分がメンテしていないコードを見たらきっとどんなデータを扱っているのか解らず苦しむだろう。</p>
+<p>それでも<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>が好きなのか？</p>
+<p>なんか好き。なんだろ。 大きいもの書き始めたら嫌になったりするのだろうか。</p>
+<p>ふと<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>書きたくなる謎の魅力がある。不思議な言語だ。 これが中毒性か。</p>
+<p>(<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>はよっぽど親を殺されたりしない限りずっと好きだと思う)</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

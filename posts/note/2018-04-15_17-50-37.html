@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - duct-frameworkに定時起動ジョブを仕込む</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">duct-frameworkに定時起動ジョブを仕込む</h1>
+    <small>
+    2018-04-15
+     / 
+    
+    [ <a href="../../tags/clojure.html">clojure</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p>ただのtips。みんな気付いているけどショボすぎて言わないことだ。</p>
+<p>ductをREPLから起動・停止くらいはできる人に向けている。 それも解らないよーという人は、なんというか、なんでこの記事を読もうと思ったのか。 そういう人はこちらを読むと良いと思う。</p>
+<p><a href="https://qiita.com/lagenorhynque/items/57d5aa086c4a080a1c54">ClojureのDuctでWeb API開発してみた</a></p>
+<h2 id="結論">結論</h2>
+<p>chimeをintegrantのライフサイクルに組み込むことでバックグラウンド処理するジョブが定義できるよという話。</p>
+<h3 id="構成要素">構成要素</h3>
+<ul>
+<li>duct (core 0.6.2)</li>
+<li>integrant</li>
+<li>chime 0.2.2</li>
+</ul>
+<h2 id="やりかた">やりかた</h2>
+<h3 id="config.edn">config.edn</h3>
+<p>まずは設定を書いておく</p>
+<p>(抜粋)</p>
+<pre><code> :example.job/channel {} :example.job/hello {:ch #ig/ref :example.job/channel}</code></pre>
+<p><code>:example.job/channel</code> はジョブ起動の通知を送ってくれるchannel (core.asyncのchan) を保持する。</p>
+<p><code>:example.job/hello</code> は channel の通知を受け取って起動されるバックグラウンド処理そのもの。 ジョブの起動には通知をくれる channel が必要なので <code>ig/ref</code> で解決している。</p>
+<h3 id="clojure"><a href="http://d.hatena.ne.jp/keyword/clojure">clojure</a></h3>
+<pre><code>(ns example.job (:require [integrant.core :as ig][clojure.core.async :as a][chime :refer [chime-ch]][clj-time.core :as time][clj-time.periodic :as periodic]))(defmethod ig/init-key :example.job/channel [\_ \_](chime-ch (periodic/periodic-seq (time/now) (time/seconds 5)){:ch (a/chan (a/dropping-buffer 1))}))(defmethod ig/halt-key! :example.job/channel [\_ ch](a/close! ch))(defmethod ig/init-key :example.job/hello [\_ {:keys [ch]}](a/go-loop [](when-let [time (a/\&lt;! ch)](prn &quot;Hello world at &quot; time)(recur))))</code></pre>
+<p>少しかいつまんで解説。</p>
+<h4 id="channelの初期化">channelの初期化</h4>
+<pre><code>(defmethod ig/init-key :example.job/channel [\_ \_](chime-ch (periodic/periodic-seq (time/now) (time/seconds 5)){:ch (a/chan (a/dropping-buffer 1))}))</code></pre>
+<p><code>chime-ch</code> 指定された時刻にタイムスタンプデータを送信するchannelを生成する。</p>
+<p><code>clj-time/periodic</code> の <code>periodic/periodic-seq</code> を使ってchannelからメッセージを受け取る時刻の無限ストリームを取得する。 (個人的に時間の経過を無限ストリームで表現する設計大好き)</p>
+<p><code>{:ch (a/chan (a/dropping-buffer 1))}</code> ここは <code>chime-ch</code> で生成される channel のバッファに長さと廃棄ポリシを設定している。</p>
+<h4 id="channelの破棄">channelの破棄</h4>
+<pre><code>(defmethod ig/halt-key! :example.job/channel [\_ ch](a/close! ch))</code></pre>
+<p>channel を閉じるだけ。 channel からメッセージを受け取れなくなった軽量プロセスはparking状態のまま何もしなくなるので、実質的にバックグラウンドジョブは停止している。</p>
+<h4 id="channelを使ったジョブ">channelを使ったジョブ</h4>
+<pre><code>(defmethod ig/init-key :example.job/hello [\_ {:keys [ch]}](a/go-loop [](when-let [time (a/\&lt;! ch)](prn &quot;Hello world at &quot; time)(recur))))</code></pre>
+<p><code>when-let</code> を使って channel からメッセージが届く時のみ印字処理を行って次のメッセージがくるまで待機するようにループさせている。</p>
+<h3 id="result">Result</h3>
+<p>ductなのでREPLから <code>(go)</code> と入力するとサーバの起動とともにREPLに5秒間隔で<a href="http://d.hatena.ne.jp/keyword/Hello%20world">Hello world</a>とぬかしてくるジョブが起動する。</p>
+<pre><code>:initiated &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x86ddf48 &quot;2018-04-15T07:49:08.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x7f4e3d0e &quot;2018-04-15T07:49:23.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x6aa2035 &quot;2018-04-15T07:49:28.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x549f285d &quot;2018-04-15T07:49:33.518Z&quot;</code></pre>
+<h2 id="web-apiとバッチジョブ">Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブ</h2>
+<p>モチベーションの話。</p>
+<p>僕がやりたかったのは、Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>経由で操作可能なWebクローラみたいなもの。 クローラが巡回しにいくエンドポイントを<a href="http://d.hatena.ne.jp/keyword/CRUD">CRUD</a>で操作できる的なやつ。</p>
+<p>ただ、Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブっていう組み合わせは <em>応用が効く</em> ような気がしている。 ふつーの典型的なバッチジョブを作るにしても、ジョブの実行時間や結果の履歴などの統計情報をWeb <a href="http://d.hatena.ne.jp/keyword/API">API</a>経由で取れるようにしておくと、他のAdmin向けサービスの統合がしやすくなったりする。</p>
+<p>運用系<a href="http://d.hatena.ne.jp/keyword/API">API</a>があるというのは僕みたいなインフラ屋からするととてもポイント高い。</p>
+<h3 id="脱線-finagleという実例">(脱線) Finagleという実例</h3>
+<p>バックグラウンドジョブとは少し違うけど、僕がとても感心したのは<a href="https://twitter.github.io/finagle/">finagle</a>という<a href="http://d.hatena.ne.jp/keyword/Scala">Scala</a>向けマイクロサービス<a href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>。</p>
+<p>このfinagleはマイクロサービスのエンドポイントを作るたくさんの<a href="http://d.hatena.ne.jp/keyword/API">API</a>を提供している。なかでも面白いのがサービスエンドポイントの統計情報もとれる仕組みが標準で提供されていること。</p>
+<p><a href="https://twitter.github.io/finagle/guide/Metrics.html">Metrics</a></p>
+<p>ユーザのリク<a href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トで起動するにせよ、定時起動するにせよ、サービスの稼働状況を抽出できる<a href="http://d.hatena.ne.jp/keyword/API">API</a>を備えていると、デプロイ後のフィードバックが得やすくなる。 これはサービスの改善点を<a href="http://d.hatena.ne.jp/keyword/%C4%EA%CE%CC">定量</a>的に探ったり問題を検知したりするのに役立つ。</p>
+<h3 id="バッチジョブ作る人へ">バッチジョブ作る人へ</h3>
+<p>こんな風にジョブの統計情報を外部にexposeできるような仕組みを仕込んでおくと、サービスが成長した時にありがたがられること間違いなし。</p>
+<p>Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブは割といい組み合わせだと再認識した。</p>
+<p>小さなバッチジョブを作ろうと思ったらまずは</p>
+<pre><code>lein new duct {プロジェクト名} +api +ataraxy</code></pre>
+<p>と打ってほしい。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

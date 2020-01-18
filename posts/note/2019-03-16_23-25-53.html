@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - 『インフラデザインパターン』読んだ</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">『インフラデザインパターン』読んだ</h1>
+    <small>
+    2019-03-16
+     / 
+    
+    [  ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <h2 id="インフラデザインパターン読んだ">インフラ<a href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%B6%A5%A4%A5%F3%A5%D1%A5%BF%A1%BC%A5%F3">デザインパターン</a>読んだ</h2>
+<p>本当に具体的な技術に言及せずに構成方法のパターンだけに注力したような内容だった。</p>
+<p>各パターンを列挙しては比較しているが、 選択肢の中には直交する、つまり併用できるものも多く、単純に比較することに意味があるのか疑問なところもあった。</p>
+<p>個人的には下記について洞察が得られれば良いかな、と思って読んだ。</p>
+<ul>
+<li>苦手分野(特にストレージ)の構成方法を知る</li>
+<li>パターンを実装するならどんな技術を援用するか想像してみる</li>
+</ul>
+<p>以降では上記の目線で発見したことをまとめる。</p>
+<p>全パターン検討するのは面倒くさいのでよく使いそうなパターンだけ考えてみる。</p>
+<h2 id="可用性">可用性</h2>
+<h3 id="webap">Web/AP</h3>
+<p>AP部分は<a href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>やSprintBootなどHTTPリク<a href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを消費して<a href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>を起動する部分。</p>
+<p>APサーバ内で持っているセッションを<a href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>内のベースノードに“<a href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%E9%A1%BC%A5%EA%A5%F3%A5%B0">ミラーリング</a>”するらしい。</p>
+<p>セッション非共有分散が謎。 セッションは共有されてない=障害発生時にフェイルオーバしないのでセッションは失われる。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B6%A5%AF%A5%B7%A5%E7%A5%F3">トランザクション</a>のジャーナルが別のところに残っていて、それを再実行するだけで復旧できる構成なら問題ないかもしれない。 ということでWeb/APだけではちょっと優劣つけられない。</p>
+<h3 id="db">DB</h3>
+<p>N+1ではコールドスタンバイのDBサーバを持っておき、障害発生時に待機系を動的に<a href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>に組み込む制御を行う調停用サーバが必要。 待機系を組み込むために調停用サーバを用意するのもなんだか効率悪いな、という感じ。</p>
+<h4 id="postgresql"><a href="http://d.hatena.ne.jp/keyword/PostgreSQL">PostgreSQL</a></h4>
+<p><a href="http://d.hatena.ne.jp/keyword/PostgreSQL">PostgreSQL</a>の構成で下記はやったことあるかも。Streaming Replicationで可用性確保してた。<a href="https://severalnines.com/blog/top-pg-clustering-ha-solutions-postgresql">https://severalnines.com/blog/top-pg-clustering-ha-solutions-postgresql</a><a href="http://d.hatena.ne.jp/keyword/PostgreSQL">PostgreSQL</a>だと他に使ったことないけどPostgres-XLとCitusっていうのがあるそうだ。これは後述の<a href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Clusterと似たノードを用意するみたい。</p>
+<p>pgpool-2を<a href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>のフロントエンドにおいてVIPで冗長取る。</p>
+<h4 id="mysql"><a href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a></h4>
+<p><a href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>だと僕が知っているのはGaleraで分散させてhaproxyをフロントエンドにとっていた。<a href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>だと<a href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a> Clusterというのがある。使ったことないけど面白そうだな。<a href="https://www.mysql.com/jp/products/cluster/features.html">https://www.mysql.com/jp/products/cluster/features.html</a></p>
+<h3 id="仮想サーバ">仮想サーバ</h3>
+<p>アクティブな<a href="http://d.hatena.ne.jp/keyword/VM">VM</a>をN個を立ち上げておいて、<a href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF%A5%EA%A5%F3%A5%B0">クラスタリング</a>ソフトウェアで<a href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>する構成。 他のアプローチとしてライブ<a href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>も紹介されているが、あれば障害発生前じゃないと意味がない気がする。 障害発生前にとったスナップショットからマイグレして再生できるから部分的には可用性を確保できていると言えなくもないが、嬉しくない。</p>
+<h4 id="openstack">OpenStack</h4>
+<p><a href="https://specs.openstack.org/openstack/openstack-user-stories/user-stories/proposed/ha_vm.html">https://specs.openstack.org/openstack/openstack-user-stories/user-stories/proposed/ha_vm.html</a></p>
+<h4 id="openstackにおけるvmライブマイグレーション">OpenStackにおける<a href="http://d.hatena.ne.jp/keyword/VM">VM</a>ライブ<a href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a></h4>
+<p><a href="https://docs.openstack.org/nova/latest/admin/live-migration-usage.html">https://docs.openstack.org/nova/latest/admin/live-migration-usage.html</a></p>
+<p>停止中の移動</p>
+<p>novaはevacuate機能があるのでBlock Storageにあるディスク情報を吸い出して<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>を別ハイパーバイザーにリストアできる。</p>
+<p><a href="https://access.redhat.com/documentation/ja-jp/red_hat_openstack_platform/11/html-single/instances_and_images_guide/#section-migration-evacuation">https://access.redhat.com/documentation/ja-jp/red_hat_openstack_platform/11/html-single/instances_and_images_guide/#section-migration-evacuation</a></p>
+<p><a href="https://access.redhat.com/documentation/ja-jp/red_hat_openstack_platform/11/html/high_availability_for_compute_instances/app-autoevac">https://access.redhat.com/documentation/ja-jp/red_hat_openstack_platform/11/html/high_availability_for_compute_instances/app-autoevac</a></p>
+<h3 id="lan">LAN</h3>
+<p>高信頼コアスイッチのパターンはMLAGで実現するものとみた。</p>
+<p><a href="https://www.juniper.net/documentation/en_US/release-independent/nce/topics/concept/mc-lag-on-core-understanding.html">https://www.juniper.net/documentation/en_US/release-independent/nce/topics/concept/mc-lag-on-core-understanding.html</a></p>
+<p>あとはSTPとかを使うのかな。</p>
+<h3 id="wan">WAN</h3>
+<p>両系現用 ECMPだと思うけど障害検知や片寄どうやるのか。</p>
+<p>片系現用<a href="http://d.hatena.ne.jp/keyword/VRRP">VRRP</a>!</p>
+<h3 id="データ可用性">データ可用性</h3>
+<p>バックアップをどうとっておくか、っていうのが焦点になっている。</p>
+<p>この辺はどうなんだろ、ベンダー製品固有だからあんまりノウハウ出てこない。</p>
+<h4 id="san上でレプリケーション">SAN上で<a href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%D7%A5%EA%A5%B1%A1%BC%A5%B7%A5%E7%A5%F3">レプリケーション</a></h4>
+<h4 id="san上でコピー">SAN上でコピー</h4>
+<h2 id="セキュリティ">セキュリティ</h2>
+<h3 id="ネットワークセキュリティ">ネットワーク・セキュリティ</h3>
+<p>セグメント分割とファイヤウォールのはさみ方</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>
