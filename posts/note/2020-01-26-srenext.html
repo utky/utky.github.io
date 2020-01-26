@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - SRE NEXT 2020 参加した</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">SRE NEXT 2020 参加した</h1>
+    <small>
+    2020-01-26
+     / 
+    
+    [ <a href="../../tags/devops.html">devops</a>, <a href="../../tags/sre.html">sre</a>, <a href="../../tags/conference.html">conference</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="https://sre-next.dev/">SRE NEXT</a> というイベントに参加してきた。</p>
+<p>公開されている資料は下記にまとめてくださっている方がいるのでありがたくリンクさせていただく。</p>
+<p><a href="https://qiita.com/Hassan/items/6f7fb1c206f77716ee2a">まとめ</a></p>
+<h2 id="動機">動機</h2>
+<p>Brendan Gregg あたりから触発されて考えるようになった 「システムの状態を統計的視点で観察する」というアプローチについて引き出しが少なすぎるので、</p>
+<p><strong>Observability に関する事例、手法を知る</strong></p>
+<p>あたりの知識領域を少しカバーしたい。</p>
+<p>(正直、調べればいくらでもこの辺の情報は出る訳で、本音の動機は「聴講を通じたモチベーションのドーピング」なのかもしれない)</p>
+<p>なので Observability に絞って感じ入った点を記載する。</p>
+<p>※ 追記</p>
+<p><strong>書いてみて力尽きたので UZABASE さんの『実践Observability』はまた後日…</strong></p>
+<h3 id="分散アプリケーションの信頼性観測技術に関する研究">分散アプリケーションの信頼性観測技術に関する研究</h3>
+<p><a href="https://sre-next.dev/schedule/#a0">講演の概要</a></p>
+<p><a href="https://speakerdeck.com/yuukit/a-study-of-sre">資料</a></p>
+<p>分散アプリケーションの依存関係を記述するために、OS が保持する socket 情報を収集してデータベースに蓄積するという話。</p>
+<p>BPF やカーネルモジュールなどでカーネルから性能情報を収集するのかな、と予想していたけど違った。 procfs 配下に出力される socket 情報を収集するので完全にユーザ空間のみで解決している。</p>
+<p>一方で <code>/proc</code> 配下の定期的な pull 型収集で通信端点を検知する仕組み上、短命な通信は検知できなさそうだった。カーネル側からの push 型のメトリクス収集であれば中継のバッファが溢れない限りは取り漏らしなく検知できそう。まあ、これだと「遅延オーバヘッド」を解決できなさそうなのでトレードオフなのだろう。</p>
+<p>さらに通信端点の情報を記録するデータベースを一箇所に集約するとそこがボトルネックになる。 これがを解決するために、データベースを各ノードの収集エージェントと同居させる。</p>
+<p>この方式では端点情報の問い合わせを受けると、自身のデータベースをスキャンするだけでなく足りない情報を他のノードに問い合わせることで補完する。問い合わせ先の決定には自身が収集した端点情報からわかる依存関係を活用する。したがってエージェントが端点の依存関係を解決しながら、依存先のノードへと再帰的に問い合わせを行う。</p>
+<p>再帰的な問い合わせグラフが静的に設定されているのではなく、実際の通信ベースで動的に構成される、というのはモダンな分散システムと相性が良さそう。 (グラフに閉路があるとどうなるんだろう)</p>
+<p>このアプローチが面白いのは、既存のアプリケーションへの変更が一切必要ないところ。 通常アプリケーション同心の依存関係をトレースするためにはアプリケーション間で共有する識別子を (よく知らないけど) Jaeger や Zipkin などで収集し可視化する。 しかしこの socket 情報の収集では Linux カーネルなどが基本的に備えている機能のみを利用しており、既存のアプリケーションに手を加える必要がない。</p>
+<p>Jeager などでは特定リクエストの流通経路をトレースできる機能があるのに対して、 socket ベースの収集ではある瞬間のリクエストがどの socket を通ったのか判断できないため、 Jeager のような解像度での分析はできない。が、分散システムの現状を俯瞰することをゴールとするなら、確かに socket 情報だけで依存関係を記述できるだけでも充分事足りそう。</p>
+<p>ということで、エージェント入れるだけでアプリケーションの変更なく依存関係を収集できるところが魅力なのかなと感じた。</p>
+<h2 id="まとめ">まとめ</h2>
+<p>分散システム上で活用できるアプリケーションは <a href="https://www.cncf.io/projects/">CNCF project</a> 見ても分かるように本当にたくさんある。 しかし実は Linux カーネルにも活用できるリソースがあったりするので、下手にオーバーキルなアプリケーションを入れるよりも良いこともあったりするのではなかろうか。</p>
+<p>とか思う insight をもらった良い講演でした。</p>
+<p>Linux のカーネル機能を活用した observability は Brendan Gregg が <a href="http://brendangregg.com/bpf-performance-tools-book.html">たくさん情報</a> 出しているので引き続き見たいなと思いつつ。。。。</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>

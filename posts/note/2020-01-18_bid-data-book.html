@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hash λ Bye - (WIP) 『ビッグデータを支える技術』を読んだ</title>
+
+        <!-- <link rel="stylesheet" type="text/css" href="/css/pure-nr-min.css" /> -->
+        <!-- <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
+        <script src="../../js/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                  <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                      <span class="sr-only">Toggle navigation</span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                      <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../../">
+                      <span>
+                      <img src="../../images/avatar.jpg" width="30" height="30" alt="avatar"> Hash λ Bye  </span>
+                    </a>
+                  </div>
+
+                  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <a href="../../about.html">
+                          <span class="glyphicon glyphicon-user"></span> About
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../writings.html">
+                          <span class="glyphicon glyphicon-book"></span> Writings
+                        </a>
+                      </li>
+                      <li>
+                        <a href="http://ilyaletre.hatenablog.com/" target="_blank">
+                          <span class="glyphicon glyphicon-pencil"></span> Blog
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://twitter.com/ilyaletre" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> Twitter
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/utky" target="_blank">
+                          <span class="glyphicon glyphicon-globe"></span> GitHub
+                        </a>
+                      </li>
+                      <li>
+                        <a href="../../contact.html">
+                          <span class="glyphicon glyphicon-envelope"></span> Contact
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+
+              <main class="content">
+                <article id="content">
+  <header>
+    <h1 class="title">(WIP) 『ビッグデータを支える技術』を読んだ</h1>
+    <small>
+    2020-01-18
+     / 
+    
+    [ <a href="../../tags/database.html">database</a>, <a href="../../tags/book.html">book</a> ]
+    
+     / 
+    
+    </small>
+  </header>
+  <div class="body">
+    <p><a href="https://www.amazon.co.jp/dp/4774192252">ビッグデータを支える技術―刻々とデータが脈打つ自動化の世界</a></p>
+<p>仕事で広告配信のログを扱っているので、周辺ノウハウをつけるために読んだ。 仕事場で実物を見ていたので読んだ内容を体験と照合することでかなり楽しく読めた。</p>
+<p>以下では心に響いた</p>
+<h2 id="アーキテクチャ">アーキテクチャ</h2>
+<p>データ処理の基盤は概ね下記に分割できる。</p>
+<ol type="1">
+<li>データソース
+<ul>
+<li>処理対象のデータ</li>
+</ul></li>
+<li>データウェアハウス
+<ul>
+<li>長期保存用の大規模データ</li>
+</ul></li>
+<li>データマート
+<ul>
+<li>分析用に加工された中規模データ</li>
+</ul></li>
+<li>可視化ツール
+<ul>
+<li>分析用のユーザインタフェース</li>
+</ul></li>
+</ol>
+<h2 id="データマート">データマート</h2>
+<p>BIツールなどでの集計速度を保つためにデータマートの層は必須となる。 これは通常バッチ処理でデータが構築されるので、必然的にバッチ処理のワークフローを管理する仕組みが必要になる。</p>
+<h3 id="列指向ストレージ">2.2. 列指向ストレージ</h3>
+<p>データ量が増えてメモリに乗り切らなくなっても高速に集計の応答を得るためにはまずシステム構成を下記のように構成する。</p>
+<ol type="1">
+<li>データレイク→データマート
+<ul>
+<li>データ集約</li>
+</ul></li>
+<li>データマート→可視化ツール
+<ul>
+<li>クロス集計</li>
+</ul></li>
+</ol>
+<p>データ処理の遅延「レイテンシ」が小さいデータマートを作るときには2つの選択肢がある。</p>
+<p>データをすべてのメモリに載せる。</p>
+<p>その規模のデータだと RDB が適している。しかしメモリが不足すると急激に性能が落ちる特徴がある。</p>
+<p>数億レコードを扱うならディスク I/O を前提としてそれを効率化すること別の選択肢を検討する。</p>
+<p>この高速化のために「圧縮」と「分散」を活用する。データを圧縮して小さく保つことで複数のディスクへと分散し読み込み時間を小さくする。さらにマルチコアを使って I/O を並列化する。こうしたアーキテクチャを MPP と呼ぶ。</p>
+<p>MPP は集計に最適化されている。実装としては Redshift や BigQuery などがある。</p>
+<p>列指向データベースでは列単位でのデータ圧縮を行う。 データ分析では一部の列だけが集計対象になる傾向があるので、必要ない列を読み込まなくて済むような保存方法になっている。 さらに同じ列には似たようなデータが並ぶことを活用して高い圧縮効率を実現している。</p>
+<p>行指向データベースでは一つあたりのクエリはたいてい短いクエリが何度も呼び出される時に効率的になるように設計さ れている。したがってクエリごとの分散処理が行われる。 それに対して MPP データベースでは一回のクエリが長いことが大抵であるためクエリ自体を分散処理する。クエリをタスクに分解してそれらを並列実行する。</p>
+<h3 id="データマートの基本構造">2.4. データマートの基本構造</h3>
+<p>中心となるのは OLAP と呼ばれる仕組み。 データ収集を効率化するアプローチ。 OLAP は多次元モデルを MDX などのクエリ言語で集計する。この多次元データを OLAP キューブと呼び、これをクロス集計するのが OLAP である。 BI ツールはもともと OLAP を使ってデータ集計するものだった。データマートも以前は OLAP キューブとして作成されていた。</p>
+<p>近年は MPP やインメモリデータベースによって OLAP キューブを作らなくても良くなってきた。MPP では多次元モデルの代わりに非正規化テーブルを用意する。 BI ツールで可視化に適したデータを作るとは、すなわちデータマートにおいて非正規化テーブルを作ることを意味する。</p>
+<h4 id="非正規化テーブルとは">非正規化テーブルとは</h4>
+<p>行動や事実の記録をファクトテーブルという。一方でマスタデータをディメンジョンテーブルという。 データマートではファクトテーブルを中心に複数のディメンジョンテーブルが結合されたスタースキーマが好ましいとされる。</p>
+<p>RDB ではマスタデータが正規化されて複数のテーブルに分割されるが、データマートではこのディメンジョンテーブルをできるだけ非正規化する。</p>
+<h4 id="スタースキーマの利点">スタースキーマの利点</h4>
+<p>これによりテーブル結合がシンプルになりBIツールからのSQL生成がしやすくなる。 またファクトテーブルはデータ量が肥大化しがちなのでカラムをIDのようなキーだけ格納してラベルをディメンジョンテーブルに追い出すことでストレージの節約ができる。</p>
+<p>列指向データベースの登場によりカラム数の増加が起きても性能影響が少なくなってきた。カラムのデータ圧縮も効くので尚更。 従って一つの巨大なファクトテーブルがありさえすればよくなってきた。多くの列指向データベースではもはやスタースキーマも不要になってきている。</p>
+<h3 id="データマートの構築">3.3 データマートの構築</h3>
+<p>ファクトテーブル</p>
+<p>作成には追記と置換を用いる。 置換はテーブルの作り直しを指す。（コスト高そう）</p>
+<p>ファクトテーブルのデータ欠損、重複、作り直しを容易にするためにパーティション分割をおこなう。通常、データの重複を避けるために毎回置換するように操作することで冪等性を保つ。このようなテーブルをデータウェアハウスに溜めておいて必要なデータだけをデータマートにインポートする。</p>
+<p>データマートの場合はパーティション置換よりもテーブルの作り直しの方が多い。例えば過去1ヶ月のデータを毎日取り出して置き換える。</p>
+<p>ファクトテーブル全体を置換するメリット</p>
+<p>データの整合が保てる。テーブルの作り直しはクエリ1つ。（ほんまか？）スキーマの変更にも柔軟に対応。</p>
+<p>デメリット</p>
+<p>書き込みの処理時間。並列書き込みでもテーブルの作り直しに時間がかかる場合はパーティションを検討する。目安は一時間以内にファクトテーブルを作れるなら毎回置換でも充分。</p>
+<p>サマリテーブル</p>
+<p>ファクトテーブルから集計したデータを日次などで保存しておくテーブル。サイズはデータのカーディナリティに大きく左右される。 （これは何がメリットなんだろう）</p>
+<p>スナップショットテーブル</p>
+<p>時間の経過とともにテーブルをまるごと保存する。一種のファクトテーブル。 ディメンジョンテーブルが日々変化する中で過去のディメンジョンを使って集計する際に役に立つ。</p>
+<p>履歴テーブル</p>
+<p>全データのスナップショットをとるのではなく差分だけを記録するテーブル。ただし復元に複雑なクエリが必要になるので、よっぽどスナップショットのサイズが問題になるのでない限り使う機会はない。</p>
+<p>データ集約の基本形</p>
+<ol type="1">
+<li>サブクエリでファクトテーブルの件数を絞り込む</li>
+<li>ディメンジョンテーブルと結合する</li>
+<li>GROUP BY で集約する</li>
+</ol>
+<h4 id="多次元モデル">多次元モデル</h4>
+<p>BIツールにおける集計を表現するモデル。 クロス集計の集計軸をディメンジョンと呼び、集計される数値と集計方法をメジャーと呼ぶ。 2つの列を選んでクロス集計する時、その集計表の次数は2次元である。</p>
+<h2 id="データインジェスチョン">データインジェスチョン</h2>
+<ul>
+<li>バルク型</li>
+<li>ストリーミング型</li>
+</ul>
+<p>時系列データを一つ一つファイルとして落とすと上記の問題にあたるためデータをまとめて一つのファイルに保存する方法が取られる。このように効率の良いストレージを作ることをデータインジェスションと呼ぶ。</p>
+<p>バルク</p>
+<p>生データから分散ストレージへの転送を担うノードをETLサーバと呼ぶ。ETLサーバはデータを抽出して保存し、次に転送タスクを実行する。（Embulk などがそれだな） データ量に応じて転送の頻度を変える必要がある。ワークフロー管理ツールをおくとこのタスク実行を管理しやすくなる。</p>
+<p>転送の信頼性が大事ならバルクを勧める。やり直しがきく。 （広告配信のログなどは信頼性第一なのでバルクが適していそう）</p>
+<p>ストリーミング</p>
+<p>まだどこにも保存されていないデータはまず保存できるところに転送する必要があるのでストリーミングが必要になる。 （あー、バルクと比較する、というよりはストリーミングはバルクのフロントエンドなんだな）</p>
+<p>高頻度に小さなデータを保存する性質からNoSQLストレージが適していることが多い。またはメッセージキューやメッセージブローカなどの中継システ厶を置くこともある。 バッファ機能を持つメッセージ配送のひとつにfluentdがある。</p>
+<p>モバイルだとネットワークが不安定なので、SDK内部で蓄積しておんらいんになったらまとめてsyncする方式がとられる。</p>
+<h3 id="トレードオフ">4.2. トレードオフ</h3>
+<p>書き込み頻度が増えるにつれて性能は悪化しやすい。クライアントは失敗すれば再送を試みるので更に負荷は増えやすい。</p>
+<p>これに耐えるためには書き込み性能が高くスケールアウト可能なストレージが必要だがそう簡単には見つからないもの。なのでメッセージングアーキテクチャには配送メッセージを一時保存してバッファリングを行うブローカーがいる。（つまりクライアントからフロントエンド、そこからストレージに直書きせずに、間にブローカーをかませる）</p>
+<p>プッシュしたメッセージをブローカに書き込み、ETLがプルしてストレージにロードするというパターンが考えられる。</p>
+<p>信頼性</p>
+<ul>
+<li>at most once</li>
+<li>at least once</li>
+<li>exactly once</li>
+</ul>
+<p>exactly once</p>
+<p>到達性を保証するにはコーディネーターなどが必要。しかしそれが性能のネックになることもある。</p>
+<p>at least once</p>
+<p>重複排除する仕組みを別途導入できるなら at least once は許容できるはず。多くのメッセージングシステムはこれ。しかしこの操作はとても高コスト。</p>
+<p>メッセージに書き込み先ファイルのオフセットを入れておく。 再送されてもファイルの同じオフセットに書き込まれるだけなので冪等。</p>
+<p>ユニークIDをつけることで重複排除。最近受け取ったIDを記録しておいて重複排除。その記録が期限切れで破棄された後にきた重複は受け入れる。</p>
+<p>重複排除は基本的にエンドツーエンドの仕組みを作らなければ実現不可能。 配送経路に at most once と at least once が混ざれば両方に対応する必要ができてコストは増すばかり。</p>
+<p>代表的な重複排除</p>
+<h3 id="時系列データの最適化">4.3. 時系列データの最適化</h3>
+<p>メッセージが届いた時間と処理される時間の違い。</p>
+<p>スマホだとオンラインになるまで時間が開くことがあるため、メッセージの生成から到着に数日遅延があることもある。</p>
+<p>生成をイベント時間 到着をプロセス時間</p>
+<p>通常はイベント時間を分析したいので、数日さかのぼって集計することになる。 一方データを保存するファイルはプロセス時間単位で作ることが多い。 つまり1/1のメッセージを全て検索するためにはその日のプロセス時間のファイルだけではなく、送れて届いたプロセス時間のファイルも読み込む必要がある。これは膨大なファイルスキャンを招くことになり効率が悪い。</p>
+<p>時系列インデックスの導入</p>
+<p>Cassandra などの時系列インデックスを持つデータベースではイベント時間をベースに並べ替えをしておくことで検索を効率化できる。これにより短い範囲でのリアルタイム集計は素早くできるようになる。長期間にわたる検索はそれでも向かないので集計効率の高い列指向データベースを別途使ったほうが良い。</p>
+<p>述語プッシュダウン</p>
+<p>定期的に新しく届いたCSVをイベント時間で並び替えて列指向ストレージに保存すると考える。 （何が嬉しいのかちゃんとメモされていない）</p>
+  </div>
+  <footer>
+    
+              </main>
+
+              <footer>
+                <hr>
+                <div class="footer-copyright">
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site generated by
+                      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Site theme is from 
+                      <a href="https://nkmr6194.github.io/Umi/">Umi</a>
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                  <div>
+                    <span class="right">
+                      <small>
+                      <i>
+                      Copyright © 2018 Yutaka Imamura
+                      </i>
+                      </small>
+                    </span>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['\\(','\\)']]},
+          processEscape: true
+        });
+        </script>
+
+
+    </body>
+</html>
