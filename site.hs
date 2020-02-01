@@ -12,7 +12,7 @@ main = do
   E.setLocaleEncoding E.utf8
   hakyllWith config $ do
 
-    match ("resources/*" .||. "images/*" .||. "js/*" .||. "fonts/*") $ do
+    match ("resources/*" .||. "images/*" .||. "images/icons/*" .||. "js/*" .||. "fonts/*") $ do
       route   idRoute
       compile copyFileCompiler
 
@@ -33,7 +33,6 @@ main = do
     tagged tags       ("Posts tagged: " ++)     "templates/tag.html"
     tagged categories ("Posts categoried: " ++) "templates/category.html"
 
-    posts postCtx' postsGlob
     toplevel postCtx' "posts/note.md" "posts/note/*"
     toplevel postCtx' "posts/linux.md" "posts/linux/*"
     toplevel postCtx' "writings.md" "posts/*"
@@ -101,7 +100,8 @@ posts ctx sources =
       >>= relativizeUrls
 
 toplevel :: Context String -> Pattern -> Pattern -> Rules ()
-toplevel ctx source children =
+toplevel ctx source children = do
+  posts ctx children
   match source $ do
     route $ setExtension "html"
     compile $ do

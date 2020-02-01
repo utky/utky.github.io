@@ -1,5 +1,5 @@
 ---
-title: (WIP) 『ビッグデータを支える技術』を読んだ
+title: WIP『ビッグデータを支える技術』を読んだ
 date: 2020-01-18
 tags: database, book
 ---
