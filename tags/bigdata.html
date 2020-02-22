@@ -4,17 +4,17 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>数学は言葉#1 - Hash λ Bye</title>
+        <title>Posts tagged: bigdata - Hash λ Bye</title>
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="数学は言葉#1 - Hash λ Bye">
+        <meta name="twitter:title" content="Posts tagged: bigdata - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
 
-        <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
-        <script src="../../js/highlight.pack.js"></script>
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/highlight/agate.css">
+        <script src="../js/highlight.pack.js"></script>
         <script>hljs.initHighlightingOnLoad();</script>
-        <link rel="stylesheet" type="text/css" href="../../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
         <script>
@@ -28,25 +28,25 @@
     </head>
     <body>
       <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
-        <a class="navbar-brand" href="../../"><span><img src="../../images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <a class="navbar-brand" href="../"><span><img src="../images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="../../about.html">
-                <img src="../../images/icons/person-fill.svg" alt width="32" height="32" title="About"> About
+              <a class="nav-link" href="../about.html">
+                <img src="../images/icons/person-fill.svg" alt width="32" height="32" title="About"> About
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../../posts/note.html">
-                <img src="../../images/icons/pencil.svg" alt width="32" height="32" title="Notes"> Notes
+              <a class="nav-link" href="../posts/note.html">
+                <img src="../images/icons/pencil.svg" alt width="32" height="32" title="Notes"> Notes
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../../writings.html">
-                <img src="../../images/icons/book.svg" alt width="32" height="32" title="Writings"> Writings
+              <a class="nav-link" href="../writings.html">
+                <img src="../images/icons/book.svg" alt width="32" height="32" title="Writings"> Writings
               </a>
             </li>
             <li class="nav-item">
@@ -56,12 +56,12 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="https://github.com/utky" target="_blank">
-                <img src="../../images/icons/GitHub-Mark-32px.png" alt width="32" height="32" title="GitHub"> GitHub
+                <img src="../images/icons/GitHub-Mark-32px.png" alt width="32" height="32" title="GitHub"> GitHub
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../../contact.html">
-                <img src="../../images/icons/envelope.svg" alt width="32" height="32" title="Writings"> Contact
+              <a class="nav-link" href="../contact.html">
+                <img src="../images/icons/envelope.svg" alt width="32" height="32" title="Writings"> Contact
               </a>
             </li>
           </ul>
@@ -69,50 +69,19 @@
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
         <article id="content">
-  <header class="row">
-    <div class="col">
-      <h1 class="title">数学は言葉#1</h1>
-      <small>
-      2015-10-13
-       / 
-      
-      [ <a href="../../tags/math.html">math</a> ]
-      
-       / 
-      
-      </small>
-    </div>
+  <header>
+    <h1 class="title">Posts tagged: bigdata</h1>
   </header>
-  <div class="body row">
-    <div class="col">
-    <p>『数学は言葉』を読んでいる。 なんて楽しい本だろう。</p>
-<p>憶えたことを書いていこう。</p>
-<h3 id="論理包含">論理包含</h3>
-<p>\(P\)ならば\(Q\) : \(P \to Q\)</p>
-<p>これは下記のように表すことができる。</p>
-<p>\((\lnot P \lor Q)\)</p>
-<p>推論規則がひとつの論理演算式で表すことができる、 ということが不思議に思えた。</p>
-<p>ので確認してみた。</p>
-<h3 id="数訳する">数訳する</h3>
-<p><em>PならばQ</em></p>
-<p>とはつまり</p>
-<p><em>(Pではない)または(PかつQ)</em></p>
-<p>これを数訳すると</p>
-<p>\( \lnot P \lor (P \land Q) \)</p>
-<p>とあらわすことができる。</p>
-<p>さて、ここから \(\lnot P \lor Q \)が導けるか試してみよう。</p>
-<p>\( \lnot P \lor (P \land Q) \\ = 分配法則 \\ (\lnot P \lor P) \land (\lnot P \lor Q) \\ = \lnot P \lor P は恒に真 \\ (\lnot P \lor Q) \\ \)</p>
-<p>となった。</p>
-<p>さらに上記のような変換で\(P \to Q\)から\( \lnot Q \to \lnot P \)という対偶も導くことができる。</p>
-<p>が、それは次回。もうねなきゃ。</p>
-    </div>
+  <div class="body">
+    <ul class="archives">
+  
+  <li>
+    2020-02-22 - <a href="../posts/note/2020-02-22-how-to-beat-cap-theorem.html">「How to beat the CAP theorem」読んだ</a>
+  </li>
+  
+</ul>
+
   </div>
-  <footer class="row">
-    <div class="col">
-      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
-    </div>
-  </footer>
 </article>
 
       </main>
@@ -141,7 +110,7 @@
         </div>
       </footer>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-      <script src="../../js/bootstrap.min.js"></script>
+      <script src="../js/bootstrap.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
       <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
       <script type="text/x-mathjax-config">
