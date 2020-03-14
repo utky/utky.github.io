@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="WIP ElmのHttp処理部をスタブする - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="WIP ElmのHttp処理部をスタブする - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2016-10-17
        / 
       
-      [ <a href="../../tags/elm.html">elm</a> ]
+      [ <a title="All pages tagged 'elm'." href="../../tags/elm.html">elm</a> ]
       
        / 
       
@@ -96,75 +97,75 @@
 <h2 id="サンプルケース">サンプルケース</h2>
 <p>たとえばWeb APIエンドポイントと通信して<code>"Hello"</code>という文字列を取り出してくるようなサンプルを考える。</p>
 <p>サンプルは下記の環境で書いている。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb1-1" title="1">    <span class="er">&quot;dependencies&quot;:</span> <span class="fu">{</span></a>
-<a class="sourceLine" id="cb1-2" title="2">        <span class="dt">&quot;elm-lang/core&quot;</span><span class="fu">:</span> <span class="st">&quot;4.0.0 &lt;= v &lt; 5.0.0&quot;</span><span class="fu">,</span></a>
-<a class="sourceLine" id="cb1-3" title="3">        <span class="dt">&quot;elm-lang/html&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0 &lt;= v &lt; 2.0.0&quot;</span><span class="fu">,</span></a>
-<a class="sourceLine" id="cb1-4" title="4">        <span class="dt">&quot;evancz/elm-http&quot;</span><span class="fu">:</span> <span class="st">&quot;3.0.1 &lt;= v &lt; 4.0.0&quot;</span></a>
-<a class="sourceLine" id="cb1-5" title="5">    <span class="fu">}</span><span class="er">,</span></a>
-<a class="sourceLine" id="cb1-6" title="6">    <span class="er">&quot;elm-version&quot;:</span> <span class="er">&quot;0.17.0</span> <span class="er">&lt;=</span> <span class="er">v</span> <span class="er">&lt;</span> <span class="er">0.18.0&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1"></a>    <span class="er">&quot;dependencies&quot;:</span> <span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>        <span class="dt">&quot;elm-lang/core&quot;</span><span class="fu">:</span> <span class="st">&quot;4.0.0 &lt;= v &lt; 5.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>        <span class="dt">&quot;elm-lang/html&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0 &lt;= v &lt; 2.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>        <span class="dt">&quot;evancz/elm-http&quot;</span><span class="fu">:</span> <span class="st">&quot;3.0.1 &lt;= v &lt; 4.0.0&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>    <span class="fu">}</span><span class="er">,</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="er">&quot;elm-version&quot;:</span> <span class="er">&quot;0.17.0</span> <span class="er">&lt;=</span> <span class="er">v</span> <span class="er">&lt;</span> <span class="er">0.18.0&quot;</span></span></code></pre></div>
 <p>では前提となるビューやモデルについて提示しておく。</p>
 <h3 id="モデル状態を表す">モデル(状態を表す)</h3>
 <p>外部から受け取った文字列を保存するだけのモデル。</p>
-<pre class="elm"><code>type alias AppState = { out : String }</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">type</span> <span class="kw">alias</span> <span class="dt">AppState</span> <span class="op">=</span> { <span class="fu">out</span> : <span class="dt">String</span> }</span></code></pre></div>
 <p>初期状態ではただ空の文字列を出力するだけとしておく。</p>
-<pre class="elm"><code>init : ( AppState, Cmd Msg )
-init = ( { out = &quot;&quot; }, Cmd.none )</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">init</span> : ( <span class="dt">AppState</span><span class="op">,</span> <span class="dt">Cmd</span> <span class="dt">Msg</span> )</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">init</span> <span class="op">=</span> ( { <span class="fu">out</span> <span class="op">=</span> <span class="st">&quot;&quot;</span> }<span class="op">,</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">none</span> )</span></code></pre></div>
 <h3 id="ビュー">ビュー</h3>
 <p><code>say hello</code>ボタンを押すと<code>FetchHello</code>というメッセージをトリガする。 モデルが保持する文字列をテキストとして書き出す。</p>
-<pre class="elm"><code>view : AppState -&gt; Html Msg
-view model =
-  div [ ]
-      [ button
-          [ onClick FetchHello ]
-          [ text &quot;say hello&quot; ]
-      , span
-          []
-          [ text model.out ]
-      ]</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">view</span> : <span class="dt">AppState</span> <span class="op">-&gt;</span> <span class="dt">Html</span> <span class="dt">Msg</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">view</span> <span class="fu">model</span> <span class="op">=</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">div</span> [ ]</span>
+<span id="cb4-4"><a href="#cb4-4"></a>      [ <span class="fu">button</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>          [ <span class="fu">onClick</span> <span class="dt">FetchHello</span> ]</span>
+<span id="cb4-6"><a href="#cb4-6"></a>          [ <span class="fu">text</span> <span class="st">&quot;say hello&quot;</span> ]</span>
+<span id="cb4-7"><a href="#cb4-7"></a>      <span class="op">,</span> <span class="fu">span</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>          []</span>
+<span id="cb4-9"><a href="#cb4-9"></a>          [ <span class="fu">text</span> <span class="fu">model</span><span class="op">.</span><span class="fu">out</span> ]</span>
+<span id="cb4-10"><a href="#cb4-10"></a>      ]</span></code></pre></div>
 <h3 id="メッセージ">メッセージ</h3>
 <p>このあたりから本題。</p>
-<pre class="elm"><code>type Msg
-  = FetchHello
-  | HalloDone String
-  | HelloFail Http.Error</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">type</span> <span class="dt">Msg</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="op">=</span> <span class="dt">FetchHello</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="op">|</span> <span class="dt">HalloDone</span> <span class="dt">String</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="op">|</span> <span class="dt">HelloFail</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span></span></code></pre></div>
 <ul>
 <li><code>FetchHello</code>: Web APIに“Hello”という文字列を送ってもらう要求。<strong>これの応答をスタブしたい</strong>。</li>
 <li><code>HalloDone</code>: 文字列を <strong>正常に</strong> 受信した場合の応答。</li>
 <li><code>HelloFail</code>: 文字列を受信に <strong>失敗した</strong> 場合の応答。</li>
 </ul>
 <h3 id="メッセージのハンドラ-update関数">メッセージのハンドラ: update関数</h3>
-<pre class="elm"><code>update : Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
-update msg model =
-  case msg of
-    -- FIXME: 普通だったらここで Http.get とかやるけど。。。。
-    FetchHello -&gt; Http.get string &quot;http://hogefuga/hello&quot; |&gt; Task.perform HelloFail HalloDone
-
-    -- ここ以降はWeb APIからのデータ受信後の動作なのであまり重要ではない
-    HalloDone s -&gt; { model | out = s } ! []
-    HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">update</span> : <span class="dt">Msg</span> <span class="op">-&gt;</span> <span class="dt">AppState</span> <span class="op">-&gt;</span> ( <span class="dt">AppState</span><span class="op">,</span> <span class="dt">Cmd</span> <span class="dt">Msg</span> )</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="fu">update</span> <span class="fu">msg</span> <span class="fu">model</span> <span class="op">=</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="cf">case</span> <span class="fu">msg</span> <span class="cf">of</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="co">-- FIXME: 普通だったらここで Http.get とかやるけど。。。。</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="dt">FetchHello</span> <span class="op">-&gt;</span> <span class="dt">Http</span><span class="op">.</span><span class="fu">get</span> <span class="fu">string</span> <span class="st">&quot;http://hogefuga/hello&quot;</span> <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">perform</span> <span class="dt">HelloFail</span> <span class="dt">HalloDone</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a>    <span class="co">-- ここ以降はWeb APIからのデータ受信後の動作なのであまり重要ではない</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>    <span class="dt">HalloDone</span> <span class="fu">s</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="fu">s</span> } <span class="op">!</span> []</span>
+<span id="cb6-9"><a href="#cb6-9"></a>    <span class="dt">HelloFail</span> <span class="fu">e</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="st">&quot;failure!&quot;</span> } <span class="op">!</span> []</span></code></pre></div>
 <p><strong>ようやく改善したいポイントに到着。</strong></p>
 <p><code>FetchHello</code>のパターンマッチに注目。 チュートリアルだとここで<code>Http</code>モジュールの関数を呼び出して、 Web APIの呼び出しをおこなう<code>Task</code>が発生する。</p>
 <p>しかしここにHTTPリクエストの発行を埋め込んでしまうと、メッセージを受信した瞬間にWeb APIの呼び出しが走る。 そのため呼び出し先のHTTP APIがどこかで起動している必要がある。<em>これが困る。</em> 開発中は<code>elm-reactor</code>で気軽に動作確認したいのに、外部API呼び出しが走るのは避けたい。</p>
 <p>そこだけ呼び出し元から制御できるようにしよう。</p>
-<pre class="elm"><code>update : Cmd Msg -&gt; Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
-update helloRequest msg model =
-  case msg of
-    FetchHello -&gt; (model, helloRequest)
-    HalloDone s -&gt; { model | out = s } ! []
-    HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">update</span> : <span class="dt">Cmd</span> <span class="dt">Msg</span> <span class="op">-&gt;</span> <span class="dt">Msg</span> <span class="op">-&gt;</span> <span class="dt">AppState</span> <span class="op">-&gt;</span> ( <span class="dt">AppState</span><span class="op">,</span> <span class="dt">Cmd</span> <span class="dt">Msg</span> )</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">update</span> <span class="fu">helloRequest</span> <span class="fu">msg</span> <span class="fu">model</span> <span class="op">=</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="cf">case</span> <span class="fu">msg</span> <span class="cf">of</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="dt">FetchHello</span> <span class="op">-&gt;</span> (<span class="fu">model</span><span class="op">,</span> <span class="fu">helloRequest</span>)</span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="dt">HalloDone</span> <span class="fu">s</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="fu">s</span> } <span class="op">!</span> []</span>
+<span id="cb7-6"><a href="#cb7-6"></a>    <span class="dt">HelloFail</span> <span class="fu">e</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="st">&quot;failure!&quot;</span> } <span class="op">!</span> []</span></code></pre></div>
 <p>updateの第一引数が<code>FetchHello</code>メッセージを受信した時のアクションになる。 そこだけ呼び出し元から受け取れるようにしておく。</p>
 <p>テスト用と実際のAPI呼び出し用の関数を用意する。</p>
-<pre class="elm"><code>-- | 実際に外部APIを呼び出してリモートからデータを受け取る
-fetchHello : Cmd Msg
-fetchHello =
-  Http.get &quot;http://hogefuga/hello&quot; string
-    |&gt; Task.perform HelloFail HalloDone
-
--- | ダミーのデータを返す
-dummyHello : Cmd Msg
-dummyHello =
-  Http.succeed &quot;Hello&quot;
-    |&gt; Task.perform HelloFail HalloDone</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">-- | 実際に外部APIを呼び出してリモートからデータを受け取る</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="fu">fetchHello</span> : <span class="dt">Cmd</span> <span class="dt">Msg</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">fetchHello</span> <span class="op">=</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="dt">Http</span><span class="op">.</span><span class="fu">get</span> <span class="st">&quot;http://hogefuga/hello&quot;</span> <span class="fu">string</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">perform</span> <span class="dt">HelloFail</span> <span class="dt">HalloDone</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">-- | ダミーのデータを返す</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="fu">dummyHello</span> : <span class="dt">Cmd</span> <span class="dt">Msg</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="fu">dummyHello</span> <span class="op">=</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>  <span class="dt">Http</span><span class="op">.</span><span class="fu">succeed</span> <span class="st">&quot;Hello&quot;</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a>    <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">perform</span> <span class="dt">HelloFail</span> <span class="dt">HalloDone</span></span></code></pre></div>
 <p>Productionで動かす時は</p>
 <pre><code>update fetchHello : Msg -&gt; AppState -&gt; (AppState, Cmd Msg)</code></pre>
 <p>開発環境で動かす時は</p>
@@ -174,21 +175,21 @@ dummyHello =
 <h3 id="複数のhttpリクエストに対応するための準備">複数のHTTPリクエストに対応するための準備</h3>
 <p>今までのコードだと<code>FetchHello</code>しかスタブ処理に対応できない。 きっと他にもHTTPリクエストは発生するだろうからこれに対処する。</p>
 <p>なのでちょっとデータ型に調整を入れる。</p>
-<pre class="elm"><code>type Msg
-  = FetchHello
-  | HalloDone String
-  | HelloFail Http.Error</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">type</span> <span class="dt">Msg</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="op">=</span> <span class="dt">FetchHello</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="op">|</span> <span class="dt">HalloDone</span> <span class="dt">String</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="op">|</span> <span class="dt">HelloFail</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span></span></code></pre></div>
 <p>これを</p>
-<pre class="elm"><code>type Msg
-  = Req Request
-  | Res Response
-
-type Request
-  = FetchHello
-
-type Response
-  = HelloDone String
-  | HelloFail Http.Error</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">type</span> <span class="dt">Msg</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="op">=</span> <span class="dt">Req</span> <span class="dt">Request</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="op">|</span> <span class="dt">Res</span> <span class="dt">Response</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="kw">type</span> <span class="dt">Request</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>  <span class="op">=</span> <span class="dt">FetchHello</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="kw">type</span> <span class="dt">Response</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a>  <span class="op">=</span> <span class="dt">HelloDone</span> <span class="dt">String</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a>  <span class="op">|</span> <span class="dt">HelloFail</span> <span class="dt">Http</span><span class="op">.</span><span class="dt">Error</span></span></code></pre></div>
 <p>こうする。</p>
 <ul>
 <li><code>Msg</code>: アプリケーション全体で発生しうるメッセージを表す</li>
@@ -196,64 +197,64 @@ type Response
 <li><code>Response</code>: HTTPレスポンスで受け取ったデータを保持するコンテナを表す</li>
 </ul>
 <p>要求を表すメッセージと応答を表すメッセージを<em>データ型として</em>分離している。 これにより今回スタブしたい部分の型をより正確に表現できるようになる。</p>
-<pre class="elm"><code>Request -&gt; Cmd Response</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb13-1"><a href="#cb13-1"></a><span class="dt">Request</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Response</span></span></code></pre></div>
 <p>なんらかのHTTPリクエストを発行する要求を受け取って、HTTPレスポンスを返すような関数だ。</p>
 <p><code>FetchHello</code>以外のメッセージが増えた場合にはこんな風に書けるだろう。</p>
-<pre class="elm"><code>dispatch : Request -&gt; Cmd Response
-dispatch req =
-  case req of
-    FetchHello -&gt; ...
-    FetchHola -&gt; ...
-    FetchHallo -&gt; ...</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">dispatch</span> : <span class="dt">Request</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Response</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="fu">dispatch</span> <span class="fu">req</span> <span class="op">=</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="cf">case</span> <span class="fu">req</span> <span class="cf">of</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>    <span class="dt">FetchHello</span> <span class="op">-&gt;</span> <span class="op">...</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>    <span class="dt">FetchHola</span> <span class="op">-&gt;</span> <span class="op">...</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>    <span class="dt">FetchHallo</span> <span class="op">-&gt;</span> <span class="op">...</span></span></code></pre></div>
 <p>上手く複数パターンのHTTPリクエストに対応できそうだ。</p>
 <h3 id="updateの対応">updateの対応</h3>
 <p>これに合わせて<code>update</code>関数はこのように書き直される。</p>
-<pre class="elm"><code>update : (Request -&gt; Cmd Response) -&gt; Msg -&gt; AppState -&gt; ( AppState, Cmd Msg )
-update disp msg model =
-  case msg of
-
-    Req request -&gt;
-      (model, (disp request |&gt; Cmd.map Res))
-
-    Res response -&gt;
-      case response of
-        HelloDone s -&gt; { model | out = s } ! []
-        HelloFail e -&gt; { model | out = &quot;failure!&quot; } ! []</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">update</span> : (<span class="dt">Request</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Response</span>) <span class="op">-&gt;</span> <span class="dt">Msg</span> <span class="op">-&gt;</span> <span class="dt">AppState</span> <span class="op">-&gt;</span> ( <span class="dt">AppState</span><span class="op">,</span> <span class="dt">Cmd</span> <span class="dt">Msg</span> )</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">update</span> <span class="fu">disp</span> <span class="fu">msg</span> <span class="fu">model</span> <span class="op">=</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="cf">case</span> <span class="fu">msg</span> <span class="cf">of</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5"></a>    <span class="dt">Req</span> <span class="fu">request</span> <span class="op">-&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>      (<span class="fu">model</span><span class="op">,</span> (<span class="fu">disp</span> <span class="fu">request</span> <span class="op">|&gt;</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">map</span> <span class="dt">Res</span>))</span>
+<span id="cb15-7"><a href="#cb15-7"></a></span>
+<span id="cb15-8"><a href="#cb15-8"></a>    <span class="dt">Res</span> <span class="fu">response</span> <span class="op">-&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a>      <span class="cf">case</span> <span class="fu">response</span> <span class="cf">of</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a>        <span class="dt">HelloDone</span> <span class="fu">s</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="fu">s</span> } <span class="op">!</span> []</span>
+<span id="cb15-11"><a href="#cb15-11"></a>        <span class="dt">HelloFail</span> <span class="fu">e</span> <span class="op">-&gt;</span> { <span class="fu">model</span> <span class="op">|</span> <span class="fu">out</span> <span class="op">=</span> <span class="st">&quot;failure!&quot;</span> } <span class="op">!</span> []</span></code></pre></div>
 <p>大事なポイントを抜粋してみる。</p>
-<pre class="elm"><code>    Req request -&gt;
-      (model, (disp request |&gt; Cmd.map Res))</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb16-1"><a href="#cb16-1"></a>    <span class="dt">Req</span> <span class="fu">request</span> <span class="op">-&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>      (<span class="fu">model</span><span class="op">,</span> (<span class="fu">disp</span> <span class="fu">request</span> <span class="op">|&gt;</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">map</span> <span class="dt">Res</span>))</span></code></pre></div>
 <p>何かしらのHTTPリクエストを発行した場合には、この分岐に入る。</p>
 <p>ちょっと型が見えにくいので整理しておこう。</p>
-<pre class="elm"><code>request : Request
-disp : Request -&gt; Cmd Response</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">request</span> : <span class="dt">Request</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">disp</span> : <span class="dt">Request</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Response</span></span></code></pre></div>
 <p><code>request</code>の値は<code>FetchHello</code>かもしれないし<code>FetchHola</code>かもしれない。 いずれにしても<code>disp</code>に<code>request</code>に適用することでHTTPレスポンスを得ることができる。</p>
-<pre class="elm"><code>disp request : Cmd Response</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">disp</span> <span class="fu">request</span> : <span class="dt">Cmd</span> <span class="dt">Response</span></span></code></pre></div>
 <p>これだけで終わりではなくて、<code>Cmd.map</code>という関数も使っている。</p>
-<pre class="elm"><code>Cmd.map Res : Cmd Response -&gt; Cmd Msg</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb19-1"><a href="#cb19-1"></a><span class="dt">Cmd</span><span class="op">.</span><span class="fu">map</span> <span class="dt">Res</span> : <span class="dt">Cmd</span> <span class="dt">Response</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Msg</span></span></code></pre></div>
 <p><code>Cmd.map Res</code>の型は<code>Cmd Response -&gt; Cmd Msg</code>を返すのでこれで<code>update</code>関数の型に合わせることができる。 これらを組み合わせて適用すると下記のような型になるはずだ。</p>
-<pre class="elm"><code>disp request |&gt; Cmd.map Res : Cmd Msg</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">disp</span> <span class="fu">request</span> <span class="op">|&gt;</span> <span class="dt">Cmd</span><span class="op">.</span><span class="fu">map</span> <span class="dt">Res</span> : <span class="dt">Cmd</span> <span class="dt">Msg</span></span></code></pre></div>
 <p>これで<code>update</code>関数の返り値の型に整合したのでコンパイルエラーはなくなる。</p>
 <h3 id="ダミーデータを返す">ダミーデータを返す</h3>
 <p>開発用ではダミーデータを返す必要がある。 これは<code>Task</code>モジュールの関数<code>succeed</code>を活用することで実現できる。</p>
-<pre class="elm"><code>dispatch : Request -&gt; Cmd Response
-dispatch req =
-  case req of
-    FetchHello -&gt; 
-      Task.succeed &quot;Hello&quot;
-        |&gt; Task.perform HelloFail HelloDone</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">dispatch</span> : <span class="dt">Request</span> <span class="op">-&gt;</span> <span class="dt">Cmd</span> <span class="dt">Response</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="fu">dispatch</span> <span class="fu">req</span> <span class="op">=</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>  <span class="cf">case</span> <span class="fu">req</span> <span class="cf">of</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>    <span class="dt">FetchHello</span> <span class="op">-&gt;</span> </span>
+<span id="cb21-5"><a href="#cb21-5"></a>      <span class="dt">Task</span><span class="op">.</span><span class="fu">succeed</span> <span class="st">&quot;Hello&quot;</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a>        <span class="op">|&gt;</span> <span class="dt">Task</span><span class="op">.</span><span class="fu">perform</span> <span class="dt">HelloFail</span> <span class="dt">HelloDone</span></span></code></pre></div>
 <p>これで<code>update</code>に渡す関数<code>dispatch</code>が出来上がった。</p>
 <p>本当にHTTPリクエストを発行したい場合は、 同じ型だけど実際に<code>Http</code>モジュールの関数を使ってHTTP通信を行うような新しい関数を用意してあげればいい。</p>
 <h3 id="関数を組み合わせてappを作る">関数を組み合わせてAppを作る</h3>
 <p><code>update</code>と<code>dispatch</code>関数を組み合わせるのは、<code>Program</code>を作る段階で行う。</p>
-<pre class="elm"><code>
-main : Program Never
-main =
-  Html.App.program
-    { init = init
-    , view = view
-    , update = update dispatch
-    , subscriptions = subscriptions
-    }</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode elm"><code class="sourceCode elm"><span id="cb22-1"><a href="#cb22-1"></a></span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="fu">main</span> : <span class="dt">Program</span> <span class="dt">Never</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="fu">main</span> <span class="op">=</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a>  <span class="dt">Html</span><span class="op">.</span><span class="dt">App</span><span class="op">.</span><span class="fu">program</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a>    { <span class="fu">init</span> <span class="op">=</span> <span class="fu">init</span></span>
+<span id="cb22-6"><a href="#cb22-6"></a>    <span class="op">,</span> <span class="fu">view</span> <span class="op">=</span> <span class="fu">view</span></span>
+<span id="cb22-7"><a href="#cb22-7"></a>    <span class="op">,</span> <span class="fu">update</span> <span class="op">=</span> <span class="fu">update</span> <span class="fu">dispatch</span></span>
+<span id="cb22-8"><a href="#cb22-8"></a>    <span class="op">,</span> <span class="fu">subscriptions</span> <span class="op">=</span> <span class="fu">subscriptions</span></span>
+<span id="cb22-9"><a href="#cb22-9"></a>    }</span></code></pre></div>
 <p>今回は<code>Main.elm</code>という1ファイルに全て詰め込んだけれど、 開発用と商用で分けるなら<code>main</code>関数定義だけそれぞれのファイルに書いてやる。</p>
 <ul>
 <li><code>Main.elm</code></li>

@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="Freeモナドを活用して問題を記述する[WIP] - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="Freeモナドを活用して問題を記述する[WIP] - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2016-03-20
        / 
       
-      [ <a href="../../tags/haskell.html">haskell</a> ]
+      [ <a title="All pages tagged 'haskell'." href="../../tags/haskell.html">haskell</a> ]
       
        / 
       
@@ -182,13 +183,13 @@ Functional way = record + functions</code></pre>
 <p>イベントは連続する。</p>
 <hr />
 <ul>
-<li>値を表すデータ型を定義する(モノのエンコード)</li>
-<li>ユースケースをドメイン内のイベントとして記述しきる(コトのエンコード) ユースケースは複数の操作に分解できるので、それらは後回し</li>
-<li>プリミティブを作る プリミティブを合成してユースケースを作ると考える これがDSLのASTになる</li>
-<li>プリミティブを組み合わせてドメインのユースケースを作る</li>
-<li>組み合わせて式を作る</li>
+<li><p>値を表すデータ型を定義する(モノのエンコード)</p></li>
+<li><p>ユースケースをドメイン内のイベントとして記述しきる(コトのエンコード) ユースケースは複数の操作に分解できるので、それらは後回し</p></li>
+<li><p>プリミティブを作る プリミティブを合成してユースケースを作ると考える これがDSLのASTになる</p></li>
+<li><p>プリミティブを組み合わせてドメインのユースケースを作る</p></li>
+<li><p>組み合わせて式を作る</p></li>
 <li><p>specを書いて使い方をつかむ</p></li>
-<li>7/7
+<li><p>7/7</p>
 <ul>
 <li>混乱してきたので基本的な事項の確認
 <ul>
@@ -198,7 +199,7 @@ Functional way = record + functions</code></pre>
 <li>すべての式を代数式として組み上げてからliftすることで代数系の意味論を崩さずにすむ</li>
 </ul></li>
 </ul></li>
-<li>7/8
+<li><p>7/8</p>
 <ul>
 <li>primitiveとcombinatorという考え方</li>
 <li>primitiveは構文木の基底部分</li>
@@ -208,7 +209,7 @@ Functional way = record + functions</code></pre>
 <li>再帰的なデータを素直に定義するとFreerでliftしにくくなる</li>
 </ul></li>
 </ul></li>
-<li>7/9
+<li><p>7/9</p>
 <ul>
 <li>今気持ち悪いと思うのは代数系とモナドが混ざること</li>
 <li>モナドに統一するためADTのコンストラクタの再帰を取り除いた</li>

@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="Haskellで抽象構文木 (AST) にメタデータを付与する - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="Haskellで抽象構文木 (AST) にメタデータを付与する - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2018-01-03
        / 
       
-      [ <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/ghc.html">ghc</a>, <a href="../../tags/compiler.html">compiler</a>, <a href="../../tags/elm.html">elm</a>, <a href="../../tags/sml.html">sml</a>, <a href="../../tags/standardml.html">standardml</a>, <a href="../../tags/parsec.html">parsec</a> ]
+      [ <a title="All pages tagged 'haskell'." href="../../tags/haskell.html">haskell</a>, <a title="All pages tagged 'ghc'." href="../../tags/ghc.html">ghc</a>, <a title="All pages tagged 'compiler'." href="../../tags/compiler.html">compiler</a>, <a title="All pages tagged 'elm'." href="../../tags/elm.html">elm</a>, <a title="All pages tagged 'sml'." href="../../tags/sml.html">sml</a>, <a title="All pages tagged 'standardml'." href="../../tags/standardml.html">standardml</a>, <a title="All pages tagged 'parsec'." href="../../tags/parsec.html">parsec</a> ]
       
        / 
       
@@ -142,8 +143,8 @@
 <p><a href="https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/HsSynType#SourceLocations">The HsSyn types</a></p>
 <p><a href="http://d.hatena.ne.jp/keyword/ghc">ghc</a>マジ天使。</p>
 <ul>
-<li><code>SrcLoc</code> というのが位置情報を持っている。</li>
-<li><code>SrcSpan</code> というのが位置から位置までのブロックを表している</li>
+<li><p><code>SrcLoc</code> というのが位置情報を持っている。</p></li>
+<li><p><code>SrcSpan</code> というのが位置から位置までのブロックを表している</p></li>
 <li><p><code>Located e</code> で <code>e</code> の実際のブロックを保存する</p>
 <p>– | We attach SrcSpans to lots of things, so let’s have a datatype for it.data GenLocated l e = L l e deriving (…)type Located e = GenLocated SrcSpan e</p></li>
 </ul>

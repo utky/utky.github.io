@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="Haskellで再帰的な構文木にFix(不動点)を導入してみる - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="Haskellで再帰的な構文木にFix(不動点)を導入してみる - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2018-03-20
        / 
       
-      [ <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/ghc.html">ghc</a>, <a href="../../tags/compiler.html">compiler</a> ]
+      [ <a title="All pages tagged 'haskell'." href="../../tags/haskell.html">haskell</a>, <a title="All pages tagged 'ghc'." href="../../tags/ghc.html">ghc</a>, <a title="All pages tagged 'compiler'." href="../../tags/compiler.html">compiler</a> ]
       
        / 
       
@@ -221,8 +222,8 @@
 <p>こんな風に <code>Fix</code> で包んだ項も比較できる。</p>
 <p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a> 8.6系から使える <code>QuantifiedConstraints</code> を使ってさらに無駄なく定義できるかは確認中。</p>
 <ul>
-<li><code>Eq (Fix f)</code> を定義するためには <code>Eq f</code> を仮定したい</li>
-<li><code>Eq f</code>を仮定したいところだが <code>f</code> はカインドが <code>* -&gt; *</code> なので <code>Eq (f a)</code> を仮定しようとする (ここが自信ない)</li>
+<li><p><code>Eq (Fix f)</code> を定義するためには <code>Eq f</code> を仮定したい</p></li>
+<li><p><code>Eq f</code>を仮定したいところだが <code>f</code> はカインドが <code>* -&gt; *</code> なので <code>Eq (f a)</code> を仮定しようとする (ここが自信ない)</p></li>
 <li><p><code>Eq (f a)</code> を仮定することで導入される型変数 <code>a</code> が、定義　<code>Eq (Fix f)</code> に現れないためにエラーとなる</p>
 <p>* Variable <code>a' occurs more often in the constraint</code>Eq (f a)’ than in the instance head <code>Eq (Fix f)' (Use UndecidableInstances to permit this) * In the instance declaration for</code>Eq (Fix f)’ | 31 | instance Eq (f a) =&gt; Eq (Fix f) where | ^^^^^^^^^^^^^^^^^^^^^^ |</p></li>
 </ul>

@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="OpenFlowのメッセージをAttoparsecで解析する - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="OpenFlowのメッセージをAttoparsecで解析する - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2016-05-15
        / 
       
-      [ <a href="../../tags/network.html">network</a>, <a href="../../tags/haskell.html">haskell</a>, <a href="../../tags/openflow.html">openflow</a> ]
+      [ <a title="All pages tagged 'network'." href="../../tags/network.html">network</a>, <a title="All pages tagged 'haskell'." href="../../tags/haskell.html">haskell</a>, <a title="All pages tagged 'openflow'." href="../../tags/openflow.html">openflow</a> ]
       
        / 
       
@@ -138,13 +139,13 @@
 </dl>
 <p><strong>今回は<code>type</code>フィールドは常に<code>EchoRequest(2)</code>を指すと考えてください。</strong></p>
 <p>これをデータ型として定義すると下記のようになるでしょう。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">data</span> <span class="dt">OpenFlow</span></a>
-<a class="sourceLine" id="cb2-2" title="2">  <span class="ot">=</span> <span class="dt">OpenFlow</span></a>
-<a class="sourceLine" id="cb2-3" title="3">  {<span class="ot"> _version ::</span> <span class="dt">Word8</span></a>
-<a class="sourceLine" id="cb2-4" title="4">  ,<span class="ot"> _type    ::</span> <span class="dt">Word8</span></a>
-<a class="sourceLine" id="cb2-5" title="5">  ,<span class="ot"> _length  ::</span> <span class="dt">Word16</span></a>
-<a class="sourceLine" id="cb2-6" title="6">  ,<span class="ot"> _xid     ::</span> <span class="dt">Word32</span></a>
-<a class="sourceLine" id="cb2-7" title="7">  }</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">data</span> <span class="dt">OpenFlow</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="ot">=</span> <span class="dt">OpenFlow</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>  {<span class="ot"> _version ::</span> <span class="dt">Word8</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>  ,<span class="ot"> _type    ::</span> <span class="dt">Word8</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>  ,<span class="ot"> _length  ::</span> <span class="dt">Word16</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  ,<span class="ot"> _xid     ::</span> <span class="dt">Word32</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>  }</span></code></pre></div>
 <p>レコードのフィールド名に<code>_</code>がついているのは、予約語や関数名の衝突を避けるためです。</p>
 <h4 id="echorequestメッセージ">EchoRequestメッセージ</h4>
 <p><code>EchoRequest</code>はOpenFlowを喋るホスト同士での死活監視に利用されます。</p>
@@ -160,18 +161,18 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</code></pre>
 <p><code>arbitary-length data field</code>がそのデータに相当します。 このデータがOpenFlowのメッセージ<code>EchoRequest</code>特有のフィールドになります。</p>
 <p><code>EchoRequest</code>をヘッダに格納するために<code>OpenFlow</code>のデータ型をもう少し拡張します。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">data</span> <span class="dt">OpenFlow</span></a>
-<a class="sourceLine" id="cb4-2" title="2">  <span class="ot">=</span> <span class="dt">OpenFlow</span></a>
-<a class="sourceLine" id="cb4-3" title="3">  {<span class="ot"> _version ::</span> <span class="dt">Word8</span></a>
-<a class="sourceLine" id="cb4-4" title="4">  ,<span class="ot"> _type    ::</span> <span class="dt">Word8</span></a>
-<a class="sourceLine" id="cb4-5" title="5">  ,<span class="ot"> _length  ::</span> <span class="dt">Word16</span></a>
-<a class="sourceLine" id="cb4-6" title="6">  ,<span class="ot"> _xid     ::</span> <span class="dt">Word32</span></a>
-<a class="sourceLine" id="cb4-7" title="7">  ,<span class="ot"> _payload ::</span> <span class="dt">OpenFlowPayload</span> <span class="co">-- payloadをフィールドとして追加</span></a>
-<a class="sourceLine" id="cb4-8" title="8">  }</a>
-<a class="sourceLine" id="cb4-9" title="9"></a>
-<a class="sourceLine" id="cb4-10" title="10"><span class="co">-- payloadそのものの定義</span></a>
-<a class="sourceLine" id="cb4-11" title="11"><span class="kw">data</span> <span class="dt">OpenFlowPayload</span></a>
-<a class="sourceLine" id="cb4-12" title="12">  <span class="ot">=</span> <span class="dt">EchoRequest</span> {<span class="ot"> _data ::</span> <span class="dt">ByteString</span> }</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">data</span> <span class="dt">OpenFlow</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="ot">=</span> <span class="dt">OpenFlow</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>  {<span class="ot"> _version ::</span> <span class="dt">Word8</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>  ,<span class="ot"> _type    ::</span> <span class="dt">Word8</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  ,<span class="ot"> _length  ::</span> <span class="dt">Word16</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  ,<span class="ot"> _xid     ::</span> <span class="dt">Word32</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  ,<span class="ot"> _payload ::</span> <span class="dt">OpenFlowPayload</span> <span class="co">-- payloadをフィールドとして追加</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>  }</span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">-- payloadそのものの定義</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="kw">data</span> <span class="dt">OpenFlowPayload</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="ot">=</span> <span class="dt">EchoRequest</span> {<span class="ot"> _data ::</span> <span class="dt">ByteString</span> }</span></code></pre></div>
 <p>データ型の定義ができました。バイナリーデータからこのデータ構造を出力するparser(解析器)を定義します。</p>
 <h2 id="解析の進め方">解析の進め方</h2>
 <p>前述のデータ構造<code>OpenFlow</code>を出力するparserを定義していきます。</p>
@@ -182,11 +183,11 @@
 <p>とあるとおりネットワークプロトコルの解析に威力を発揮します。</p>
 <h3 id="固定長フィールドの解析">固定長フィールドの解析</h3>
 <p>先頭から固定長のフィールドを読んでいくのはとても簡単です。 AttoparsecのParserを素直に使えばいいだけです。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1">version_ <span class="ot">&lt;-</span> anyWord8</a>
-<a class="sourceLine" id="cb5-2" title="2">type_    <span class="ot">&lt;-</span> anyWord8</a>
-<a class="sourceLine" id="cb5-3" title="3">length_  <span class="ot">&lt;-</span> anyWord16</a>
-<a class="sourceLine" id="cb5-4" title="4">xid_     <span class="ot">&lt;-</span> anyWord32</a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="co">-- anyWord16とanyWord32は標準ではついていないので適当に自作します</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb5-1"><a href="#cb5-1"></a>version_ <span class="ot">&lt;-</span> anyWord8</span>
+<span id="cb5-2"><a href="#cb5-2"></a>type_    <span class="ot">&lt;-</span> anyWord8</span>
+<span id="cb5-3"><a href="#cb5-3"></a>length_  <span class="ot">&lt;-</span> anyWord16</span>
+<span id="cb5-4"><a href="#cb5-4"></a>xid_     <span class="ot">&lt;-</span> anyWord32</span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">-- anyWord16とanyWord32は標準ではついていないので適当に自作します</span></span></code></pre></div>
 <p>こうすると到着したフレームの先頭から順次固定長フィールドを取り出すことができます。</p>
 <pre><code> 0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -208,7 +209,7 @@
 <p>いま知りたいのはフレームからOpenFlowヘッダを除いた残りの部分のデータ長です。</p>
 <pre><code>ペイロードのデータ長 = length - OpenFlowヘッダ長(8)</code></pre>
 <p>なので<code>length - 8</code>が残りのフィールドの長さになります。 これをHaskellで書くとこんな感じです。Nオクテットのデータを<code>ByteString</code>として読み込む<code>take</code>を使います。</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb10-1" title="1">payloadBytes <span class="ot">&lt;-</span> <span class="fu">take</span> (length_ <span class="op">-</span> <span class="dv">8</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb10-1"><a href="#cb10-1"></a>payloadBytes <span class="ot">&lt;-</span> <span class="fu">take</span> (length_ <span class="op">-</span> <span class="dv">8</span>)</span></code></pre></div>
 <p>あとはこのペイロードを解析すればいいだけです。</p>
 <h3 id="可変長データ用parserを実行する">可変長データ用parserを実行する</h3>
 <p>上記の手順まで進むと、解決すべき残りの課題は</p>
@@ -229,29 +230,29 @@
 | arbitary-length data field                                    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</code></pre>
 <p>任意の長さのデータを取り出して<code>EchoRequest</code>のペイロードとするため下記のような定義になります。</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb12-1" title="1"><span class="ot">payloadParser ::</span> <span class="dt">Parser</span> <span class="dt">OpenFlowPayload</span></a>
-<a class="sourceLine" id="cb12-2" title="2">payloadParser <span class="ot">=</span> <span class="dt">EchoRequest</span> <span class="op">&lt;$&gt;</span> takeByteString</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb12-1"><a href="#cb12-1"></a><span class="ot">payloadParser ::</span> <span class="dt">Parser</span> <span class="dt">OpenFlowPayload</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>payloadParser <span class="ot">=</span> <span class="dt">EchoRequest</span> <span class="op">&lt;$&gt;</span> takeByteString</span></code></pre></div>
 <p><code>takeByteString</code>は残りのデータを<code>ByteString</code>として読み込むparserです。</p>
 <h4 id="ヘッダのparserとペイロードのparserを組み合わせる">ヘッダのparserとペイロードのparserを組み合わせる</h4>
 <p>いままでのコードと合わせるとこんな感じになります。</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb13-1" title="1"><span class="co">-- 固定長フィールドはそのまま読み込む</span></a>
-<a class="sourceLine" id="cb13-2" title="2">version_     <span class="ot">&lt;-</span> anyWord8</a>
-<a class="sourceLine" id="cb13-3" title="3">type_        <span class="ot">&lt;-</span> anyWord8</a>
-<a class="sourceLine" id="cb13-4" title="4">length_      <span class="ot">&lt;-</span> anyWord16</a>
-<a class="sourceLine" id="cb13-5" title="5">xid_         <span class="ot">&lt;-</span> anyWord32</a>
-<a class="sourceLine" id="cb13-6" title="6"></a>
-<a class="sourceLine" id="cb13-7" title="7"><span class="co">-- 可変長フィールドを含んだデータを切り出す</span></a>
-<a class="sourceLine" id="cb13-8" title="8">payloadBytes <span class="ot">&lt;-</span> <span class="fu">take</span> (<span class="fu">length</span> <span class="op">-</span> <span class="dv">8</span>)</a>
-<a class="sourceLine" id="cb13-9" title="9"></a>
-<a class="sourceLine" id="cb13-10" title="10"><span class="co">-- 1. 読み込んだpayloadBytesをもとにpayloadParserを実行する</span></a>
-<a class="sourceLine" id="cb13-11" title="11"><span class="kw">case</span> parseOnly (payloadParser <span class="op">&lt;*</span> endOfInput) payloadBytes <span class="kw">of</span></a>
-<a class="sourceLine" id="cb13-12" title="12"></a>
-<a class="sourceLine" id="cb13-13" title="13">  <span class="co">-- 2. Either String a が返却されるので中身を取り出す</span></a>
-<a class="sourceLine" id="cb13-14" title="14">  <span class="co">--   3. 失敗した場合はエラーメッセージをParserの失敗として呼び出し元に知らせる</span></a>
-<a class="sourceLine" id="cb13-15" title="15">  <span class="dt">Left</span> err     <span class="ot">-&gt;</span> <span class="fu">fail</span> err</a>
-<a class="sourceLine" id="cb13-16" title="16"></a>
-<a class="sourceLine" id="cb13-17" title="17">  <span class="co">--   4. 成功した場合はそのデータを持つParserとして返却</span></a>
-<a class="sourceLine" id="cb13-18" title="18">  <span class="dt">Right</span> payload <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="op">$</span> <span class="dt">OpenFlow</span> version_ type_ length_ xid_ payload</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">-- 固定長フィールドはそのまま読み込む</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>version_     <span class="ot">&lt;-</span> anyWord8</span>
+<span id="cb13-3"><a href="#cb13-3"></a>type_        <span class="ot">&lt;-</span> anyWord8</span>
+<span id="cb13-4"><a href="#cb13-4"></a>length_      <span class="ot">&lt;-</span> anyWord16</span>
+<span id="cb13-5"><a href="#cb13-5"></a>xid_         <span class="ot">&lt;-</span> anyWord32</span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">-- 可変長フィールドを含んだデータを切り出す</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>payloadBytes <span class="ot">&lt;-</span> <span class="fu">take</span> (<span class="fu">length</span> <span class="op">-</span> <span class="dv">8</span>)</span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">-- 1. 読み込んだpayloadBytesをもとにpayloadParserを実行する</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="kw">case</span> parseOnly (payloadParser <span class="op">&lt;*</span> endOfInput) payloadBytes <span class="kw">of</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a></span>
+<span id="cb13-13"><a href="#cb13-13"></a>  <span class="co">-- 2. Either String a が返却されるので中身を取り出す</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a>  <span class="co">--   3. 失敗した場合はエラーメッセージをParserの失敗として呼び出し元に知らせる</span></span>
+<span id="cb13-15"><a href="#cb13-15"></a>  <span class="dt">Left</span> err     <span class="ot">-&gt;</span> <span class="fu">fail</span> err</span>
+<span id="cb13-16"><a href="#cb13-16"></a></span>
+<span id="cb13-17"><a href="#cb13-17"></a>  <span class="co">--   4. 成功した場合はそのデータを持つParserとして返却</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a>  <span class="dt">Right</span> payload <span class="ot">-&gt;</span> <span class="fu">return</span> <span class="op">$</span> <span class="dt">OpenFlow</span> version_ type_ length_ xid_ payload</span></code></pre></div>
 <ol type="1">
 <li><code>payload :: ByteString</code>とpayload解析用の<code>payloadParser</code>を<code>parseOnly</code>に渡す</li>
 <li>返却される<code>Either String a</code>をパターンマッチで剥がして結果を取り出す</li>

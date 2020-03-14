@@ -9,7 +9,8 @@
         <meta name="twitter:title" content="証明を学ぶ - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-
+        <meta property="og:title" content="証明を学ぶ - Hash λ Bye">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../../css/highlight/agate.css">
         <script src="../../js/highlight.pack.js"></script>
@@ -76,7 +77,7 @@
       2016-05-20
        / 
       
-      [ <a href="../../tags/math.html">math</a>, <a href="../../tags/proof.html">proof</a> ]
+      [ <a title="All pages tagged 'math'." href="../../tags/math.html">math</a>, <a title="All pages tagged 'proof'." href="../../tags/proof.html">proof</a> ]
       
        / 
       
@@ -115,7 +116,7 @@
 <p>こんな風に含意で書き換えることができる。</p>
 <p>はて、これを証明するプロセスはどんな感じになるか。整理してみよう。</p>
 <p>プログラムのように考えると、\( P \rightarrow Q \) はあたかも関数のように考えることができる。 Haskellならこういう型を持つだろう。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="ot">proof ::</span> <span class="dt">P</span> <span class="ot">-&gt;</span> <span class="dt">Q</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span id="cb1-1"><a href="#cb1-1"></a><span class="ot">proof ::</span> <span class="dt">P</span> <span class="ot">-&gt;</span> <span class="dt">Q</span></span></code></pre></div>
 <p>証明はこの関数の実装を与えるような作業だ。 つまり与えられた<code>P</code>という仮定に他の関数(定理・公理)を適用して<code>Q</code>という結論を生じることを示す。</p>
 <p>そう考えてみる。</p>
 <p>これを証明の手続きで表現するのであれば、仮定を変形しながら結論を導く作業が証明の道筋となる。</p>
