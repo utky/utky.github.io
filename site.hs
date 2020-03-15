@@ -65,7 +65,19 @@ main = do
           >>= loadAndApplyTemplate "templates/default.html" indexCtx
           >>= relativizeUrls
 
+    create ["sitemap.xml"] $ do
+      route idRoute
+      compile $ do
+        postPages <- recentFirst =<< loadAll "posts/**"
+        singlePages <- loadAll (fromList ["about.md", "contact.md", "profile.md", "archive.html"])
+        let pages = postPages <> singlePages
+            sitemapCtx = rootField <> (listField "pages" postCtx (return pages))
+        makeItem "" >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
+
     match "templates/*" $ compile templateCompiler
+
+rootField :: Context String
+rootField = constField "root" "https://utky.github.io"
 
 --------------------------------------------------------------------------------
 postsGlob :: Pattern
@@ -74,6 +86,7 @@ postsGlob = "posts/**.md"
 postCtx :: Context String
 postCtx =
   dateField "date" "%Y-%m-%d" `mappend`
+  rootField `mappend`
   defaultContext
 
 tagCtx :: Tags -> Context String
