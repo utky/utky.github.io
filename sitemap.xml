@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
+>
+  <url>
+    <loc>https://utky.github.io</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2020-03-13-aws-performance-test.html</loc>
+    <lastmod>2020-03-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2020-02-22-how-to-beat-cap-theorem.html</loc>
+    <lastmod>2020-02-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2020-02-01-big-data-book.html</loc>
+    <lastmod>2020-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2020-01-26-srenext.html</loc>
+    <lastmod>2020-01-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/linux/99-working-with-netlink-in-go.html</loc>
+    <lastmod>2019-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/linux/99-communicating-netlink-with-ipc.html</loc>
+    <lastmod>2019-09-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2019-07-14_15-45-26.html</loc>
+    <lastmod>2019-07-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2019-03-16_23-25-53.html</loc>
+    <lastmod>2019-03-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2019-02-24_11-31-31.html</loc>
+    <lastmod>2019-02-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/linux/01-network-device.html</loc>
+    <lastmod>2018-12-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/linux.html</loc>
+    <lastmod>2018-12-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-09-08_01-00-40.html</loc>
+    <lastmod>2018-09-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-06-03_20-15-52.html</loc>
+    <lastmod>2018-06-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-05-28_22-49-55.html</loc>
+    <lastmod>2018-05-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-05-02_19-34-33.html</loc>
+    <lastmod>2018-05-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-04-15_17-50-37.html</loc>
+    <lastmod>2018-04-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-03-23_23-36-28.html</loc>
+    <lastmod>2018-03-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-03-20_22-43-20.html</loc>
+    <lastmod>2018-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-01-08_16-20-43.html</loc>
+    <lastmod>2018-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-01-03_18-59-20.html</loc>
+    <lastmod>2018-01-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2018-01-01_12-05-43.html</loc>
+    <lastmod>2018-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-12-17_21-20-53.html</loc>
+    <lastmod>2017-12-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-12-11_15-38-50.html</loc>
+    <lastmod>2017-12-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-12-10_19-50-16.html</loc>
+    <lastmod>2017-12-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-11-04_11-13-55.html</loc>
+    <lastmod>2017-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-09-30_19-30-43.html</loc>
+    <lastmod>2017-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-09-24_23-41-26.html</loc>
+    <lastmod>2017-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-09-19_00-10-24.html</loc>
+    <lastmod>2017-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-07-17_20-16-39.html</loc>
+    <lastmod>2017-07-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-07-15_11-52-09.html</loc>
+    <lastmod>2017-07-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-07-03_16-37-49.html</loc>
+    <lastmod>2017-07-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-06-19_00-51-41.html</loc>
+    <lastmod>2017-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-06-02_23-10-51.html</loc>
+    <lastmod>2017-06-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-05-27_13-48-17.html</loc>
+    <lastmod>2017-05-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-05-21_16-28-55.html</loc>
+    <lastmod>2017-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-05-20_17-41-25.html</loc>
+    <lastmod>2017-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-05-07_08-57-26.html</loc>
+    <lastmod>2017-05-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-05-01_07-55-16.html</loc>
+    <lastmod>2017-05-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-04-20_22-17-49.html</loc>
+    <lastmod>2017-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-01-29-write-tool-in-go.html</loc>
+    <lastmod>2017-01-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-01-22-view-model-in-elm.html</loc>
+    <lastmod>2017-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-01-01-new-year-2017.html</loc>
+    <lastmod>2017-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-12-29-design-clojure-program.html</loc>
+    <lastmod>2016-12-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-10-17-testing-elm-http.html</loc>
+    <lastmod>2016-10-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-08-16-reading-and-learning-method.html</loc>
+    <lastmod>2016-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-07-26-stack-extra-lib-problem.html</loc>
+    <lastmod>2016-07-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-07-21-minimal-api-design-step-by-step.html</loc>
+    <lastmod>2016-07-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2017-07-19-clojure-design-note.html</loc>
+    <lastmod>2016-07-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-07-13-learning-processor-introduction.html</loc>
+    <lastmod>2016-07-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-07-02-learning-basics.html</loc>
+    <lastmod>2016-07-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-06-11-eliminate-excel-logging.html</loc>
+    <lastmod>2016-06-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-05-20-learning-proof.html</loc>
+    <lastmod>2016-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-05-07-parsing-with-attoparsec.html</loc>
+    <lastmod>2016-05-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-03-20-haskell-design-note.html</loc>
+    <lastmod>2016-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-03-13-learning-bgp.html</loc>
+    <lastmod>2016-03-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-03-12-stack-and-nix.html</loc>
+    <lastmod>2016-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-02-21-starting-clojure.html</loc>
+    <lastmod>2016-02-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-01-30-learning-ospf.html</loc>
+    <lastmod>2016-01-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-01-04-reading-rfc6241.html</loc>
+    <lastmod>2016-01-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2016-01-01-new-year.html</loc>
+    <lastmod>2016-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-12-12-trema-day-8.html</loc>
+    <lastmod>2015-12-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-12-09-npstudy-7.html</loc>
+    <lastmod>2015-12-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-10-13-learning-math.html</loc>
+    <lastmod>2015-10-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-09-25-opencontrail-meetup.html</loc>
+    <lastmod>2015-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-09-25-manage-page-state-and-sub-components-with-react.html</loc>
+    <lastmod>2015-09-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-08-16-starting-react-js.html</loc>
+    <lastmod>2015-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2015-01-24-opendaylight-tokyo-user-group-kickoff-meetup.html</loc>
+    <lastmod>2015-01-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-11-18-voyage.html</loc>
+    <lastmod>2014-11-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-11-04-lycopene-issues.html</loc>
+    <lastmod>2014-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-10-15-rec-02.html</loc>
+    <lastmod>2014-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-10-14-rec-01.html</loc>
+    <lastmod>2014-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-10-06-initial-server-provisioning.html</loc>
+    <lastmod>2014-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-10-04-ansible-jenkins.html</loc>
+    <lastmod>2014-10-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-09-16-lfp-04.html</loc>
+    <lastmod>2014-09-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-09-15-lfp-03.html</loc>
+    <lastmod>2014-09-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-09-10-ansible-for-sdn.html</loc>
+    <lastmod>2014-09-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note/2014-09-09-lfp.html</loc>
+    <lastmod>2014-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/posts/note.html</loc>
+    <lastmod>2014-09-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/about.html</loc>
+    <lastmod></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/archive.html</loc>
+    <lastmod></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/contact.html</loc>
+    <lastmod></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://utky.github.io/profile.html</loc>
+    <lastmod></lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
