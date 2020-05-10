@@ -14,6 +14,13 @@
   </url>
 
   <url>
+    <loc>https://utky.github.io/posts/linux/99-proc-net-dev.html</loc>
+    <lastmod>2020-05-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://utky.github.io/posts/note/2020-03-27-tech-lead.html</loc>
     <lastmod>2020-03-27</lastmod>
     <changefreq>weekly</changefreq>
