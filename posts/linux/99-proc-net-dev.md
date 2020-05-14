@@ -1,7 +1,7 @@
 ---
 title: procfs ネットワーク周りを覗き見る /proc/net/dev 編
 date: 2020-05-10
-tags: linux, network
+tags: linux, network, procfs
 ---
 
 procfs からシステムの統計データが色々採取できる。
@@ -24,15 +24,17 @@ $ uname -srvp
 Linux 3.10.0-957.12.2.el7.x86_64 #1 SMP Tue May 14 21:24:32 UTC 2019 x86_64
 ```
 
-## net/core/net-procfs.c
+## dev ファイルの初期化
 
-"dev" の初期化
+net/core/net-procfs.c にてデバイス関連の procfs の初期化を行っている。
+
+dev ファイルに dev_seq_fops というコールバック関数を含む構造体を関連付けるのが主な処理となる。
+実際に dev ファイルを読み込む時のアクションはこの関連付けられたコールバック関数の責務となる。
 ```c
-	if (!proc_create_net("dev", 0444, net->proc_net, &dev_seq_ops,
-			sizeof(struct seq_net_private)))
+	if (!proc_create("dev", S_IRUGO, net->proc_net, &dev_seq_fops))
 ```
 
-ここが `dev` を読み出す時に呼び出される関数の対応を表す。
+dev_seq_fops にはいわゆるファイルアクセスで発生する open, read, seek, close に対応した関数の関連付けが定義される。
 ```c
 static const struct file_operations dev_seq_fops = {
 	.owner	 = THIS_MODULE,
@@ -43,7 +45,8 @@ static const struct file_operations dev_seq_fops = {
 };
 ```
 
-ここで `file` に `dev_seq_ops` をアタッチする。
+open で呼び出される関数 dev_seq_open をみて、dev ファイルを開いた際に発生するアクションについて確認する。
+と言ってもここでは file 構造体にまた dev_seq_ops というコールバック関数を含む構造体を関連付けているだけとなる。
 ```c
 static int dev_seq_open(struct inode *inode, struct file *file)
 {
@@ -52,7 +55,7 @@ static int dev_seq_open(struct inode *inode, struct file *file)
 }
 ```
 
-アタッチされる操作は `dev_seq_ops` に定義されている。
+関連付けられた `dev_seq_ops` は dev ファイルを反復的に読み出す際のアクションを定義している。
 ```
 static const struct seq_operations dev_seq_ops = {
 	.start = dev_seq_start,
@@ -62,7 +65,9 @@ static const struct seq_operations dev_seq_ops = {
 };
 ```
 
-読み出し開始のトリガになっていると思われる `dev_seq_start` 
+## dev ファイルの読み込み
+
+読み込み開始のトリガになっていると思われる `dev_seq_start` は下記。
 返却されたポインタは `dev_seq_show` に渡される。
 ```c
 /*
@@ -133,7 +138,7 @@ static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
 }
 ```
 
-統計データは下記の関数から netdev のメソッド経由で取得される。
+統計データ `rtnl_link_stats64` は下記の関数から netdev のメソッド経由で取得される。
 
 net/core/dev.c
 ```c
@@ -166,3 +171,43 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
 ```
 
 `ndo_get_stats64` のメソッドは各デバイスの初期化時にデバイスドライバ側で設定される。
+
+## 統計情報 rtnl_link_stats64
+
+include/uapi/linux/if_link.h
+```c
+/* The main device statistics structure */
+struct rtnl_link_stats64 {
+	__u64	rx_packets;		/* total packets received	*/
+	__u64	tx_packets;		/* total packets transmitted	*/
+	__u64	rx_bytes;		/* total bytes received 	*/
+	__u64	tx_bytes;		/* total bytes transmitted	*/
+	__u64	rx_errors;		/* bad packets received		*/
+	__u64	tx_errors;		/* packet transmit problems	*/
+	__u64	rx_dropped;		/* no space in linux buffers	*/
+	__u64	tx_dropped;		/* no space available in linux	*/
+	__u64	multicast;		/* multicast packets received	*/
+	__u64	collisions;
+
+	/* detailed rx_errors: */
+	__u64	rx_length_errors;
+	__u64	rx_over_errors;		/* receiver ring buff overflow	*/
+	__u64	rx_crc_errors;		/* recved pkt with crc error	*/
+	__u64	rx_frame_errors;	/* recv'd frame alignment error */
+	__u64	rx_fifo_errors;		/* recv'r fifo overrun		*/
+	__u64	rx_missed_errors;	/* receiver missed packet	*/
+
+	/* detailed tx_errors */
+	__u64	tx_aborted_errors;
+	__u64	tx_carrier_errors;
+	__u64	tx_fifo_errors;
+	__u64	tx_heartbeat_errors;
+	__u64	tx_window_errors;
+
+	/* for cslip etc */
+	__u64	rx_compressed;
+	__u64	tx_compressed;
+};
+```
+最初のひとかたまりのメンバーはよく見るので疑問はない。
+一方でエラーの統計以下のメンバーについては詳細をよく知らないものも多いためここで確認しておく。
