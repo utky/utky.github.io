@@ -112,6 +112,8 @@ static int dev_seq_show(struct seq_file *seq, void *v)
 ```
 
 ネットワークデバイスごとの統計情報が印字される。
+`temp` に統計を書き込んでもらって、それのポインタをまた `const` で受け取ってる。
+ちょっと回りくどい感じがするが何でだろう。
 ```c
 static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
 {
@@ -139,7 +141,7 @@ static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
 ```
 
 統計データ `rtnl_link_stats64` は下記の関数から netdev のメソッド経由で取得される。
-
+`ndo_get_stats64`/`ndo_get_stats` のメソッド実装があればそれを使うしなければ、netdev の stats を使う。
 net/core/dev.c
 ```c
 /**
@@ -211,3 +213,27 @@ struct rtnl_link_stats64 {
 ```
 最初のひとかたまりのメンバーはよく見るので疑問はない。
 一方でエラーの統計以下のメンバーについては詳細をよく知らないものも多いためここで確認しておく。
+
+統計の更新はドライバ側で行う。
+今回は Realtek のドライバで確認してみる。
+`drivers/net/ethernet/realtek/8139cp.c` 
+
+## RX 系エラー
+
+#### __u64	rx_length_errors;
+#### __u64	rx_over_errors;		/* receiver ring buff overflow	*/
+#### __u64	rx_crc_errors;		/* recved pkt with crc error	*/
+#### __u64	rx_frame_errors;	/* recv'd frame alignment error */
+#### __u64	rx_fifo_errors;		/* recv'r fifo overrun		*/
+#### __u64	rx_missed_errors;	/* receiver missed packet	*/
+
+## TX 系エラー
+
+#### __u64	tx_aborted_errors;
+#### __u64	tx_carrier_errors;
+#### __u64	tx_fifo_errors;
+#### __u64	tx_heartbeat_errors;
+#### __u64	tx_window_errors;
+
+#### __u64	rx_compressed;
+#### __u64	tx_compressed;
