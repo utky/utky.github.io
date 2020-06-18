@@ -1,8 +1,9 @@
-------------------
-title: OpenFlow再入門[W.I.P]
-date: 2016-04-18
-tags: [network, openflow]
-------------------
++++
+title = "OpenFlow再入門"
+date = 2016-04-18
+[taxonomies]
+tags = ["network", "openflow"]
++++
 
 ## 動機
 

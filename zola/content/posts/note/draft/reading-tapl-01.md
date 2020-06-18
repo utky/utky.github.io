@@ -1,3 +1,10 @@
++++
+title = "TAPLを読む 01"
+date = 2019-10-01
+[taxonomies]
+tags = ["tapl"]
++++
+
 3.2 構文
 -----
 
