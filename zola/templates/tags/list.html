@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{%- block content %}
+  {% for term in terms %}
+    <div>
+      <a href="{{ term.permalink }}" class="name">{{ term.name }}</a>
+      <span class="count">{{ term.pages | length }}</span>
+    </div>
+  {% endfor %}
+{% endblock content %}
