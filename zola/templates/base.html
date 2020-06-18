@@ -4,17 +4,31 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title>{{ config.title }} - Hash λ Bye</title>
+
+        {% if page %}
+        <title>{{ page.title }} - {{ config.title }}</title>
+        <meta name="twitter:title" content="{{ page.title }} - {{ config.title }}">
+        <meta property="og:title" content="{{ page.title }} - {{ config.title }}">
+        {% elif section %}
+        <title>{{ section.title }} - {{ config.title }}</title>
+        <meta name="twitter:title" content="{{ section.title }} - {{ config.title }}">
+        <meta property="og:title" content="{{ section.title }} - {{ config.title }}">
+        {% else %}
+        <title>{{ config.title }}</title>
+        <meta name="twitter:title" content="{{ config.title }}">
+        <meta property="og:title" content="{{ config.title }}">
+        {% endif %}
+
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ config.title }} - Hash λ Bye">
         <meta name="twitter:creator" content="@ilyaletre">
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
-        <meta property="og:title" content="{{ config.title }} - Hash λ Bye">
         <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
         <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
         <script src='/js/highlight.pack.js'></script>
         <script>hljs.initHighlightingOnLoad();</script>
+        -->
         <link rel="stylesheet" type="text/css" href="/css/default.css" />
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>

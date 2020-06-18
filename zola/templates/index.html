@@ -3,7 +3,7 @@
 {% block content %}
 <section class="row">
   <div class="col">
-    <h1>Hash λ Bye</h1>
+    <h1>{{ config.title }}</h1>
     <p>
       関数型プログラミングのことやLinuxのことなどについて書いたりします。
     </p>
@@ -13,17 +13,13 @@
 <section class="row">
   <div class="col">
     <h2><span class="glyphicon glyphicon-flash"></span> Updates</h2>
-
-{{ __tera_context }}
-
     <ul>
-    {% for page in section.pages | sort(attribute="date") | slice(end=5) %}
-      {% for post in posts %}
-      <li><a href="{{ post.permalink }}">{{ post.title }}</a></li>
-      {% endfor %}
+    {% set note = get_section(path="posts/note/_index.md", metadat_only=true) %}
+    {% set linux = get_section(path="posts/writings/linux/_index.md", metadat_only=true) %}
+    {% for page in note.pages | concat(with=linux.pages) | sort(attribute="date") | reverse | slice(end=10) %}
+      <li>{{ page.date }} - <a href="{{ page.permalink }}">{{ page.title }}</a></li>
     {% endfor %}
     </ul>
-
   </div>
 </section>
 
