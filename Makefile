@@ -1,20 +1,17 @@
-.PHONY: all build clean latex run build_hakyll publish
+.PHONY: all build clean run publish
 
 all: build
 
-build_hakyll:
-	stack build
-
 clean:
-	stack exec site -- clean
+	rm -rf ./public
 
-build: build_hakyll
-	stack exec site -- build
+build:
+	zola build
 
 run:
-	stack exec site -- watch
+	zola serve -p 8080 -i 0.0.0.0
 
-publish:
+publish: 
 	# Temporarily store uncommited changes
 	git stash
 
@@ -22,15 +19,15 @@ publish:
 	git checkout develop
 
 	# Build new files
-	stack exec site clean
-	stack exec site build
+	rm -rf ./public
+	zola build
 
 	# Get previous files
 	git fetch --all
 	git checkout -b master --track origin/master
 
 	# Overwrite existing files with new files
-	cp -a _site/. .
+	cp -a public/. .
 
 	# Commit
 	git add -A
