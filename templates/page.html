@@ -5,6 +5,8 @@
   <header class="row">
     <div class="col">
       <h1 class="title">{{ page.title }}</h1>
+      {% if page.date %}
+      <p>
       <small> {{ page.date }} / 
       {% for key, taxonomy in page.taxonomies %}
       {% for tag in taxonomy %}
@@ -12,6 +14,8 @@
       {% endfor %}
       {% endfor %}
       </small>
+      </p>
+      {% endif %}
     </div>
   </header>
   <div class="body row">

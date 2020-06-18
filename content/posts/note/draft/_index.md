@@ -1,4 +1,3 @@
 +++
-title = "draft"
-date = 2020-06-18
+title = "作成中"
 +++

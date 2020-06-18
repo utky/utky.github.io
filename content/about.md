@@ -2,7 +2,6 @@
 title = "About"
 aliases = ["/about.html"]
 +++
-# About
 
 [utky (Yutaka Imamura)](https://github.com/utky), 神奈川圏の対象
 
