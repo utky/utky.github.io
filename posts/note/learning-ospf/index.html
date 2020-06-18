@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>OSPF reading note - Hash λ Bye</title>
+        <meta name="twitter:title" content="OSPF reading note - Hash λ Bye">
+        <meta property="og:title" content="OSPF reading note - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">OSPF reading note</h1>
+      <small> 2016-01-30 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;network&#x2F;">[network]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>OSPFの処理ステップ</p>
+<ul>
+<li>LSDBの作成</li>
+<li>SPF計算</li>
+<li>経路テーブルの作成</li>
+</ul>
+<h2 id="messages">Messages</h2>
+<h3 id="gong-tong-nohetuda">共通のヘッダ</h3>
+<ul>
+<li>Version</li>
+<li>Type</li>
+<li>Packet length</li>
+<li>Router ID</li>
+<li>Area ID</li>
+<li>Checksum</li>
+<li>AuType</li>
+<li>Authentication</li>
+</ul>
+<p>ChecksumはOSPFヘッダからOSPFパケットの末尾までを含めて算出するが、
+Authenticationは含まないらしい。なんで……。</p>
+<h3 id="type">Type</h3>
+<ul>
+<li>1: Hello</li>
+<li>2: Database Description</li>
+<li>3: Link-State Request</li>
+<li>4: Link-State Update</li>
+<li>5: Link-State Acknowledgement</li>
+</ul>
+<p>こうしてみるとシンプルですね。
+データの要求、広告、レスポンス。</p>
+<p>なんとなく見ただけで</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">A == Request ==&gt; B
+A &lt;== Update == B
+A == Ack ==&gt; B
+</span></code></pre>
+<p>という動作が想像できる。。。違うかもしれないけれど。</p>
+<h3 id="autype">AuType</h3>
+<ul>
+<li>0: 認証なし</li>
+<li>1: パスワード認証</li>
+<li>2: 暗号を用いた認証</li>
+</ul>
+<p>暗号を用いた認証ってなんだろう？
+平文でないということか？
+ふつうパスワードって暗号化するんじゃないの？
+盗聴されてないとかいう性善説な想定なの？</p>
+<p>謎。そして解説がない。他の資料読まないとな。</p>
+<h2 id="hello">Hello</h2>
+<p>Helloパケットを送信するルータはOSPFルータである。</p>
+<p>NeighborとはHelloパケットの交換に成功した2つのOSPFルータの関係を指す。
+つまり<code>¬Neighbor(A, B)</code>とは<code>¬OSPF(A) || ¬OSPF(B)</code>を表す。</p>
+<h3 id="huirudo">フィールド</h3>
+<ul>
+<li>Network Mask</li>
+<li>HelloInterval</li>
+<li>Options</li>
+<li>Rtr Pri</li>
+<li>RouterDeadInteval</li>
+<li>Designated Router</li>
+<li>Backup Designated Router</li>
+<li>[Neighbor]</li>
+</ul>
+<h3 id="options">Options</h3>
+<p>どうやらここでTraffic Engineeringのcapabilityとかを表現している？</p>
+<h3 id="rtr-pri">Rtr Pri</h3>
+<p>DRへのなりやすさを表す数値。高いほどなりやすい。
+デフォルトは1。同じPriorityを持つルータがいる場合は、ルータIDの大きい方が優先される。
+マルチアクセスネットワークの場合にのみ使う。</p>
+<h3 id="designated-routertobackup-designated-router">Designated RouterとBackup Designated Router</h3>
+<p>ルータIDではなく、DRのインタフェースのうちそのネットワークに所属するインタフェースのIPアドレスになる。
+あー、マルチアクセスネットワークだと一つのサブネットの中に複数のルータがいて、
+それらのどれかがDRになるというシナリオを想定しているから、絶対にDRと共有しているネットワークが一つはある、という発想なのね。</p>
+<h2 id="database-description">Database Description</h2>
+<p>Adjacencyの初期化をするときに交換される。</p>
+<p>ほー、HelloでNeighborを確立して、Database DescriptionでAdjacencyを確立するということか。</p>
+<p>つまりは、、、</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">任意のルータA, Bについて
+Adjacency(A, B) =&gt; Neighbot(A, B)
+が成り立つ
+</span></code></pre>
+<p>ということはわかった。</p>
+<ul>
+<li>Interface MTU</li>
+<li>Options</li>
+<li>Iビット</li>
+<li>Mビット</li>
+<li>MSビット</li>
+<li>DD sequence number</li>
+<li>LSA Header</li>
+</ul>
+<h3 id="msbituto">MSビット</h3>
+<p>Master/Slaveを表すビット。相手がマスターの場合は1でスレーブの場合は2という0ということのようだ。
+しかしMaster/Slaveという立場によってどう意味が違うのか書いていない。
+Masterとは何をする役割なのか。</p>
+<p><a href="https://www.ietf.org/rfc/rfc2328.txt">RFC2328</a></p>
+<p>7.2.  The Synchronization of Databases</p>
+<blockquote>
+<p>During this process, the two routers form a master/slave relationship. 
+Each Database Description Packet has a sequence number. 
+Database Description Packets sent by the master (polls) are acknowledged by the slave
+through echoing of the sequence number.</p>
+</blockquote>
+<p>どうやらmasterがシーケンスを払い出してslaveがそのシーケンスを使ってLSAckを返すらしい。</p>
+<p>ではMaster/Slaveの関係自体はどうやって確立されるんだろう。</p>
+<blockquote>
+<p>Master/Slave
+When the two neighbors are exchanging databases, they form a
+master/slave relationship.  The master sends the first Database
+Description Packet, and is the only part that is allowed to
+retransmit.  The slave can only respond to the master's Database
+Description Packets.  The master/slave relationship is
+negotiated in state ExStart.</p>
+</blockquote>
+<p>どうやらmasterが最初にDD(Database Description)を発行できたり再送できたりするらしい。シーケンスはmasterが決められる。
+逆にslaveはmasterのDDに応答するだけ。</p>
+<p>で、もしslave側のリンク状況が変化した場合はmasterは自分の持っているデータベースが古いと判断してLSRをslaveに出す
+ということだろうか。</p>
+<p>どちらがmasterになるかはDatabase Description送信前に決まっている必要があると思うのだが、
+それを決定する仕組みはHelloには無いようなのでよくわからない。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">Hello交換開始(Init)
+Hello交換成功(2-way)
+masterの決定(ExStart)★ここの仕組みが解らない！！！
+</span></code></pre>
+<p>さらに言うとDDは分割して送信ができるが分割が必要かどうかはMTUによる。
+しかし送信側からMTUを判断するには相手のインタフェースのMTUを知る必要がある。</p>
+<p>そしてそれは相手がmasterとなってDDを送らない限り解らない。
+よって自分はslaveとなる。</p>
+<p>相手がmasterとなってDDを送るためには。。。以下同文</p>
+<p>なんだこの仕組みは！</p>
+<h3 id="link-state-update">Link-State Update</h3>
+<p>Requestはあまりおもしろくないので飛ばす。
+というかテキストにはほとんど説明がない。これもRFCか。。。。</p>
+<p>ということでUpdateの定義を確認。</p>
+<p>LSDBを作るための重要なレコードの集まりを表す。</p>
+<p>レコードはいくつかのタイプに分かれる。</p>
+<ol>
+<li>Router-LSA</li>
+<li>Network-LSA</li>
+<li>Summary-LSA(IP network)</li>
+<li>SUmmary-LSR(ASBR)</li>
+<li>AS-external-LSA</li>
+</ol>
+<h4 id="router-lsa">Router-LSA</h4>
+<p>OSPFルータが所有するインタフェースのうち同一エリアに属するOSPFインタフェースの数だけリンクをカウントする。</p>
+<p>さらにそれぞれのリンクにはいくつかの種類がある。</p>
+<ol>
+<li>P2P</li>
+<li>トランジットネットワークへの接続</li>
+<li>スタブネットワークへの接続</li>
+<li>バーチャルリンク</li>
+</ol>
+<p>さて、これらはなんだっけな。</p>
+<p>こんなにリンクの種別いるのかな。
+もっている経路渡せばいいだけでは？</p>
+<p>P2Pはまあ解る。</p>
+<p>トランジットネットワークはDRから発出されるらしい。
+IS-ISではpseudo nodeと呼ばれるダミーノードからの経路を表す時に使う。
+スタブネットワークは一般的に収容しているLANとかだろうな。</p>
+<p>バーチャルリンクはエリアをひとつまたいで向こうのエリアへと繋がるリンクのこと。
+経路を計算する時に考慮するのかな。</p>
+<p>トランジットとなにが違うのだろう。</p>
+<h3 id="network-lsa">Network-LSA</h3>
+<p>ネットワークに接続しているルータのIDリストを含む。
+DRから配信されるネットワークの状況を知らせる。</p>
+<h3 id="summary-lsa-ip-network">Summary-LSA (IP network)</h3>
+<p>0.0.0.1 -&gt; 0.0.0.0</p>
+<p>みたいに下位エリアのABRからバックボーンに伝達される経路とか。
+ABRから広告される経路らしい。</p>
+<h3 id="summary-lsa-asbr">Summary-LSA (ASBR)</h3>
+<p>ASBRから広告される。
+ネットマスクは0.0.0.0らしい。</p>
+<p>ASBRのルータIDとそこまでのメトリックを通知する。</p>
+<p>詳細はType 5で通知される。</p>
+<h3 id="as-external-lsa">AS-external-LSA</h3>
+<p>AS外部の経路をエリア内へ教える。</p>
+<ul>
+<li>Link State ID: Network Address</li>
+<li>Netmask</li>
+<li>Forwarding Address: 外部ネットワークへと転送可能なルータのアドレス</li>
+</ul>
+<p>OSPFルータがサービス回線を直接収容している場合などは、
+そのインタフェースをパッシブにしておくとこのType 5で広告できるってこと？</p>
+<p>それともその向こうにルータがいる場合にそのルータが持つ経路をredistributeするために使う？</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

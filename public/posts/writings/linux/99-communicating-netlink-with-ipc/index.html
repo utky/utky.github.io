@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする - Hash λ Bye</title>
+        <meta name="twitter:title" content="Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする - Hash λ Bye">
+        <meta property="og:title" content="Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする</h1>
+      <small> 2019-09-01 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;network&#x2F;">[network]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;netlink&#x2F;">[netlink]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <h2 id="bei-jing">背景</h2>
+<p>Linux networkingには下記のような様々な構成要素があります。</p>
+<ul>
+<li>ネットワークデバイス</li>
+<li>経路テーブル</li>
+<li>フィルタ</li>
+<li>etc.</li>
+</ul>
+<p>これらを操作する必要がある場合、一般的には <a href="https://github.com/shemminger/iproute2">iproute2</a> などのコマンドラインツールから操作を行うことが多いかと思います。</p>
+<p>しかしOpenStackやKubernetesなどの大規模なクラスタを管理する環境では、複数ホストにまたがってネットワークを動的にかつ一貫した方法で構成することが求められます。
+こうしたニーズを実現するために、Linux networkingの構成要素を自作のプログラムから直接制御することが最も効率的な場合があります。
+NetlinkというLinuxのサブシステムはLinuxカーネル内のネットワーク関連リソースを制御します。このNetlinkサブシステムを活用することでネットワーク管理を自動化することができます。</p>
+<h2 id="gai-yao">概要</h2>
+<p>NetlinkとはLinuxカーネルのサブシステムの名称です。
+このサブシステムとユーザ空間のアプリケーションがやりとりするためのインタフェースとしてソケットベースのIPCが定義されています。
+アプリケーションは一般的なソケットプログラミングの作法を通じてLinuxカーネル管理下のネットワーク関連リソースを操作することができます。</p>
+<p>この記事ではNetlinkサブシステムとの典型的な通信方法について調査し説明します。
+NetlinkサブシステムとIPC経由で通信するための典型的な作法については、 <a href="https://www.linuxjournal.com/article/7356">Kernel Korner - Why and How to Use Netlink Socket</a> こちらの記事でコードと共に解説されていますのでそれだけでも充分参考になります。</p>
+<p>通信方法を示すための例としてここでは、ネットワークインタフェースの情報を取得するケースについて記述します。</p>
+<p>全体のコードは <a href="https://gist.github.com/utky/de8b37756f8664d0045f829292657ae5">こちら</a></p>
+<h3 id="konoji-shi-deshi-tutakodonoribiziyon">この記事で使ったコードのリビジョン</h3>
+<ul>
+<li>linux kernel : 4.19 <code>84df9525b0c27f3ebc2ebb1864fa62a97fdedb7d</code></li>
+<li>iproute2: <code>260dc56ae3efbac6aa80e946d18eb0c66b95c5a4</code></li>
+</ul>
+<h2 id="ipcniyorucao-zuo">IPCによる操作</h2>
+<p>ここではNetlinkを使ったLinux networkingの設定を行うことを想定します。
+特に簡単な例としてネットワークデバイスの作成・削除を例にとります。</p>
+<p>IPCメッセージの送受信の流れは概して下記のようになります。</p>
+<ul>
+<li>
+<ol>
+<li>socketの確保</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>アドレスの確保</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>要求メッセージの作成</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>要求メッセージの送信</li>
+</ol>
+</li>
+<li>
+<ol start="5">
+<li>応答メッセージの受信</li>
+</ol>
+</li>
+<li>
+<ol start="6">
+<li>応答メッセージの解析</li>
+</ol>
+</li>
+</ul>
+<p>以降ではこれらのステップごとにコードの例を示しながら説明をします。</p>
+<ol>
+<li>socketの確保</li>
+</ol>
+<hr />
+<p>ソケットの作成には <code>socket</code> を使います。</p>
+<p>SOCKET(3P)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">SYNOPSIS
+       #include &lt;sys/socket.h&gt;
+
+       int socket(int domain, int type, int protocol);
+</span></code></pre>
+<p>この関数はソケット作成に必要なプロトコルや通信方式を表す定数を渡します。</p>
+<p>ソケット作成が成功するとソケットのファイルディスクリプタが返却されます。
+失敗した場合は <code>-1</code> が返却されます。</p>
+<p>以降では指定するべき引数について説明します。</p>
+<h3 id="domain">domain</h3>
+<p>ソケット通信に使うプロトコルファミリーを指定します。</p>
+<p>ADDRESS_FAMILIES(7)には指定可能なファミリーの定義が記載されています。
+一般的によく使うのは</p>
+<ul>
+<li><code>AF_INET</code> : IPv4通信</li>
+<li><code>AF_LOCAL</code> : Unix domain socket</li>
+</ul>
+<h3 id="type">type</h3>
+<p>データ送受信の通信方式を指定します。
+TCPのような信頼性が高くストリーム指向の通信をおこなうか、UDPのようなデータグラム転送方式で通信をおこなうか選択できます。</p>
+<h3 id="protocol">protocol</h3>
+<p>domainで指定した種別に対応する具体的な利用プロトコルを指定します。
+0を指定するとデフォルトの実装が使われます。</p>
+<h3 id="netlinknochang-he">Netlinkの場合</h3>
+<p>Netlinkの操作を行う場合、この関数に渡す引数はほぼ決まっています。</p>
+<ul>
+<li><code>domain</code> :  <code>AF_NETLINK</code></li>
+<li><code>type</code> : <code>SOCK_DGRAM</code></li>
+<li><code>protocol</code> : <code>NETLINK_ROUTE</code></li>
+</ul>
+<p>protocolにはNetlinkサブシステム上に定義されたいくつかの機能から選びます。
+定義はNETLINK(7)で確認することができます。</p>
+<p>ネットワークデバイスや経路テーブルの制御には <code>NETLINK_ROUTE</code> を指定します。</p>
+<p>NETLINK(7)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">       NETLINK_ROUTE
+              Receives routing and link updates and may be used to modify
+              the routing tables (both IPv4 and IPv6), IP addresses, link
+              parameters, neighbor setups, queueing disciplines,  traffic
+              classes and packet classifiers (see rtnetlink(7)).
+</span></code></pre><h3 id="kodoli">コード例</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">int</span><span style="color:#c0c5ce;"> fd = </span><span style="color:#bf616a;">socket</span><span style="color:#c0c5ce;">(AF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(fd &lt; </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">) {
+        </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Opening socket failed</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> errno;
+    }
+</span></code></pre>
+<p>負値が返却された場合はソケット作成に失敗しているので、エラーハンドリングを行います。</p>
+<ol start="2">
+<li>アドレスの確保</li>
+</ol>
+<hr />
+<p>ソケットを通信の端点として利用可能にするためにはソケットに特定のアドレスを与える必要があります。
+使う <code>domain</code> によってアドレスを表すデータ構造は異なります。</p>
+<p>例えばIPv4用ソケットのアドレスは下記のような定義になります。</p>
+<p>include/uapi/linux/in.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">sockaddr_in {
+  __kernel_sa_family_t  sin_family;     </span><span style="color:#65737e;">/* Address family               */</span><span style="color:#c0c5ce;">
+  __be16                sin_port;       </span><span style="color:#65737e;">/* Port number                  */
+  </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> in_addr        sin_addr;       </span><span style="color:#65737e;">/* Internet address             */
+
+  /* Pad to size of `struct sockaddr&#39;. */
+  </span><span style="color:#b48ead;">unsigned char</span><span style="color:#c0c5ce;">         __pad[__SOCK_SIZE__ - sizeof(</span><span style="color:#b48ead;">short int</span><span style="color:#c0c5ce;">) -
+                        sizeof(</span><span style="color:#b48ead;">unsigned short int</span><span style="color:#c0c5ce;">) - sizeof(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> in_addr)];
+};
+</span></code></pre>
+<p>IPv4のプロトコルにおけるアドレスとして</p>
+<ul>
+<li><code>sin_port</code> : ポート番号</li>
+<li><code>sin_addr</code> : IPアドレス</li>
+</ul>
+<p>を指定する必要があることが分かります。
+またここでも <code>sin_family</code> のフィールドに <code>socket</code> の <code>domain</code> と同じプロトコルファミリーを指定する必要があります。</p>
+<p>Netlinkの場合は先頭のプロトコルファミリー以外にもいくつか固有のフィールドがあります。</p>
+<p>include/uapi/linux/netlink.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">sockaddr_nl {
+        __kernel_sa_family_t    nl_family;      </span><span style="color:#65737e;">/* AF_NETLINK   */
+        </span><span style="color:#b48ead;">unsigned short</span><span style="color:#c0c5ce;">  nl_pad;         </span><span style="color:#65737e;">/* zero         */</span><span style="color:#c0c5ce;">
+        __u32           nl_pid;         </span><span style="color:#65737e;">/* port ID      */</span><span style="color:#c0c5ce;">
+        __u32           nl_groups;      </span><span style="color:#65737e;">/* multicast groups mask */
+</span><span style="color:#c0c5ce;">};
+</span></code></pre>
+<ul>
+<li><code>nl_pad</code> : パディング用の領域</li>
+<li><code>nl_pid</code> : ポート番号</li>
+<li><code>nl_groups</code> : このソケットで受信を許可するマルチキャストメッセージのグループ</li>
+</ul>
+<p>アドレスが作れたらソケットとアドレスを対応付けます。
+そのために使うのが関数 <code>bind</code> です。</p>
+<p>BIND(3P)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">SYNOPSIS
+       #include &lt;sys/socket.h&gt;
+
+       int bind(int socket, const struct sockaddr *address,
+           socklen_t address_len);
+</span></code></pre>
+<p>対応付けに成功する場合は <code>0</code> を返し、失敗した場合は負値を返します。</p>
+<ul>
+<li><code>socket</code> : 対応付けるソケットのファイルディスクリプタ</li>
+<li><code>address</code> : プロトコルに対応したアドレス構造体のポインタ</li>
+<li><code>address_len</code> : アドレス構造体のデータ長</li>
+</ul>
+<h3 id="kodoli-1">コード例</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">int</span><span style="color:#c0c5ce;"> pid = </span><span style="color:#bf616a;">getpid</span><span style="color:#c0c5ce;">();
+    </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> sockaddr_nl sa;
+    </span><span style="color:#bf616a;">memset</span><span style="color:#c0c5ce;">(&amp;sa, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, sizeof(sa));
+    sa.</span><span style="color:#bf616a;">nl_family </span><span style="color:#c0c5ce;">= AF_NETLINK;
+    sa.</span><span style="color:#bf616a;">nl_pid </span><span style="color:#c0c5ce;">= pid;
+
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">bind</span><span style="color:#c0c5ce;">(fd, (</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> sockaddr*)&amp;sa, sizeof(sa)) &lt; </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">) {
+        </span><span style="color:#bf616a;">close</span><span style="color:#c0c5ce;">(fd);
+        </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Binding socket to address failed</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> errno;
+    }
+</span></code></pre>
+<p><code>pid</code> にはアドレスを利用するプロセスのPIDを渡すこともできます。
+用途はあくまでもポート番号であるため、識別性があればPIDである必要はありません。</p>
+<ol start="3">
+<li>要求メッセージの作成</li>
+</ol>
+<hr />
+<p>ソケット経由で送信するNetlinkメッセージは大きく2つの層に分離することができます。</p>
+<ol>
+<li>Netlink固有ヘッダ <code>nlmsghdr</code></li>
+<li>データグラム通信共通ヘッダ <code>msghdr</code></li>
+</ol>
+<p>メッセージを作成する場合はまず <code>nlmsghdr</code> とそのボディを先に作ってから、
+<code>msghdr</code> でカプセル化した構造体を送信用関数に入力することになります。</p>
+<h3 id="nlmsghdr">nlmsghdr</h3>
+<p>Netlink固有ヘッダは下記のような構造になっています。</p>
+<p>include/uapi/linux/netlink.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">nlmsghdr {
+	__u32		nlmsg_len;	</span><span style="color:#65737e;">/* Length of message including header */</span><span style="color:#c0c5ce;">
+	__u16		nlmsg_type;	</span><span style="color:#65737e;">/* Message content */</span><span style="color:#c0c5ce;">
+	__u16		nlmsg_flags;	</span><span style="color:#65737e;">/* Additional flags */</span><span style="color:#c0c5ce;">
+	__u32		nlmsg_seq;	</span><span style="color:#65737e;">/* Sequence number */</span><span style="color:#c0c5ce;">
+	__u32		nlmsg_pid;	</span><span style="color:#65737e;">/* Sending process port ID */
+</span><span style="color:#c0c5ce;">};
+</span></code></pre>
+<p>このデータ構造はあくまでもヘッダです。
+実際の詳細な要求内容などのパラメータはボディとしてこのヘッダに続くデータ構造でエンコードされます。
+ヘッダに続くデータ構造は <code>nlmsg_type</code> に応じて変わります。
+ネットワークインタフェースを操作するメッセージや経路テーブルを操作するメッセージなど、目的に応じてこのヘッダの後に続けるデータの構造を返る必要があります。</p>
+<p>Netlinkの <code>NETLINK_ROUTE</code> プロトコルでインタフェースを操作する場合は典型的にこのヘッダの後に</p>
+<ul>
+<li>メッセージ種別固有のメッセージボディ <code>ifinfomsg</code></li>
+<li>属性 <code>rtattr</code> 可変長リスト</li>
+</ul>
+<p>が続きます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">| nlmsghdr | ifinfomsg | rtattr 1 | rtattr 2 | rtattr 3 | ... | rtattr N |
+</span></code></pre>
+<p>このため要求メッセージに必要な構造体を合成して一つの構造体とする下記のようなデータを定義する方法があります。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">iplink_req {
+	</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> nlmsghdr		n;
+	</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> ifinfomsg	i;
+	</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;">			buf[</span><span style="color:#d08770;">1024</span><span style="color:#c0c5ce;">];
+}
+</span></code></pre><h4 id="huirudo-nlmsgn-len">フィールド nlmsgn_len</h4>
+<p>このヘッダ + ボディ の長さを指定します。
+マクロ <code>NLMSG_LENGTH</code> にボディのデータ長を渡すと正しい値が計算されます。</p>
+<p>include/uapi/linux/netlink.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">#define </span><span style="color:#8fa1b3;">NLMSG_LENGTH</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">len</span><span style="color:#c0c5ce;">) ((len) + NLMSG_HDRLEN)
+</span></code></pre><h4 id="huirudo-nlmsg-type">フィールド nlmsg_type</h4>
+<p>送信するメッセージの種類を指定します。
+ソケット作成時に <code>protocol</code> に指定したNetlinkの機能ごとにメッセージ種別が定義されています。
+今回の例であれば <code>NETLINK_ROUTE</code> に対応するメッセージ種別はRTNETLINK(7)にドキュメンテーションされています。</p>
+<p>例えばヘッダファイル <code>rtnetlink.h</code> の定数定義ではリンクの操作として下記のように4種類のメソッドが定義されています。</p>
+<p>include/uapi/linux/rtnetlink.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">	RTM_NEWLINK	= </span><span style="color:#d08770;">16</span><span style="color:#c0c5ce;">,
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">RTM_NEWLINK	RTM_NEWLINK
+	RTM_DELLINK,
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">RTM_DELLINK	RTM_DELLINK
+	RTM_GETLINK,
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">RTM_GETLINK	RTM_GETLINK
+	RTM_SETLINK,
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">RTM_SETLINK	RTM_SETLINK
+</span></code></pre>
+<p>ちょうどCRUDのような操作種別が定義されているのが分かると思います。
+この記事の想定しているネットワークインタフェース情報の取得であれば <code>RTM_GETLINK</code> を指定することになります。</p>
+<p>今回は <code>RTM_GETLINK</code> を指定してインタフェース情報を取得してみようと思います。</p>
+<h4 id="huirudo-nlmsg-flags">フィールド nlmsg_flags</h4>
+<p>Netlinkに共通するメッセージのオプションをフラグ形式で指定します。</p>
+<p>NETLINK(7)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">       Standard flag bits in nlmsg_flags
+       ──────────────────────────────────────────────────────────────────
+       NLM_F_REQUEST   Must be set on all request messages.
+       NLM_F_MULTI     The message is part of a multipart message termi‐
+                       nated by NLMSG_DONE.
+       NLM_F_ACK       Request for an acknowledgment on success.
+       NLM_F_ECHO      Echo this request.
+
+       Additional flag bits for GET requests
+       ────────────────────────────────────────────────────────────────────
+       NLM_F_ROOT     Return the complete table instead of a single entry.
+       NLM_F_MATCH    Return  all entries matching criteria passed in mes‐
+                      sage content.  Not implemented yet.
+
+       NLM_F_ATOMIC   Return an atomic snapshot of the table.
+       NLM_F_DUMP     Convenience macro; equivalent to
+                      (NLM_F_ROOT|NLM_F_MATCH).
+</span></code></pre>
+<p>共通のフラグだけでなくGET系メッセージ固有のフラグも定義されていることが分かります。
+今回のネットワークインタフェースの参照リクエストではこのGET系メッセージ用のフラグもつけます。</p>
+<ul>
+<li><code>NLM_F_REQUEST</code> : リクエストであることを明示する</li>
+<li><code>NLM_F_ACK</code> : メッセージ処理成功時にACKが返ることを要求する</li>
+<li><code>NLM_F_DUMP</code> : 条件にマッチする内容をすべて取得する</li>
+</ul>
+<p>今回は <code>NLM_F_REQUEST</code> と <code>NLM_F_DUMP</code> をフラグとして渡します。
+<code>NLM_F_ACK</code> を指定するとACKメッセージの解析も必要になって手間が増えそうなので今回はやめておきます。
+Netlinkサブシステムに確実にメッセージが届いたことを確認する必要があれば <code>NLM_F_ACK</code> をフラグを指定してACKメッセージを受け取るようにしてください。</p>
+<h4 id="huirudo-nlmsg-seq">フィールド nlmsg_seq</h4>
+<p>このシーケンス番号は要求メッセージと応答メッセージの対応を追跡するために使われます。</p>
+<h4 id="huirudo-nlmsg-pid">フィールド nlmsg_pid</h4>
+<p>アドレスに指定したポート番号と同じ数値を指定します。
+名称はPIDとありますがプロセスIDを要求されているわけではなく、あくまでも通信端点の識別に必要な番号です。</p>
+<h4 id="intahuesucao-zuo-yong-metusezi-ifinfomsg">インタフェース操作用メッセージ ifinfomsg</h4>
+<p>ネットワークインタフェースの操作に用いる要求メッセージには <code>ifinfomsg</code> という構造体を用います。
+これはあくまでのインタフェース操作用のメッセージであるため、他の用途には使えません。
+他にも経路制御用の構造体として <code>rtmsg</code> などがあります。</p>
+<p><code>ifinfomsg</code> はインタフェース作成・削除時などに使用するため、
+どのインタフェースを操作するのかを特定するインデックスなどのフィールドを持ちます。</p>
+<p>include/uapi/linux/rtnetlink.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#65737e;">/* struct ifinfomsg
+ * passes link level specific information, not dependent
+ * on network protocol.
+ */
+
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">ifinfomsg {
+	</span><span style="color:#b48ead;">unsigned char</span><span style="color:#c0c5ce;">	ifi_family;
+	</span><span style="color:#b48ead;">unsigned char</span><span style="color:#c0c5ce;">	__ifi_pad;
+	</span><span style="color:#b48ead;">unsigned short</span><span style="color:#c0c5ce;">	ifi_type;		</span><span style="color:#65737e;">/* ARPHRD_* */
+	</span><span style="color:#b48ead;">int</span><span style="color:#c0c5ce;">		ifi_index;		</span><span style="color:#65737e;">/* Link index	*/
+	</span><span style="color:#b48ead;">unsigned</span><span style="color:#c0c5ce;">	ifi_flags;		</span><span style="color:#65737e;">/* IFF_* flags	*/
+	</span><span style="color:#b48ead;">unsigned</span><span style="color:#c0c5ce;">	ifi_change;		</span><span style="color:#65737e;">/* IFF_* change mask */
+</span><span style="color:#c0c5ce;">};
+</span></code></pre>
+<p>コードだけでは少し説明不足なのでmanも確認します。</p>
+<p>RTNETLINK(7)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">       RTM_NEWLINK, RTM_DELLINK, RTM_GETLINK
+              Create, remove or get information about a specific network interface.  These messages contain an ifinfomsg structure  followed  by  a
+              series of rtattr structures.
+
+              struct ifinfomsg {
+                  unsigned char  ifi_family; /* AF_UNSPEC */
+                  unsigned short ifi_type;   /* Device type */
+                  int            ifi_index;  /* Interface index */
+                  unsigned int   ifi_flags;  /* Device flags  */
+                  unsigned int   ifi_change; /* change mask */
+              };
+
+</span></code></pre>
+<ul>
+<li><code>ifi_family</code> : <code>AF_UNSPEC</code> を指定します</li>
+<li><code>ifi_type</code> : <code>ARPHDR_*</code> で定義されたリンクの種類</li>
+<li><code>ifi_index</code> : インタフェースのインデックス</li>
+<li><code>ifi_flags</code> : NETDFEVICE(7) にある <code>SIOCGIFFLAGS</code> の節を見よとのこと</li>
+<li><code>ifi_change</code> :  manによると将来に向けて予約されているフィールドでありひとまず <code>0xFFFFFFFF</code> を指定しておくとのこと</li>
+</ul>
+<h5 id="ifi-typenituite">ifi_typeについて</h5>
+<p>ソースコードのコメントに <code>ARPHRD_*</code> と書いてあるとおりARP関連ヘッダファイルに利用可能な定数の定義があります。</p>
+<p>include/uapi/linux/if_arp.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#65737e;">/* ARP protocol HARDWARE identifiers. */
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_NETROM	</span><span style="color:#d08770;">0		</span><span style="color:#65737e;">/* from KA9Q: NET/ROM pseudo	*/
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_ETHER 	</span><span style="color:#d08770;">1		</span><span style="color:#65737e;">/* Ethernet 10Mbps		*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_EETHER	</span><span style="color:#d08770;">2		</span><span style="color:#65737e;">/* Experimental Ethernet	*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_AX25	</span><span style="color:#d08770;">3		</span><span style="color:#65737e;">/* AX.25 Level 2		*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_PRONET	</span><span style="color:#d08770;">4		</span><span style="color:#65737e;">/* PROnet token ring		*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_CHAOS	</span><span style="color:#d08770;">5		</span><span style="color:#65737e;">/* Chaosnet			*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_IEEE802	</span><span style="color:#d08770;">6		</span><span style="color:#65737e;">/* IEEE 802.2 Ethernet/TR/TB	*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_ARCNET	</span><span style="color:#d08770;">7		</span><span style="color:#65737e;">/* ARCnet			*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_APPLETLK	</span><span style="color:#d08770;">8		</span><span style="color:#65737e;">/* APPLEtalk			*/
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_DLCI	</span><span style="color:#d08770;">15		</span><span style="color:#65737e;">/* Frame Relay DLCI		*/
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_ATM	</span><span style="color:#d08770;">19		</span><span style="color:#65737e;">/* ATM 				*/
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_METRICOM	</span><span style="color:#d08770;">23		</span><span style="color:#65737e;">/* Metricom STRIP (new IANA id)	*/
+</span><span style="color:#b48ead;">#define	</span><span style="color:#c0c5ce;">ARPHRD_IEEE1394	</span><span style="color:#d08770;">24		</span><span style="color:#65737e;">/* IEEE 1394 IPv4 - RFC 2734	*/
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_EUI64	</span><span style="color:#d08770;">27		</span><span style="color:#65737e;">/* EUI-64                       */
+</span><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">ARPHRD_INFINIBAND </span><span style="color:#d08770;">32		</span><span style="color:#65737e;">/* InfiniBand			*/
+</span></code></pre>
+<p>一般的なEthernetのデバイスに対するクエリであれば <code>ARPHRD_ETHER</code> を指定します。</p>
+<h5 id="ifi-indexnituite">ifi_indexについて</h5>
+<p>システム上でインタフェースを一意に特定できるインデックスです。
+インタフェース名とペアになっているため下記の関数によって名前からインデックスに解決することができます。</p>
+<p>IF_NAMETOINDEX(3)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">NAME
+       if_nametoindex,  if_indextoname  - mappings between network inter‐
+       face names and indexes
+
+SYNOPSIS
+       #include &lt;net/if.h&gt;
+
+       unsigned int if_nametoindex(const char *ifname);
+
+       char *if_indextoname(unsigned int ifindex, char *ifname);
+</span></code></pre><h3 id="msghdr">msghdr</h3>
+<p>ソケットで送信するデータを収める構造体である <code>msghdr</code> は下記のようになっています。</p>
+<p>include/linux/socket.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#65737e;">/*
+ *	As we do 4.4BSD message passing we use a 4.4BSD message passing
+ *	system, not 4.3. Thus msg_accrights(len) are now missing. They
+ *	belong in an obscure libc emulation or the bin.
+ */
+ 
+</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">msghdr {
+	</span><span style="color:#b48ead;">void		</span><span style="color:#c0c5ce;">*msg_name;	</span><span style="color:#65737e;">/* ptr to socket address structure */
+	</span><span style="color:#b48ead;">int</span><span style="color:#c0c5ce;">		msg_namelen;	</span><span style="color:#65737e;">/* size of socket address structure */
+	</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> iov_iter	msg_iter;	</span><span style="color:#65737e;">/* data */
+	</span><span style="color:#b48ead;">void		</span><span style="color:#c0c5ce;">*msg_control;	</span><span style="color:#65737e;">/* ancillary data */</span><span style="color:#c0c5ce;">
+	__kernel_size_t	msg_controllen;	</span><span style="color:#65737e;">/* ancillary data buffer length */
+	</span><span style="color:#b48ead;">unsigned int</span><span style="color:#c0c5ce;">	msg_flags;	</span><span style="color:#65737e;">/* flags on received message */
+	</span><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">kiocb	*msg_iocb;	</span><span style="color:#65737e;">/* ptr to iocb for async requests */
+</span><span style="color:#c0c5ce;">};
+</span></code></pre>
+<p>しかし後方互換のために下記の構造体を渡すことができます。ここでは <code>iovec</code> というバッファを単純に扱えるこの互換構造を使います。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">compat_msghdr {
+    compat_uptr_t   msg_name;   </span><span style="color:#65737e;">/* void * */</span><span style="color:#c0c5ce;">
+    compat_int_t    msg_namelen;
+    compat_uptr_t   msg_iov;    </span><span style="color:#65737e;">/* struct compat_iovec * */</span><span style="color:#c0c5ce;">
+    compat_size_t   msg_iovlen;
+    compat_uptr_t   msg_control;    </span><span style="color:#65737e;">/* void * */</span><span style="color:#c0c5ce;">
+    compat_size_t   msg_controllen;
+    compat_uint_t   msg_flags;
+};
+</span></code></pre>
+<ul>
+<li><code>msg_name</code> : ソケットアドレスへのポインタ</li>
+<li><code>msg_namelen</code> : ソケットアドレスのデータ長</li>
+<li><code>msg_iov</code> : 送信するリクエストのデータを格納するバッファ</li>
+</ul>
+<h4 id="iov-iter">iov_iter</h4>
+<p><code>msghdr</code> にペイロードを埋め込むためのコンテナとして使います。</p>
+<p>include/uapi/linux/uio.h</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">struct </span><span style="color:#c0c5ce;">iovec
+{
+        </span><span style="color:#b48ead;">void</span><span style="color:#c0c5ce;"> __user *iov_base;  </span><span style="color:#65737e;">/* BSD uses caddr_t (1003.1g requires void&gt;
+        __kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+</span><span style="color:#c0c5ce;">};
+</span></code></pre>
+<ul>
+<li><code>iov_base</code> : データの領域を指すポインタ</li>
+<li><code>iov_len</code> : データ長</li>
+</ul>
+<p><a href="https://lwn.net/Articles/625077/">The iov_iter interface</a> </p>
+<ol start="4">
+<li>要求メッセージを送信</li>
+</ol>
+<hr />
+<p>送信するメッセージとオープンしたソケットのファイルディスクリプタを使います。</p>
+<p>SENDMSG(3P)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">NAME
+       sendmsg — send a message on a socket using a message structure
+
+SYNOPSIS
+       #include &lt;sys/socket.h&gt;
+
+       ssize_t sendmsg(int socket, const struct msghdr *message, int flags);
+</span></code></pre>
+<ul>
+<li><code>socket</code> : ソケットのファイルディスクリプタ</li>
+<li><code>messge</code> : 送信するメッセージを指すポインタ</li>
+<li><code>flags</code> : 送信時の振る舞いを細かく制御するフラグ</li>
+</ul>
+<p>返却値が負値の場合は送信に失敗しているため、 <code>errno</code> を参照してエラーハンドリングをします。</p>
+<h3 id="kodoli-2">コード例</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">sendmsg</span><span style="color:#c0c5ce;">(fd, &amp;msg, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">) &lt; </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">) {
+        </span><span style="color:#bf616a;">close</span><span style="color:#c0c5ce;">(fd);
+        </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Sending message failed</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> errno;
+    }
+</span></code></pre>
+<ol start="5">
+<li>応答メッセージの受信</li>
+</ol>
+<hr />
+<p>カーネルから応答を受け取る際には要求送信時に利用したソケットのファイルディスクリプタとヘッダ <code>msghdr</code> を使い回すようです。
+<a href="https://github.com/shemminger/iproute2/blob/master/lib/libnetlink.c#L863">iproute2のlibnetlink.c __rtnl_talk_iov</a>を参照。</p>
+<h3 id="batuhuanochu-qi-hua">バッファの初期化</h3>
+<p>送信時に使った <code>msghdr</code> に埋め込まれている <code>iovec</code> を初期化することで受信データをカーネルからユーザ空間にコピーする空き領域を作ります。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">#define </span><span style="color:#c0c5ce;">MAX_RECV_BUF_LEN </span><span style="color:#d08770;">32768
+
+    </span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;"> recv_buf[MAX_RECV_BUF_LEN];
+    </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> iovec riov = {
+        .</span><span style="color:#bf616a;">iov_base </span><span style="color:#c0c5ce;">= &amp;recv_buf,
+        .</span><span style="color:#bf616a;">iov_len </span><span style="color:#c0c5ce;">= MAX_RECV_BUF_LEN
+    };
+	msg.</span><span style="color:#bf616a;">msg_iov </span><span style="color:#c0c5ce;">= &amp;riov;
+	msg.</span><span style="color:#bf616a;">msg_iovlen </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">1</span><span style="color:#c0c5ce;">;
+</span></code></pre>
+<p><code>msg</code> は送信時に使った <code>msghdr</code> を使い回します。
+このヘッダ構造のインスタンスにはソケットのアドレスが紐付けられているため、
+使い回すことで引き続き同じ通信アドレスを利用できます。</p>
+<p>ただし <code>msg</code> のペイロード部分には新しく受信したデータを格納する領域が必要であるため、
+<code>iovec</code> を新しく確保して <code>msg</code> にそのポインタを埋め込みます。
+<code>iovec</code> 内部のデータ格納用領域にはバイト配列である <code>recv_buf</code> を使います。</p>
+<h3 id="metusezinoshou-xin">メッセージの受信</h3>
+<p>ソケットから受信したデータを取り出すには <code>recvmsg</code> を使います。</p>
+<p>RECVMSG(3P)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">NAME
+       recvmsg — receive a message from a socket
+
+SYNOPSIS
+       #include &lt;sys/socket.h&gt;
+
+       ssize_t recvmsg(int socket, struct msghdr *message, int flags);
+</span></code></pre>
+<ul>
+<li><code>socket</code> : ソケットのファイルディスクリプタ</li>
+<li><code>messge</code> : 受信するメッセージを指すポインタ</li>
+<li><code>flags</code> : 受信時の振る舞いを細かく制御するフラグ</li>
+</ul>
+<p><code>sendmsg</code> と同様に負値</p>
+<h3 id="kodoli-3">コード例</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">int</span><span style="color:#c0c5ce;"> recv_len = </span><span style="color:#bf616a;">recvmsg</span><span style="color:#c0c5ce;">(fd, &amp;msg, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">);
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(recv_len &lt; </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">) {
+            </span><span style="color:#bf616a;">close</span><span style="color:#c0c5ce;">(fd);
+            </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Receiving message failed</span><span style="color:#c0c5ce;">&quot;);
+            </span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> errno;
+        }
+</span></code></pre>
+<ol start="6">
+<li>応答メッセージの解析</li>
+</ol>
+<hr />
+<p>メッセージの受信に成功するとNetlinkサブシステムから受信したデータを格納したアドレスを指すポインタが手に入ります。
+メッセージの解析はこのポインタを起点としてアドレスを移動しながらデータを読み出していきます。</p>
+<p>いい感じの解析方法の大枠は <code>man</code> ページに書いてあるのでそれを参考にします。</p>
+<p>NETLINK(7)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">           for (nh = (struct nlmsghdr *) buf; NLMSG_OK (nh, len);
+                nh = NLMSG_NEXT (nh, len)) {
+               /* The end of multipart message */
+               if (nh-&gt;nlmsg_type == NLMSG_DONE)
+                   return;
+
+               if (nh-&gt;nlmsg_type == NLMSG_ERROR)
+                   /* Do some error handling */
+               ...
+
+               /* Continue with parsing payload */
+               ...
+           }
+</span></code></pre>
+<p>メッセージの解析にはマクロを活用します。</p>
+<h3 id="nlmsg-ok">NLMSG_OK</h3>
+<p><code>NLMSG_OK</code> は指定された <code>nlmsghdr</code> のアドレスと <code>recvmsg</code> で得られたデータ長から正しい長さのデータが受信できているかを判定します。</p>
+<p>NETLINK(3)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">       int NLMSG_OK(struct nlmsghdr *nlh, int len);
+</span></code></pre>
+<p>ソケットから読み込んだメッセージが正しい長さである場合に解析処理を続行するための判定に使われます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">           </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">(nh = (</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> nlmsghdr *) buf; </span><span style="color:#bf616a;">NLMSG_OK </span><span style="color:#c0c5ce;">(nh, len);
+                nh = </span><span style="color:#bf616a;">NLMSG_NEXT </span><span style="color:#c0c5ce;">(nh, len)) {
+</span></code></pre><h3 id="nlmsg-next">NLMSG_NEXT</h3>
+<p><code>NLMSG_NEXT</code> は指定された <code>nlmsghdr</code> のアドレスと <code>recvmsg</code> で得られたデータ長を元に次の <code>mlmsghdr</code> を指すアドレスを返します。</p>
+<p>NETLINK(3)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">       struct nlmsghdr *NLMSG_NEXT(struct nlmsghdr *nlh, int len);
+</span></code></pre>
+<p>このマクロはソケットから一度に複数のメッセージを読み出せた場合に
+2つめ以降のメッセージの先頭のポインタを取得するために使います。</p>
+<h3 id="kodoli-4">コード例</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> nlmsghdr *rnh = recv_buf;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(!</span><span style="color:#bf616a;">NLMSG_OK</span><span style="color:#c0c5ce;">(rnh, recved)) {
+        </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Maybe received multi-part message in response</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#b48ead;">goto</span><span style="color:#c0c5ce;"> handle_failure;
+    }
+</span></code></pre><h3 id="jie-xi-bu-fen-nokodoli">解析部分のコード例</h3>
+<p>下記のコード例では解析したデータをただ印字するだけになっています。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> nlmsghdr *rnh;
+    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">(rnh = (</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> nlmsghdr *) recv_buf; </span><span style="color:#bf616a;">NLMSG_OK </span><span style="color:#c0c5ce;">(rnh, recv_len); rnh = </span><span style="color:#bf616a;">NLMSG_NEXT </span><span style="color:#c0c5ce;">(rnh, recv_len)) {
+        </span><span style="color:#65737e;">/* The end of multipart message */
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(rnh-&gt;nlmsg_type == NLMSG_DONE) {
+            </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">NLMSG_DONE detected</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;);
+            </span><span style="color:#b48ead;">break</span><span style="color:#c0c5ce;">;
+        }
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(rnh-&gt;nlmsg_type == NLMSG_ERROR) {
+            </span><span style="color:#96b5b4;">perror</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Receiving message failed</span><span style="color:#c0c5ce;">&quot;);
+            </span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> errno;
+        }
+
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Received nlmsghdr</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlhdr address: </span><span style="color:#d08770;">%p</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlmsg_len: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh-&gt;nlmsg_len);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlmsg_type: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh-&gt;nlmsg_type);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlmsg_flags: </span><span style="color:#d08770;">%x</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh-&gt;nlmsg_flags);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlmsg_seq: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh-&gt;nlmsg_seq);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">nlmsg_pid: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, rnh-&gt;nlmsg_pid);
+
+        </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> ifinfomsg *riim = </span><span style="color:#bf616a;">NLMSG_DATA</span><span style="color:#c0c5ce;">(rnh);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">Received ifinfomsg</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">ifi_type: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, riim-&gt;ifi_type);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">ifi_index: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, riim-&gt;ifi_index);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">ifi_flags: </span><span style="color:#d08770;">%x</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, riim-&gt;ifi_flags);
+        </span><span style="color:#96b5b4;">printf</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#96b5b4;">\t</span><span style="color:#a3be8c;">ifi_change: </span><span style="color:#d08770;">%x</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, riim-&gt;ifi_change);
+    }
+</span></code></pre>
+<p>全体のコードは <a href="https://gist.github.com/utky/de8b37756f8664d0045f829292657ae5">こちら</a></p>
+<h2 id="can-kao">参考</h2>
+<p>Netlinkに関する情報を掴むのには下記が有用でした。</p>
+<ol>
+<li>Linux Kernalのソースコード</li>
+<li><a href="https://github.com/shemminger/iproute2">iproute2</a> のソースコード</li>
+<li>man</li>
+<li>下記のリンク</li>
+</ol>
+<ul>
+<li><a href="https://www.linuxjournal.com/article/7356">Kernel Korner - Why and How to Use Netlink Socket</a></li>
+<li><a href="https://www.linuxjournal.com/article/8498">Manipulating the Networking Environment Using RTNETLINK</a></li>
+<li><a href="https://people.redhat.com/nhorman/papers/netlink.pdf">Understanding And Programming With Netlink Sockets</a></li>
+<li><a href="https://lwn.net/Articles/625077/">The iov_iter interface</a></li>
+<li><a href="https://medium.com/@mdlayher/linux-netlink-and-go-part-1-netlink-4781aaeeaca8">Linux, Netlink, and Go — Part 1: netlink</a></li>
+</ul>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>2017のあれこれ - Hash λ Bye</title>
+        <meta name="twitter:title" content="2017のあれこれ - Hash λ Bye">
+        <meta property="og:title" content="2017のあれこれ - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">2017のあれこれ</h1>
+      <small> 2017-01-01 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;note&#x2F;">[note]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <h2 id="2016nozhen-rifan-ri">2016の振り返り</h2>
+<h3 id="qian-ban">前半</h3>
+<p>割と要素技術に偏ってしまった。
+後半で巻き返そうとしている感じ。</p>
+<h4 id="clojure">Clojure</h4>
+<p>職場でPythonを使っていたが、ずっと2.x依存で導入も面倒だしかといって3.xにアップデートするほど
+Python好きでもなかったので別の武器を身に着けたかった。
+Lisp系方言は以前からずっと触れてみたかったところだったのでまともに学習を始めた。</p>
+<h4 id="ruteingupurotokoru">ルーティング・プロトコル</h4>
+<p>Twitterで良い本を教えてもらったのでOSPFとBGPまわりを中心に再学習。
+しかし内容に不足を感じたまま終了。</p>
+<p>主にOSPFのデータ交換の実際とかが見えてない。もうRFC読まないといけないレベルだと思う。</p>
+<h4 id="openflow">OpenFlow</h4>
+<p>なんとなく再学習。消化不良。
+Haskellでデータのparsingを一部だけ実装してみたが、
+いまいち自分のデザインに納得できずいったん保留にしている。</p>
+<h4 id="haskell">Haskell</h4>
+<p>タスクの記録用のアプリケーションの記述にトライしている。
+servantを使ったWeb APIを作ってみる。</p>
+<p>relational-recordと組み合わせたWeb DBの基本形は押さえられたので、
+今後も応用の効くノウハウにはなりそう。</p>
+<p>しかし、RESTful Web APIのデザインはなかなか正解がつかめず今も解っていない。</p>
+<h3 id="hou-ban">後半</h3>
+<p>コンピュータ関連の基礎の再入門をしはじめる。
+この年齢にしてあまりに知らなすぎると自覚して愕然としたため。</p>
+<h4 id="purosetusa">プロセッサ</h4>
+<p>難しくて解ったところは少ないけど、
+パイプライン周りのハザードとそれに対する施策があるのを知ったのは収穫。</p>
+<p>まだもんやりしてるところも多い。</p>
+<ol>
+<li>ページングとメモリ管理</li>
+<li>キャッシュ機構</li>
+</ol>
+<h4 id="konpiyutaquan-ban">コンピュータ全般</h4>
+<p>論理回路、レジスタ、アセンブリ言語、仮想マシンなどを
+総なめする書籍を読む。</p>
+<p>中間の構造としてスタックマシーンという抽象機械を実装するのは発見だった。
+どうやらGHC Coreも抽象機械に対する命令へと変換されて、
+そのあとようやく機械語になるようなので、「なぜそうなっているのか」を気にする手がかりは得た。</p>
+<h4 id="xing-sisutemu">型システム</h4>
+<p>とにかく読みたかった型システム入門。
+まだ最初の方だけれど、プログラミング言語の構文が数学的対象となって
+形式的に記述されていくのは刺激的だ。</p>
+<p>証明がいちいち難しくてなかなか進まない。おそらく2017でも読みきるのは至難だろう。</p>
+<p>とはいえ、集合と論理が基本なので実は次で述べるオイラーの贈物よりは、
+少ない前提で解けるはずなのだが……。</p>
+<h4 id="shu-xue">数学</h4>
+<p>オイラーの贈物の関数のあたりまで来てまた壁にぶつかる。
+問題を与えられた時に解法を計画できないことが多く、
+何が根本的な原因なのかまだ判明していない。</p>
+<p>より簡単な問題を何度も解きながら、
+「既知の解法を編成して応用していく」というスタイルを定着させる必要がある。</p>
+<h4 id="elm">Elm</h4>
+<p>初めてまともに書いてみた。
+JSの縛りがないのであれば良さそうだが、
+production投入するにはまだまだ自分のノウハウが不足していると感じる。</p>
+<p>UIデザインのスキルが圧倒的に不足していると気づいたのもElmのおかげ。
+未だにUIのデザインはできていない。</p>
+<h4 id="minecraft">Minecraft</h4>
+<p>急にゲームがやりたくなって始めた。</p>
+<p>プレイ開始以来、羊が一匹も見つからず未だにベッドが作れない。(ﾉД`)</p>
+<p>現在は見晴らし塔付きの豆腐ハウスをベースキャンプにして羊探索に出ようかとしているところ。
+今後も羊発見に向けた活動がテーマになると思われる。</p>
+<p>ベースキャンプへの帰路を確保するため、
+道中に灯台を作りながら探索路を拡大していくのが今後のプラン。</p>
+<ol>
+<li>最低限のコストで安全に灯台を作る方法</li>
+<li>夜間のMOB忌避するための簡易シェルタ作法</li>
+</ol>
+<p>あたりが決まれば割とルーティンで進められそうだ。
+しばらく時間がとれないのでプレイできなさそうだけど。</p>
+<h2 id="2017notema">2017のテーマ</h2>
+<p><em>巧遅は拙速に如かず</em></p>
+<p>どんなアウトプットに関しても今までの自分の悪い癖を修正していきたい。</p>
+<ul>
+<li>つい大きなものを作ろうとして挫折する</li>
+</ul>
+<p>大きなものを作るには相応の経験が技術の引き出しが必要。
+それを身につけるためにも</p>
+<ul>
+<li>何事も小さく、繰り返して継続する</li>
+<li>小さく区切った目標を素早く終わらせる</li>
+<li>素早く終わらせた後に燃え尽きずに推敲するリズムをつける</li>
+</ul>
+<p>を原則に取り組む。</p>
+<h3 id="ji-shu-yi-wai">技術以外</h3>
+<h4 id="huikusiyon">フィクション</h4>
+<p>もう少しフィクションを読みたい。
+既に持っている本でも再読の価値のあるものはいっぱいあるので。</p>
+<ul>
+<li>冒険小説類
+<ul>
+<li>アリステア・マクリーン</li>
+<li>スティーブン・ハンター</li>
+</ul>
+</li>
+<li>ファンタジー小説類
+<ul>
+<li>タニス・リー (新規)</li>
+<li>クライヴ・バーカー (新規)</li>
+<li>ジョナサン・キャロル (新規)</li>
+<li>スコット・ウェスターフィールド</li>
+<li>フィリップ・プルマン</li>
+</ul>
+</li>
+</ul>
+<p>あたりを読みたい。</p>
+<h4 id="nonhuikusiyon">ノンフィクション</h4>
+<p>マクニールの世界史の本がとても面白い。
+引き続き読みたい。</p>
+<p>その他</p>
+<ul>
+<li>暗号技術</li>
+<li>日本語</li>
+<li>論理</li>
+</ul>
+<p>暗号技術は教養としてもう一度学習しておきたい。
+日本語は論理と組み合わせて文章の組み立て方を見直したいため。</p>
+<h3 id="ji-shu">技術</h3>
+<p>引き続き基礎関連を勉強する。</p>
+<ul>
+<li>型システム</li>
+</ul>
+<p>実践の分野で取り組みたいことは、</p>
+<ul>
+<li>小さなもの(ゴミやおもちゃ)をたくさん作る</li>
+<li>小さな問題を(テキストなどから引いて)解いてみる</li>
+<li>小さくテストを書くことに慣れる</li>
+</ul>
+<p>ほんとこの年齢でこんなこと言ってるの悲しすぎるけど、
+このままでいいはずもないので取り組む。</p>
+<p>あとは引き続きHaskellを主戦場にして自分の武器となるように磨く磨く。</p>
+<h2 id="kpiwomatomeru">KPIをまとめる</h2>
+<h3 id="zhao-huo-noji-hua">朝活の計画</h3>
+<p>型システム入門の読み方を変えよう。
+演習問題が解けるまで次に進まないだと無限に時間を消費する。
+なので、とにかく進むことにする。
+解らないところにマークをつける。</p>
+<p>11章まではとにかく進もう。
+月に2章くらいいけると仮定する。</p>
+<ul>
+<li>1
+<ul>
+<li>型システム入門 3, 4章</li>
+</ul>
+</li>
+<li>2
+<ul>
+<li>型システム入門 5, 6章</li>
+</ul>
+</li>
+<li>3
+<ul>
+<li>型システム入門 7, 8章</li>
+</ul>
+</li>
+<li>4
+<ul>
+<li>型システム入門 9, 10章</li>
+</ul>
+</li>
+<li>5
+<ul>
+<li>型システム入門 11, 12?章</li>
+</ul>
+</li>
+<li>6
+<ul>
+<li>Haskellアプリ Web APIリファクタリング</li>
+</ul>
+</li>
+</ul>
+<p>キューに積んでおく</p>
+<ul>
+<li>Haskellアプリ Web UIを捨ててCLIにする？</li>
+</ul>
+<h3 id="tong-qin-du-shu-noji-hua">通勤読書の計画</h3>
+<p>文庫や電子書籍に絞ること。
+まあ、計画して読書するのって面白くないんだけどね。</p>
+<p>とりあえず半年分だけ。
+かつ、再読重視。</p>
+<ul>
+<li>1, 2
+<ul>
+<li>ウィリアム・マクニール 『世界史』</li>
+</ul>
+</li>
+<li>3, 4
+<ul>
+<li>サイモン・シン 『暗号解読』</li>
+</ul>
+</li>
+<li>5
+<ul>
+<li>アリステア・マクリーン 『女王陛下のユリシーズ』</li>
+</ul>
+</li>
+<li>6
+<ul>
+<li>ブレイク・スナイダーの本</li>
+</ul>
+</li>
+</ul>
+<p>キューに積んでおく</p>
+<ul>
+<li>永井均 『倫理とは何か』</li>
+<li>タニス・リー 『闇の公子』</li>
+<li>ジョナサン・キャロル 『死者の書』</li>
+</ul>
+<h3 id="xiu-ri-du-shu-noji-hua">休日読書の計画</h3>
+<p>こちらも半年まで計画しておく。</p>
+<ul>
+<li>1
+<ul>
+<li>ローン関連の本</li>
+</ul>
+</li>
+<li>2, 3
+<ul>
+<li>論理トレーニング</li>
+</ul>
+</li>
+<li>4, 5, 6
+<ul>
+<li>オイラーの贈物</li>
+</ul>
+</li>
+</ul>
+<p>ふむ、計画というか見通し作ると気持ちが楽になるな。できるかどうかは別として。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

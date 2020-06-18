@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>「How to beat the CAP theorem」読んだ - Hash λ Bye</title>
+        <meta name="twitter:title" content="「How to beat the CAP theorem」読んだ - Hash λ Bye">
+        <meta property="og:title" content="「How to beat the CAP theorem」読んだ - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">「How to beat the CAP theorem」読んだ</h1>
+      <small> 2020-02-22 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;architecture&#x2F;">[architecture]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;pipeline&#x2F;">[pipeline]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;bigdata&#x2F;">[bigdata]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>ビッグデータを支える技術を読んでいて言及された「ラムダアーキテクチャ」を提唱した記事（だったはず）</p>
+<p>ラムダアーキテクチャは既に市井で実用されていると思うし、自分も職場で見てるけどデザインの背景とかよく知らなかったので見直しの意味で読む。</p>
+<p><a href="http://nathanmarz.com/blog/how-to-beat-the-cap-theorem.html">How to beat the CAP theorem</a></p>
+<h2 id="da-ti-nogai-yao">大体の概要</h2>
+<h3 id="capding-li-karajian-tukaruwen-ti">CAP定理から見つかる問題</h3>
+<p>下記で述べるように可用性を犠牲にするのはそもそも運用に耐えないし、結果整合性でもまだ複雑過ぎる。
+CAP定理はデータシステムを作る本質的な難しさを表していると言える。</p>
+<h4 id="ke-yong-xing-ganaitokun-ru">可用性がないと困る</h4>
+<p>データベースの可用性よりも整合性を採用すると仮定する。
+この場合、書き込みはバッファリングされる。しかしバッファリングしているアプリケーションがバッファごと故障して消えてしまうリスクは依然としてある。
+バッファリングされた書き込みは他のアプリケーションから見えないためやはり不整合を招いてしまう。
+仮にバッファリングをやめればこれは解決できるが、それはすなわちアプリケーション全体が利用できなくなることにつながる。</p>
+<h4 id="jie-guo-zheng-he-xing-demoyaharixin-i">結果整合性でもやはり辛い</h4>
+<p>結果整合性という方法によって整合性を保証する。これは成功した書き込み結果が他の読み込みではすぐには見えないことを意味する。
+書き込みが成功した直後にそのキーに対して2つの読み込みがあったとしても異なる結果が返ってくるかもしれない。
+このように分岐した読み取り結果をマージして修復するread repairが必要になる。</p>
+<p>アプリケーション側でこのread repairを行うのはとても重たい作業である。
+仮に誤ったread repairを行ってしまうと正しい結果は失われてしまい取り返しのつかない破壊を起こす。</p>
+<h3 id="detasisutemutoha">データシステムとは</h3>
+<p>改めてデータシステムが何かというのを捉え直してみる。</p>
+<p>単純な定義は下記のようになる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">Query = Function(All Data)
+</span></code></pre>
+<p>すなわちデータシステムはデータセットに対する問い合わせに応答するものである。
+この問い合わせをクエリと呼ぶ。</p>
+<p>この等式は抽象化し過ぎて一見すると役に立たないが、クエリとデータという役割を捉え直すことがCAP定理を克服することにつながる。</p>
+<h4 id="deta">データ</h4>
+<p>データは2つの性質を持つ。</p>
+<p>時刻ベースである。
+すなわちある時点での事実を表している。時間が進んだとしても過去に発生した事実のデータが不正とはならない。</p>
+<p>データは不変である。
+これはデータがある時点での事実を表していること、過去の事実を改変できないことからも明らかである。
+CRUDと操作のうち許容されるのはすなわちCRのみとなる。</p>
+<p>Updateは新しい事実の生成で代用できる。Deleteは例えば「Twitterのフォロワーが消えた」ことを表すためにunfollowの事実を新しく記録すればよい。
+このデータの不変性こそがCAT定理を克服する鍵になる。</p>
+<h4 id="kueri">クエリ</h4>
+<p>過去も含めたデータセットに対する関数であると考えられる。
+それはデータを集約したり結合したりしてサブセットを抽出する。</p>
+<h3 id="capding-li-woke-fu-suru">CAP定理を克服する</h3>
+<p>もともと問題だったのはインクリメンタルな更新とCAP定理の組み合わせだった。
+可変のデータを更新するのがread repairを招いた。</p>
+<p>しかしデータを不変にすればレプリカ間で不整合になることはない。
+一時的な障害があってもいずれ追記された新しいデータが読めるようになるしread repairも必要ない。
+クエリから見るとデータがあるかないかどちらかの状態しかないというように単純化できる。</p>
+<p>可変データをやめて不変データを使いクエリで一から結果を計算することでCAP定理から生まれた問題を克服することができる。</p>
+<p>勿論これは実験である。実際はクエリで結果を一から計算するのは非効率だ。
+すなわちここから検討すべきなのは最適化である。
+バッチ処理やストリーミング処理などはこの最適化の技術に含まれる。</p>
+<p>すべてのデータセットに作用して素早く完了する関数は効率が悪く非現実的である。</p>
+<h3 id="batutichu-li">バッチ処理</h3>
+<p>あらかじめクエリの結果を計算しておくことで非効率なクエリを取り除くことができる。
+このようなアプローチの実装はHadoopとして存在している。
+Hadoopではデータの保存にはHDFSを用いて事前計算にはMapReduceを用いることができる。
+計算結果をアプリケーションから利用しやすいようにElaphantDBなどに保存する。</p>
+<p>バッチ処理では任意の関数を任意のデータに対して作用させられる。ただし出力される結果はバッチ処理の所要時間のため数時間古いものになるだろう。</p>
+<h3 id="batutisisutemutocapding-li-ren-de-erahenonai-xing">バッチシステムとCAP定理、人的エラーへの耐性</h3>
+<p>CAP定理の観点でこのバッチ処理を見直してみると、結果整合性をもたらしてはくれるものの極端である。
+書き込み結果がクエリで見えるようになるのに数時間くらいはかかる可能性があるためだ。</p>
+<p>人的エラーへの耐性について。
+クエリの不具合があった場合でも修正版をデプロイして元なるデータセットから再計算すればよい。</p>
+<h3 id="riarutaimureiya">リアルタイムレイヤ</h3>
+<p>上記のバッチシステムは数時間前のデータをクエリで利用可能なようになっている。
+一方で直近数時間のデータを埋め合わせてクエリの結果に含められるようにする必要がある。
+直近数時間に対するクエリであれば、データセット全体に対するクエリは簡単になる。</p>
+<p>直近数時間のデータを埋め合わせるためにはバッチシステムと並行して実行されるリアルタイムシステムが必要になる。そしてクエリの応答結果を完成させるためには、バッチのビューとリアルタイムのビューをマージする必要がある。</p>
+<p>リアルタイムレイヤにはRiakやCassandraなどのデータベースを使う。そしてこのレイヤにはインクリメンタルな更新を用いる。</p>
+<p>Hadoopにおけるリアルタイムな計算をサポートするものとしてStormが挙げられる。Stormは無限のストリームをスケーラブルにかつ堅牢に実行することができる。
+さらにその計算結果をCassandraに書き込むことでクエリ向けの直近数時間のビューを提供する。</p>
+<h3 id="batutireiya-riarutaimureiyanoping-jia">バッチレイヤ + リアルタイムレイヤの評価</h3>
+<p>リアルタイムレイヤでは依然と同様に可変データを更新するため複雑性を導入する。しかしそれらが使われるのは直近数時間のデータであり、時間の経過とともにバッチレイヤの処理結果で上書きされる。
+そのためリアルタイムレイヤにおいて誤りがあったとしてもバッチレイヤが訂正してくれる。つまり複雑性は一時的なものとなる。</p>
+<ul>
+<li>リアルタイムレイヤ: データ処理は速い代わりに複雑</li>
+<li>バッチレイヤ: データ処理は遅いがシンプルで堅牢</li>
+</ul>
+<h3 id="gabezikorekusiyon">ガベージコレクション</h3>
+<p>追記型あのストレージを用意したことにより不変データが無限に増えていずれ保存できないサイズになる。
+そのため意味や価値のなくなったデータを取り除く必要がある。
+この手法を用いて最新のデータ以外を消すようにすれば可変性を模倣することもできる。
+こうしたガベージコレクションもバッチタスクとして実装することができる。</p>
+<h3 id="jie-lun">結論</h3>
+<p>データシステムの構築を難しくしているのはCAP定理ではない。インクリメンタルな更新と可変データである。
+これに対してCRUDからCRだけを許容した不変データのストレージを使ったバッチレイヤとリアルタイムレイヤを組み合わせたアーキテクチャを提案した。
+これは誤りにも強いため人的エラー(バグの混入)などがあっても訂正することができる堅牢さを持つ。</p>
+<h2 id="korenidui-surufan-lun">これに対する反論</h2>
+<p>いわゆる「カッパアーキテクチャ」サイドの主張。</p>
+<p><a href="https://www.infoq.com/jp/news/2014/09/lambda-architecture-questions/">ラムダアーキテクチャに関する疑問</a></p>
+<p>ラムダアーキテクチャの堅牢性はほぼ永続的に残る追記型ストレージ(HDFS)から再計算ができることに依存している。
+一方でカッパアーキテクチャではストリーム処理レイヤのストリーム再送による再計算で堅牢性を謳うことになる。
+ストリーム処理レイヤを例えばメッセージブローカーであるKafkaなどに担わせた場合、そのメッセージを永続的に保存しておくのだろうか。</p>
+<h2 id="gan-xiang">感想</h2>
+<p>不変データの威力を思い知る内容だった。
+追記型ストレージを軸に据えることでプロセッシング部分の誤りも後からやり直せば訂正できる堅牢性が手に入る。</p>
+<p>課金処理の絡むビジネスの基幹システムなどにおいてはこの堅牢性はなんとかして保証したいものだと思う。
+自分も広告配信ログの蓄積において同じようなモチベーションを抱えていたりするので同様の堅牢性は重要な要件だと認識している。</p>
+<p>ただし堅牢性のトレードオフとしてデータフローが2経路になるという別の複雑性がもたらされている。
+この記事自体は数年前の話なので今となってはもう少し洗練されたアプローチがあるように思う。</p>
+<p>ということで過去の提案について把握することができたので最近の動向を探って行きたいと思う次第。
+(今までデータ系の基盤は全く知らなかったけど面白いなあ)</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

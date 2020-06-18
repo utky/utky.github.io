@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>ClojureとHaskell 異なるスタイルのプログラミング言語に触れること - Hash λ Bye</title>
+        <meta name="twitter:title" content="ClojureとHaskell 異なるスタイルのプログラミング言語に触れること - Hash λ Bye">
+        <meta property="og:title" content="ClojureとHaskell 異なるスタイルのプログラミング言語に触れること - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">ClojureとHaskell 異なるスタイルのプログラミング言語に触れること</h1>
+      <small> 2018-01-08 / 
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>この記事の背景は下記にとてもよくまとまっているのでそれを見ればよいかと。</p>
+<p><a href="http://www.lispcast.com/clojure-and-types">Clojure vs. The Static Typing World</a></p>
+<p>僕はあまり自分の主義が無いので、ある人がXを良いと言えばそっかーいいのかー、となる。</p>
+<p>SPJがCore言語のデザインを披瀝してsafetyを主張すれば「確かにいいー<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>大事ー」と思う。</p>
+<p>Richが<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>の解きたい問題と設計判断を主張すれば「確かにいいー<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>大事ー」と思う。</p>
+<p>どちらも「わかるー」となってしまう。</p>
+<p>なので、両者の主張が多少衝突していたとしても、割とすんなり飲み込んでしまう。ほんと脳が雑にできている。</p>
+<h2 id="mian-bai-ixiao-guo">面白い効果</h2>
+<p>異なる主張を受け入れると僕の場合、頭の中で妙なことが起き始める。(と、最近知った)</p>
+<h3 id="1-chong-tu-conflict">1. 衝突 (conflict)</h3>
+<p>あらゆるプログラミング上の判断で毎回この主張がぶつかりあったりする。</p>
+<p>「あー、これってRichが言ってたやつに似てるのでわー」 という連想と 「あー、でも、いやー、type checkerに怒られた方が幸せだなー」 という連想が起こる。</p>
+<h4 id="li">例</h4>
+<p>例えば、仕様の曖昧な<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>を作ると考える。</p>
+<p>この<a href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>は自分の作業を定型化するために役立てたいのだけれど、そのデータ・モデルがまだはっきり解っていない。</p>
+<ul>
+<li>選択肢1: ラフにスケッチしながら進めるために<a href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のmapを使う</li>
+<li>選択肢2: 後から入れた新たなア<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%C7%A5%A2">イデア</a>による修正を正しくエラー伝播させるために<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>(<a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a>)のtype systemを使う</li>
+</ul>
+<p>どっちも良い気がするー。となってとても悩む。</p>
+<p>この時点ではうまく選べないので、まあ、仮で選んでみたりする。</p>
+<h3 id="2-zheng-liu-purify">2. 蒸留 (purify)</h3>
+<h3 id="3-tong-he-merge">3. 統合 (merge)</h3>
+<h2 id="he-gaqi-kiteitanoka">何が起きていたのか</h2>
+<p>2つの選択</p>
+<p>と</p>
+<p>1つの問題。</p>
+<p>をながーいこと行ったり来たりしているうちに、自然とどちらを選ぶべきか判断基準が養われていく。</p>
+<p>大事なのはながーいこと考えたり迷ったりしているということ。</p>
+<p>時間の経過とともに人間の頭に他の情報もどんどん入ってくる。</p>
+<h2 id="matome">まとめ</h2>
+<p>頭の悪い人に2つの異なる主張を放り込むと、時間の経過と共にどっかで無意識が作用して勝手に適当に衝突が解決されることがある。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>duct-frameworkに定時起動ジョブを仕込む - Hash λ Bye</title>
+        <meta name="twitter:title" content="duct-frameworkに定時起動ジョブを仕込む - Hash λ Bye">
+        <meta property="og:title" content="duct-frameworkに定時起動ジョブを仕込む - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">duct-frameworkに定時起動ジョブを仕込む</h1>
+      <small> 2018-04-15 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;clojure&#x2F;">[clojure]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>ただのtips。みんな気付いているけどショボすぎて言わないことだ。</p>
+<p>ductをREPLから起動・停止くらいはできる人に向けている。 それも解らないよーという人は、なんというか、なんでこの記事を読もうと思ったのか。 そういう人はこちらを読むと良いと思う。</p>
+<p><a href="https://qiita.com/lagenorhynque/items/57d5aa086c4a080a1c54">ClojureのDuctでWeb API開発してみた</a></p>
+<h2 id="jie-lun">結論</h2>
+<p>chimeをintegrantのライフサイクルに組み込むことでバックグラウンド処理するジョブが定義できるよという話。</p>
+<h3 id="gou-cheng-yao-su">構成要素</h3>
+<ul>
+<li>duct (core 0.6.2)</li>
+<li>integrant</li>
+<li>chime 0.2.2</li>
+</ul>
+<h2 id="yarikata">やりかた</h2>
+<h3 id="config-edn">config.edn</h3>
+<p>まずは設定を書いておく</p>
+<p>(抜粋)</p>
+<pre style="background-color:#2b303b;">
+<code> :example.job/channel {} :example.job/hello {:ch #ig/ref :example.job/channel}
+</code></pre>
+<p><code>:example.job/channel</code> はジョブ起動の通知を送ってくれるchannel (core.asyncのchan) を保持する。</p>
+<p><code>:example.job/hello</code> は channel の通知を受け取って起動されるバックグラウンド処理そのもの。 ジョブの起動には通知をくれる channel が必要なので <code>ig/ref</code> で解決している。</p>
+<h3 id="clojure"><a href="http://d.hatena.ne.jp/keyword/clojure">clojure</a></h3>
+<pre style="background-color:#2b303b;">
+<code>(ns example.job (:require [integrant.core :as ig][clojure.core.async :as a][chime :refer [chime-ch]][clj-time.core :as time][clj-time.periodic :as periodic]))(defmethod ig/init-key :example.job/channel [\_ \_](chime-ch (periodic/periodic-seq (time/now) (time/seconds 5)){:ch (a/chan (a/dropping-buffer 1))}))(defmethod ig/halt-key! :example.job/channel [\_ ch](a/close! ch))(defmethod ig/init-key :example.job/hello [\_ {:keys [ch]}](a/go-loop [](when-let [time (a/\&lt;! ch)](prn &quot;Hello world at &quot; time)(recur))))
+</code></pre>
+<p>少しかいつまんで解説。</p>
+<h4 id="channelnochu-qi-hua">channelの初期化</h4>
+<pre style="background-color:#2b303b;">
+<code>(defmethod ig/init-key :example.job/channel [\_ \_](chime-ch (periodic/periodic-seq (time/now) (time/seconds 5)){:ch (a/chan (a/dropping-buffer 1))}))
+</code></pre>
+<p><code>chime-ch</code> 指定された時刻にタイムスタンプデータを送信するchannelを生成する。</p>
+<p><code>clj-time/periodic</code> の <code>periodic/periodic-seq</code> を使ってchannelからメッセージを受け取る時刻の無限ストリームを取得する。 (個人的に時間の経過を無限ストリームで表現する設計大好き)</p>
+<p><code>{:ch (a/chan (a/dropping-buffer 1))}</code> ここは <code>chime-ch</code> で生成される channel のバッファに長さと廃棄ポリシを設定している。</p>
+<h4 id="channelnopo-qi">channelの破棄</h4>
+<pre style="background-color:#2b303b;">
+<code>(defmethod ig/halt-key! :example.job/channel [\_ ch](a/close! ch))
+</code></pre>
+<p>channel を閉じるだけ。 channel からメッセージを受け取れなくなった軽量プロセスはparking状態のまま何もしなくなるので、実質的にバックグラウンドジョブは停止している。</p>
+<h4 id="channelwoshi-tutaziyobu">channelを使ったジョブ</h4>
+<pre style="background-color:#2b303b;">
+<code>(defmethod ig/init-key :example.job/hello [\_ {:keys [ch]}](a/go-loop [](when-let [time (a/\&lt;! ch)](prn &quot;Hello world at &quot; time)(recur))))
+</code></pre>
+<p><code>when-let</code> を使って channel からメッセージが届く時のみ印字処理を行って次のメッセージがくるまで待機するようにループさせている。</p>
+<h3 id="result">Result</h3>
+<p>ductなのでREPLから <code>(go)</code> と入力するとサーバの起動とともにREPLに5秒間隔で<a href="http://d.hatena.ne.jp/keyword/Hello%20world">Hello world</a>とぬかしてくるジョブが起動する。</p>
+<pre style="background-color:#2b303b;">
+<code>:initiated &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x86ddf48 &quot;2018-04-15T07:49:08.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x7f4e3d0e &quot;2018-04-15T07:49:23.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x6aa2035 &quot;2018-04-15T07:49:28.518Z&quot;] &quot;Hello world at &quot; #object[org.joda.time.DateTime 0x549f285d &quot;2018-04-15T07:49:33.518Z&quot;
+</code></pre><h2 id="web-apitobatutiziyobu">Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブ</h2>
+<p>モチベーションの話。</p>
+<p>僕がやりたかったのは、Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>経由で操作可能なWebクローラみたいなもの。 クローラが巡回しにいくエンドポイントを<a href="http://d.hatena.ne.jp/keyword/CRUD">CRUD</a>で操作できる的なやつ。</p>
+<p>ただ、Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブっていう組み合わせは <em>応用が効く</em> ような気がしている。 ふつーの典型的なバッチジョブを作るにしても、ジョブの実行時間や結果の履歴などの統計情報をWeb <a href="http://d.hatena.ne.jp/keyword/API">API</a>経由で取れるようにしておくと、他のAdmin向けサービスの統合がしやすくなったりする。</p>
+<p>運用系<a href="http://d.hatena.ne.jp/keyword/API">API</a>があるというのは僕みたいなインフラ屋からするととてもポイント高い。</p>
+<h3 id="tuo-xian-finagletoiushi-li">(脱線) Finagleという実例</h3>
+<p>バックグラウンドジョブとは少し違うけど、僕がとても感心したのは<a href="https://twitter.github.io/finagle/">finagle</a>という<a href="http://d.hatena.ne.jp/keyword/Scala">Scala</a>向けマイクロサービス<a href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>。</p>
+<p>このfinagleはマイクロサービスのエンドポイントを作るたくさんの<a href="http://d.hatena.ne.jp/keyword/API">API</a>を提供している。なかでも面白いのがサービスエンドポイントの統計情報もとれる仕組みが標準で提供されていること。</p>
+<p><a href="https://twitter.github.io/finagle/guide/Metrics.html">Metrics</a></p>
+<p>ユーザのリク<a href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トで起動するにせよ、定時起動するにせよ、サービスの稼働状況を抽出できる<a href="http://d.hatena.ne.jp/keyword/API">API</a>を備えていると、デプロイ後のフィードバックが得やすくなる。 これはサービスの改善点を<a href="http://d.hatena.ne.jp/keyword/%C4%EA%CE%CC">定量</a>的に探ったり問題を検知したりするのに役立つ。</p>
+<h3 id="batutiziyobuzuo-ruren-he">バッチジョブ作る人へ</h3>
+<p>こんな風にジョブの統計情報を外部にexposeできるような仕組みを仕込んでおくと、サービスが成長した時にありがたがられること間違いなし。</p>
+<p>Web <a href="http://d.hatena.ne.jp/keyword/API">API</a>とバッチジョブは割といい組み合わせだと再認識した。</p>
+<p>小さなバッチジョブを作ろうと思ったらまずは</p>
+<pre style="background-color:#2b303b;">
+<code>lein new duct {プロジェクト名} +api +ataraxy
+</code></pre>
+<p>と打ってほしい。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

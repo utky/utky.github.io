@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>WIP ElmのHttp処理部をスタブする - Hash λ Bye</title>
+        <meta name="twitter:title" content="WIP ElmのHttp処理部をスタブする - Hash λ Bye">
+        <meta property="og:title" content="WIP ElmのHttp処理部をスタブする - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">WIP ElmのHttp処理部をスタブする</h1>
+      <small> 2016-10-17 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;elm&#x2F;">[elm]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p><a href="http://qiita.com/advent-calendar/2016/elm">Elm Advent Calendar 2016</a> 2日目の記事です。</p>
+<h2 id="wen-ti">問題</h2>
+<p>Elmでアプリケーション書いているとリモートのWeb APIへリクエストを飛ばす部分がでてくる。
+けれど<a href="https://www.elm-tutorial.org/en/06-fetching-resources/04-players-cmds.html">チュートリアルの章</a>を読むと<code>Http</code>パッケージの関数を直接埋め込んで埋め込んである。この流儀に従ってそのまま実装していくと、<code>elm-reactor</code>で動かした際に、<strong>Web APIのエンドポイントに本当にリクエストを飛ばしてしまう</strong>。</p>
+<p>Web APIの実装がまだない場合や、テストでダミーのJSONを渡したい場合はこれだと困る。</p>
+<p>できればテスト用に動かす時は<code>Http</code>処理部分のスタブがほしい。</p>
+<h2 id="jie-fa">解法</h2>
+<p>なにか大仰なモックライブラリが必要か、とか悩んでしまったけど、簡単な話だった。</p>
+<p>HTTPリクエスト処理部の関数だけ抜き出して、呼び出し元から渡せるようにすればいい。つまり <strong>高階関数</strong> で解決する。
+<code>Http</code>ライブラリを呼び出す関数またはダミー用データを返す関数、いずれかを後から注入する感じ。</p>
+<h2 id="sanpurukesu">サンプルケース</h2>
+<p>たとえばWeb APIエンドポイントと通信して<code>&quot;Hello&quot;</code>という文字列を取り出してくるようなサンプルを考える。</p>
+<p>サンプルは下記の環境で書いている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">dependencies</span><span style="color:#c0c5ce;">&quot;: {
+        &quot;</span><span style="color:#a3be8c;">elm-lang/core</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">4.0.0 &lt;= v &lt; 5.0.0</span><span style="color:#c0c5ce;">&quot;,
+        &quot;</span><span style="color:#a3be8c;">elm-lang/html</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">1.0.0 &lt;= v &lt; 2.0.0</span><span style="color:#c0c5ce;">&quot;,
+        &quot;</span><span style="color:#a3be8c;">evancz/elm-http</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">3.0.1 &lt;= v &lt; 4.0.0</span><span style="color:#c0c5ce;">&quot;
+    },
+    &quot;</span><span style="color:#a3be8c;">elm-version</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">0.17.0 &lt;= v &lt; 0.18.0</span><span style="color:#c0c5ce;">&quot;
+</span></code></pre>
+<p>では前提となるビューやモデルについて提示しておく。</p>
+<h3 id="moderu-zhuang-tai-wobiao-su">モデル(状態を表す)</h3>
+<p>外部から受け取った文字列を保存するだけのモデル。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">type alias AppState </span><span style="color:#c0c5ce;">= </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> out : </span><span style="color:#d08770;">String </span><span style="color:#96b5b4;">}
+</span></code></pre>
+<p>初期状態ではただ空の文字列を出力するだけとしておく。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">init </span><span style="color:#b48ead;">:</span><span style="color:#c0c5ce;"> ( </span><span style="color:#b48ead;">AppState</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Cmd Msg</span><span style="color:#c0c5ce;"> )
+</span><span style="color:#8fa1b3;">init </span><span style="color:#c0c5ce;">= </span><span style="color:#b48ead;">( </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> out = &quot;&quot; </span><span style="color:#96b5b4;">}, </span><span style="color:#d08770;">Cmd</span><span style="color:#c0c5ce;">.none </span><span style="color:#b48ead;">)
+</span></code></pre><h3 id="biyu">ビュー</h3>
+<p><code>say hello</code>ボタンを押すと<code>FetchHello</code>というメッセージをトリガする。
+モデルが保持する文字列をテキストとして書き出す。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">view </span><span style="color:#b48ead;">: AppState -&gt; Html Msg
+</span><span style="color:#8fa1b3;">view </span><span style="color:#c0c5ce;">model =
+  div </span><span style="color:#96b5b4;">[ ]
+      [</span><span style="color:#c0c5ce;"> button
+          </span><span style="color:#96b5b4;">[</span><span style="color:#c0c5ce;"> onClick </span><span style="color:#d08770;">FetchHello </span><span style="color:#96b5b4;">]
+          [</span><span style="color:#c0c5ce;"> text &quot;</span><span style="color:#a3be8c;">say hello</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">]
+      ,</span><span style="color:#c0c5ce;"> span
+          </span><span style="color:#96b5b4;">[]
+          [</span><span style="color:#c0c5ce;"> text model.out </span><span style="color:#96b5b4;">]
+      ]
+</span></code></pre><h3 id="metusezi">メッセージ</h3>
+<p>このあたりから本題。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">type Msg
+  </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">FetchHello
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">HalloDone String
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">HelloFail Http</span><span style="color:#c0c5ce;">.</span><span style="color:#d08770;">Error
+</span></code></pre>
+<ul>
+<li><code>FetchHello</code>: Web APIに&quot;Hello&quot;という文字列を送ってもらう要求。<strong>これの応答をスタブしたい</strong>。</li>
+<li><code>HalloDone</code>: 文字列を <strong>正常に</strong> 受信した場合の応答。</li>
+<li><code>HelloFail</code>: 文字列を受信に <strong>失敗した</strong> 場合の応答。</li>
+</ul>
+<h3 id="metusezinohandora-updateguan-shu">メッセージのハンドラ: update関数</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">update </span><span style="color:#b48ead;">: Msg -&gt; AppState -&gt;</span><span style="color:#c0c5ce;"> ( </span><span style="color:#b48ead;">AppState</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Cmd Msg</span><span style="color:#c0c5ce;"> )
+</span><span style="color:#8fa1b3;">update </span><span style="color:#c0c5ce;">msg model =
+  </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">msg </span><span style="color:#b48ead;">of
+    </span><span style="color:#65737e;">-- FIXME: 普通だったらここで Http.get とかやるけど。。。。
+    </span><span style="color:#d08770;">FetchHello </span><span style="color:#c0c5ce;">-&gt; </span><span style="color:#d08770;">Http</span><span style="color:#c0c5ce;">.get string &quot;</span><span style="color:#a3be8c;">http://hogefuga/hello</span><span style="color:#c0c5ce;">&quot; |&gt; </span><span style="color:#d08770;">Task</span><span style="color:#c0c5ce;">.perform </span><span style="color:#d08770;">HelloFail HalloDone
+
+    </span><span style="color:#65737e;">-- ここ以降はWeb APIからのデータ受信後の動作なのであまり重要ではない
+    </span><span style="color:#d08770;">HalloDone</span><span style="color:#c0c5ce;"> s -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = s </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+    </span><span style="color:#d08770;">HelloFail</span><span style="color:#c0c5ce;"> e -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = &quot;</span><span style="color:#a3be8c;">failure!</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+</span></code></pre>
+<p><strong>ようやく改善したいポイントに到着。</strong></p>
+<p><code>FetchHello</code>のパターンマッチに注目。
+チュートリアルだとここで<code>Http</code>モジュールの関数を呼び出して、
+Web APIの呼び出しをおこなう<code>Task</code>が発生する。</p>
+<p>しかしここにHTTPリクエストの発行を埋め込んでしまうと、メッセージを受信した瞬間にWeb APIの呼び出しが走る。
+そのため呼び出し先のHTTP APIがどこかで起動している必要がある。<em>これが困る。</em>
+開発中は<code>elm-reactor</code>で気軽に動作確認したいのに、外部API呼び出しが走るのは避けたい。</p>
+<p>そこだけ呼び出し元から制御できるようにしよう。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">update </span><span style="color:#b48ead;">: Cmd Msg -&gt; Msg -&gt; AppState -&gt;</span><span style="color:#c0c5ce;"> ( </span><span style="color:#b48ead;">AppState</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Cmd Msg</span><span style="color:#c0c5ce;"> )
+</span><span style="color:#8fa1b3;">update </span><span style="color:#c0c5ce;">helloRequest msg model =
+  </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">msg </span><span style="color:#b48ead;">of
+    </span><span style="color:#d08770;">FetchHello </span><span style="color:#c0c5ce;">-&gt; </span><span style="color:#b48ead;">(</span><span style="color:#c0c5ce;">model</span><span style="color:#96b5b4;">,</span><span style="color:#c0c5ce;"> helloRequest</span><span style="color:#b48ead;">)
+    </span><span style="color:#d08770;">HalloDone</span><span style="color:#c0c5ce;"> s -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = s </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+    </span><span style="color:#d08770;">HelloFail</span><span style="color:#c0c5ce;"> e -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = &quot;</span><span style="color:#a3be8c;">failure!</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+</span></code></pre>
+<p>updateの第一引数が<code>FetchHello</code>メッセージを受信した時のアクションになる。
+そこだけ呼び出し元から受け取れるようにしておく。</p>
+<p>テスト用と実際のAPI呼び出し用の関数を用意する。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#65737e;">-- | 実際に外部APIを呼び出してリモートからデータを受け取る
+</span><span style="color:#8fa1b3;">fetchHello </span><span style="color:#b48ead;">: Cmd Msg
+</span><span style="color:#8fa1b3;">fetchHello </span><span style="color:#c0c5ce;">=
+  </span><span style="color:#d08770;">Http</span><span style="color:#c0c5ce;">.get &quot;</span><span style="color:#a3be8c;">http://hogefuga/hello</span><span style="color:#c0c5ce;">&quot; string
+    |&gt; </span><span style="color:#d08770;">Task</span><span style="color:#c0c5ce;">.perform </span><span style="color:#d08770;">HelloFail HalloDone
+
+</span><span style="color:#65737e;">-- | ダミーのデータを返す
+</span><span style="color:#8fa1b3;">dummyHello </span><span style="color:#b48ead;">: Cmd Msg
+</span><span style="color:#8fa1b3;">dummyHello </span><span style="color:#c0c5ce;">=
+  </span><span style="color:#d08770;">Http</span><span style="color:#c0c5ce;">.succeed &quot;</span><span style="color:#a3be8c;">Hello</span><span style="color:#c0c5ce;">&quot;
+    |&gt; </span><span style="color:#d08770;">Task</span><span style="color:#c0c5ce;">.perform </span><span style="color:#d08770;">HelloFail HalloDone
+</span></code></pre>
+<p>Productionで動かす時は</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">update fetchHello : Msg -&gt; AppState -&gt; (AppState, Cmd Msg)
+</span></code></pre>
+<p>開発環境で動かす時は</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">update dummyHello : Msg -&gt; AppState -&gt; (AppState, Cmd Msg)
+</span></code></pre>
+<p>のように渡しわけることになる。</p>
+<h2 id="saranarugai-shan">さらなる改善</h2>
+<h3 id="fu-shu-nohttprikuesutonidui-ying-surutamenozhun-bei">複数のHTTPリクエストに対応するための準備</h3>
+<p>今までのコードだと<code>FetchHello</code>しかスタブ処理に対応できない。
+きっと他にもHTTPリクエストは発生するだろうからこれに対処する。</p>
+<p>なのでちょっとデータ型に調整を入れる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">type Msg
+  </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">FetchHello
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">HalloDone String
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">HelloFail Http</span><span style="color:#c0c5ce;">.</span><span style="color:#d08770;">Error
+</span></code></pre>
+<p>これを</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">type Msg
+  </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">Req Request
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">Res Response
+
+</span><span style="color:#b48ead;">type Request
+  </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">FetchHello
+
+</span><span style="color:#b48ead;">type Response
+  </span><span style="color:#c0c5ce;">= </span><span style="color:#d08770;">HelloDone String
+  </span><span style="color:#c0c5ce;">| </span><span style="color:#d08770;">HelloFail Http</span><span style="color:#c0c5ce;">.</span><span style="color:#d08770;">Error
+</span></code></pre>
+<p>こうする。</p>
+<ul>
+<li><code>Msg</code>: アプリケーション全体で発生しうるメッセージを表す</li>
+<li><code>Request</code>: HTTPリクエストを発行せよ、という命令を表す</li>
+<li><code>Response</code>: HTTPレスポンスで受け取ったデータを保持するコンテナを表す</li>
+</ul>
+<p>要求を表すメッセージと応答を表すメッセージを<em>データ型として</em>分離している。
+これにより今回スタブしたい部分の型をより正確に表現できるようになる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#d08770;">Request </span><span style="color:#c0c5ce;">-&gt; </span><span style="color:#d08770;">Cmd Response
+</span></code></pre>
+<p>なんらかのHTTPリクエストを発行する要求を受け取って、HTTPレスポンスを返すような関数だ。</p>
+<p><code>FetchHello</code>以外のメッセージが増えた場合にはこんな風に書けるだろう。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">dispatch </span><span style="color:#b48ead;">: Request -&gt; Cmd Response
+</span><span style="color:#8fa1b3;">dispatch </span><span style="color:#c0c5ce;">req =
+  </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">req </span><span style="color:#b48ead;">of
+    </span><span style="color:#d08770;">FetchHello </span><span style="color:#c0c5ce;">-&gt; ...
+    </span><span style="color:#d08770;">FetchHola </span><span style="color:#c0c5ce;">-&gt; ...
+    </span><span style="color:#d08770;">FetchHallo </span><span style="color:#c0c5ce;">-&gt; ...
+</span></code></pre>
+<p>上手く複数パターンのHTTPリクエストに対応できそうだ。</p>
+<h3 id="updatenodui-ying">updateの対応</h3>
+<p>これに合わせて<code>update</code>関数はこのように書き直される。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">update </span><span style="color:#b48ead;">:</span><span style="color:#c0c5ce;"> (</span><span style="color:#b48ead;">Request -&gt; Cmd Response</span><span style="color:#c0c5ce;">) </span><span style="color:#b48ead;">-&gt; Msg -&gt; AppState -&gt;</span><span style="color:#c0c5ce;"> ( </span><span style="color:#b48ead;">AppState</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">Cmd Msg</span><span style="color:#c0c5ce;"> )
+</span><span style="color:#8fa1b3;">update </span><span style="color:#c0c5ce;">disp msg model =
+  </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">msg </span><span style="color:#b48ead;">of
+
+    </span><span style="color:#d08770;">Req</span><span style="color:#c0c5ce;"> request -&gt;
+      </span><span style="color:#b48ead;">(</span><span style="color:#c0c5ce;">model</span><span style="color:#96b5b4;">, </span><span style="color:#b48ead;">(</span><span style="color:#c0c5ce;">disp request |&gt; </span><span style="color:#d08770;">Cmd</span><span style="color:#c0c5ce;">.map </span><span style="color:#d08770;">Res</span><span style="color:#b48ead;">))
+
+    </span><span style="color:#d08770;">Res</span><span style="color:#c0c5ce;"> response -&gt;
+      </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">response </span><span style="color:#b48ead;">of
+        </span><span style="color:#d08770;">HelloDone</span><span style="color:#c0c5ce;"> s -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = s </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+        </span><span style="color:#d08770;">HelloFail</span><span style="color:#c0c5ce;"> e -&gt; </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> model | out = &quot;</span><span style="color:#a3be8c;">failure!</span><span style="color:#c0c5ce;">&quot; </span><span style="color:#96b5b4;">} </span><span style="color:#c0c5ce;">! </span><span style="color:#96b5b4;">[]
+</span></code></pre>
+<p>大事なポイントを抜粋してみる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    </span><span style="color:#d08770;">Req</span><span style="color:#c0c5ce;"> request -&gt;
+      </span><span style="color:#b48ead;">(</span><span style="color:#c0c5ce;">model</span><span style="color:#96b5b4;">, </span><span style="color:#b48ead;">(</span><span style="color:#c0c5ce;">disp request |&gt; </span><span style="color:#d08770;">Cmd</span><span style="color:#c0c5ce;">.map </span><span style="color:#d08770;">Res</span><span style="color:#b48ead;">))
+</span></code></pre>
+<p>何かしらのHTTPリクエストを発行した場合には、この分岐に入る。</p>
+<p>ちょっと型が見えにくいので整理しておこう。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">request </span><span style="color:#b48ead;">: Request
+</span><span style="color:#8fa1b3;">disp </span><span style="color:#b48ead;">: Request -&gt; Cmd Response
+</span></code></pre>
+<p><code>request</code>の値は<code>FetchHello</code>かもしれないし<code>FetchHola</code>かもしれない。
+いずれにしても<code>disp</code>に<code>request</code>に適用することでHTTPレスポンスを得ることができる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">disp </span><span style="color:#c0c5ce;">request : </span><span style="color:#d08770;">Cmd Response
+</span></code></pre>
+<p>これだけで終わりではなくて、<code>Cmd.map</code>という関数も使っている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#d08770;">Cmd</span><span style="color:#c0c5ce;">.map </span><span style="color:#d08770;">Res </span><span style="color:#c0c5ce;">: </span><span style="color:#d08770;">Cmd Response </span><span style="color:#c0c5ce;">-&gt; </span><span style="color:#d08770;">Cmd Msg
+</span></code></pre>
+<p><code>Cmd.map Res</code>の型は<code>Cmd Response -&gt; Cmd Msg</code>を返すのでこれで<code>update</code>関数の型に合わせることができる。
+これらを組み合わせて適用すると下記のような型になるはずだ。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">disp </span><span style="color:#c0c5ce;">request |&gt; </span><span style="color:#d08770;">Cmd</span><span style="color:#c0c5ce;">.map </span><span style="color:#d08770;">Res </span><span style="color:#c0c5ce;">: </span><span style="color:#d08770;">Cmd Msg
+</span></code></pre>
+<p>これで<code>update</code>関数の返り値の型に整合したのでコンパイルエラーはなくなる。</p>
+<h3 id="damidetawofan-su">ダミーデータを返す</h3>
+<p>開発用ではダミーデータを返す必要がある。
+これは<code>Task</code>モジュールの関数<code>succeed</code>を活用することで実現できる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#8fa1b3;">dispatch </span><span style="color:#b48ead;">: Request -&gt; Cmd Response
+</span><span style="color:#8fa1b3;">dispatch </span><span style="color:#c0c5ce;">req =
+  </span><span style="color:#b48ead;">case </span><span style="color:#c0c5ce;">req </span><span style="color:#b48ead;">of
+    </span><span style="color:#d08770;">FetchHello </span><span style="color:#c0c5ce;">-&gt; 
+      </span><span style="color:#d08770;">Task</span><span style="color:#c0c5ce;">.succeed &quot;</span><span style="color:#a3be8c;">Hello</span><span style="color:#c0c5ce;">&quot;
+        |&gt; </span><span style="color:#d08770;">Task</span><span style="color:#c0c5ce;">.perform </span><span style="color:#d08770;">HelloFail HelloDone
+</span></code></pre>
+<p>これで<code>update</code>に渡す関数<code>dispatch</code>が出来上がった。</p>
+<p>本当にHTTPリクエストを発行したい場合は、
+同じ型だけど実際に<code>Http</code>モジュールの関数を使ってHTTP通信を行うような新しい関数を用意してあげればいい。</p>
+<h3 id="guan-shu-wozu-mihe-waseteappwozuo-ru">関数を組み合わせてAppを作る</h3>
+<p><code>update</code>と<code>dispatch</code>関数を組み合わせるのは、<code>Program</code>を作る段階で行う。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">
+</span><span style="color:#8fa1b3;">main </span><span style="color:#b48ead;">: Program Never
+</span><span style="color:#8fa1b3;">main </span><span style="color:#c0c5ce;">=
+  </span><span style="color:#d08770;">Html</span><span style="color:#c0c5ce;">.</span><span style="color:#d08770;">App</span><span style="color:#c0c5ce;">.program
+    </span><span style="color:#96b5b4;">{</span><span style="color:#c0c5ce;"> init = init
+    </span><span style="color:#96b5b4;">,</span><span style="color:#c0c5ce;"> view = view
+    </span><span style="color:#96b5b4;">,</span><span style="color:#c0c5ce;"> update = update dispatch
+    </span><span style="color:#96b5b4;">,</span><span style="color:#c0c5ce;"> subscriptions = subscriptions
+    </span><span style="color:#96b5b4;">}
+</span></code></pre>
+<p>今回は<code>Main.elm</code>という1ファイルに全て詰め込んだけれど、
+開発用と商用で分けるなら<code>main</code>関数定義だけそれぞれのファイルに書いてやる。</p>
+<ul>
+<li><code>Main.elm</code></li>
+<li><code>Test.elm</code></li>
+</ul>
+<p>それぞれ<code>dispatch</code>関数を開発用と商用で呼び分けるようにしておくといい。</p>
+<h2 id="zhen-rifan-ri">振り返り</h2>
+<p>とりあえずこれで開発用にHTTP通信部をスタブしたり、本当にWeb APIを呼ぶように切り替えたりできるようになった。</p>
+<p>実際に自分がElmのコードを書く時はこんな風にしてスタブを作りながら<code>elm-reactor</code>で表示を確認している。</p>
+<p>こんなこと書いておいて何だけど「いや実はもっとまともなモック用のライブラリがあってね。。。」という情報あったら是非教えてほしい。</p>
+<h3 id="konofang-fa-nomerituto">この方法のメリット</h3>
+<ul>
+<li>HTTP通信部をスタブ処理で置き換えることができる</li>
+</ul>
+<h3 id="konofang-fa-nodemerituto">この方法のデメリット</h3>
+<ul>
+<li>直接HTTP通信部を埋め込むよりも1サイクルだけupdate関数の呼び出しが増えるのでもしかしたらパフォーマンスに影響があるかも</li>
+</ul>
+<p>コード全体は<a href="https://gist.github.com/utky/e96db0d4b8845c4bc877b5a3f6b3a2ae">Gist</a>にあげました。</p>
+<h2 id="za-gan-du-mifei-basiteii">雑感 (読み飛ばしていい)</h2>
+<p>「なんだやってることは当たり前で普通じゃないか」と思うかもしれない。</p>
+<p>普通に高階関数を使っているだけだ。 <strong>でもそれでいい。それがいい</strong>。</p>
+<p>複雑な概念の導入や技法もなく関数を組み合わせるだけで要求を満たせてしまう。
+そういう関数型プログラミングの良さを実感できたのが今回の収穫だった。</p>
+<p>もちろんElm Architectureがとても良くできていたおかげでもあるんだけど。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>

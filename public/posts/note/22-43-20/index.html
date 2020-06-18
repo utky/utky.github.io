@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>Haskellで再帰的な構文木にFix(不動点)を導入してみる - Hash λ Bye</title>
+        <meta name="twitter:title" content="Haskellで再帰的な構文木にFix(不動点)を導入してみる - Hash λ Bye">
+        <meta property="og:title" content="Haskellで再帰的な構文木にFix(不動点)を導入してみる - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          if (window.location.hostname != "localhost") {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'UA-156288666-1');
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">Haskellで再帰的な構文木にFix(不動点)を導入してみる</h1>
+      <small> 2018-03-20 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;haskell&#x2F;">[haskell]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ghc&#x2F;">[ghc]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;compiler&#x2F;">[compiler]</a>
+      
+      
+      </small>
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <h2 id="maeoki">まえおき</h2>
+<p>例によって僕の記事など読まなくても下記のリンクで解説されているので、<a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>楽しいなと思う人はこちらをどうぞ。</p>
+<p><a href="http://blog.sumtypeofway.com/an-introduction-to-recursion-schemes/">An Introduction to Recursion Schemes</a></p>
+<p>生きるのに疲れた人は半分白目のゆるい気持ちで以降を読んでね。</p>
+<p><a href="http://ilyaletre.hatenablog.com/entry/2018/01/03/185920">Haskellで抽象構文木 (AST) にメタデータを付与する</a></p>
+<p>以前この記事でASTへの<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>の埋め込み方について少し整理して、 下記のようなアプローチがあることを明らかにした。</p>
+<ol>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するための値コンスト<a href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>タをASTのブランチとして定義する</li>
+<li><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するラッパーを定義する</li>
+</ol>
+<p>加えて</p>
+<p><em>Fixを使ってなんかファンシーにする</em></p>
+<p>というアプローチについて最後に少し言及した。 これについては当時の僕の頭では理解が追いつかなかったが、 いま少しだけ近づけてきた気がするのでまたしても整理してみる。</p>
+<h2 id="dao-ru">導入</h2>
+<p>僕達は日常的に<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的な構文に出くわしている。</p>
+<p>ラムダ項の定義とかもうまさしくそれ。</p>
+<pre style="background-color:#2b303b;">
+<code>t ::= x λx. t t t
+</code></pre>
+<p><em>型システム入門のP.40から拝借</em></p>
+<p><a href="http://d.hatena.ne.jp/keyword/Haskell">Haskell</a>で書くと、例えばこうなる。</p>
+<pre style="background-color:#2b303b;">
+<code>type Id = Stringdata Term = Var Id | Abs Id Term | App Term Term deriving (Eq, Show)
+</code></pre><h2 id="wen-ti">問題</h2>
+<p>素朴に記述したこのAST。 使っているうちに<a href="http://d.hatena.ne.jp/keyword/%B9%BD%CA%B8%CC%DA">構文木</a>そのもののデータだけでなく、<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存していきたくなる。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>の例</p>
+<ul>
+<li>ソースファイル名</li>
+<li>ファイル内の位置情報</li>
+</ul>
+<p>普通にアプローチするとこのASTの定義を改造して<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を埋め込める場所を用意する。</p>
+<p>例えば<a href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンの開始位置と終了位置を含むデータ <code>Region</code> を埋め込む例の場合。</p>
+<pre style="background-color:#2b303b;">
+<code>data Term = Var Region Id | Abs Region Id Term | App Region Term Term deriving (Eq, Show)
+</code></pre>
+<p>しかし、これだとASTのデータ型は純粋な構文 <em>以外</em> のデータも持つことになってしまう。 できれば<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>をASTをに混ぜるのではなく、分離した上で自然に組み合わせたい。</p>
+<p>ということでその立役者となる <a href="https://www.reddit.com/r/haskell/comments/4x22f9/labelling_ast_nodes_with_locations/d6ce74g/">Cofree</a> を目指すことになる。</p>
+<p>しかし、そもそも <code>Cofree</code> の下地となっている <code>Fix</code> という構造がよく解らなかったので、この記事ではまず下記のポイントを確認していこうと思う。</p>
+<ol>
+<li><code>Fix</code> とはなにものなのか</li>
+<li><code>Fix</code> を導入するとなにが起こるのか</li>
+</ol>
+<h2 id="zai-gui-de-nagou-wen-nochou-xiang-hua"><a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的な構文の抽象化</h2>
+<pre style="background-color:#2b303b;">
+<code>data Term = Var Id | Abs Id Term -- 再帰あり| App Term Term -- 再帰ありderiving (Eq, Show)
+</code></pre>
+<p>もう一度構文定義を再掲。 3つ中2つのコンスト<a href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>タは<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に <code>Term</code> を受け取るようになっている。</p>
+<p>たとえば <code>Abs</code> は具体的なデータとして <code>Term</code> を<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に内包できる。</p>
+<p>この<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>構造はもう一段抽象化できる。 型変数を導入することで下記のようになる。</p>
+<pre style="background-color:#2b303b;">
+<code>data TermF a = VarF Id | AbsF Id a | AppF a a deriving (Eq, Show)
+</code></pre>
+<p>コンスト<a href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>タの中で <code>Term</code> を持っていたところを型変数 <code>a</code> に括りだした形になる。 型をみると解るように、carrier typeを持つこのデータ型は <code>Functor</code> になることができる。 言語拡張の <code>DeriveFunctor</code> , <code>DeriveTraversable</code> , <code>DeriveFoldable</code> を使うことで、 このデータ型はとても多くの性質を獲得できるようになる。</p>
+<p>これで具体的な項を作ってみる。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; let absx = AbsF &quot;x&quot; $ VarF &quot;x&quot; \&gt; :t absx absx :: TermF (TermF a)
+
+\&gt; let absxy = AbsF &quot;x&quot; $ AbsF &quot;y&quot; $ VarF &quot;y&quot; \&gt; :t absxy absxy :: TermF (TermF (TermF a))
+</code></pre>
+<p>こんな感じ。</p>
+<p><em>項がネストする深さに応じて型もネストしている</em> のが解る。 10の深さの項を作ると、</p>
+<pre style="background-color:#2b303b;">
+<code>TermF (TermF (TermF (TermF ...)))
+</code></pre>
+<p>とTermFが10個続いていくことになる。<em>でもこれは扱いにくい。</em> 構成するデータに応じて型が変わり過ぎる。</p>
+<p>古いバージョンの定義を使って項を構成して見比べてみよう。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; let absx = Abs &quot;x&quot; $ Var &quot;x&quot; \&gt; :t absx absx :: Term
+
+\&gt; let absxy = Abs &quot;x&quot; $ Abs &quot;y&quot; $ Var &quot;y&quot; \&gt; :t absxy absxy :: Term
+</code></pre>
+<p>型が単純。</p>
+<p>型変数を導入する前はどんな構成方法でも項の型は <code>Term</code> だった。 しかし型変数を導入したら、構成方法によって型が変わってしまった。</p>
+<p>実はこれでは充分ではない。 ネストする、つまり<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>する型を一つの型に収束させる必要がある。</p>
+<p>イメージ的には、</p>
+<pre style="background-color:#2b303b;">
+<code>TermF (TermF a) -\&gt; TermF TermF (TermF (TermF a)) -\&gt; TermF
+</code></pre>
+<p>のようにネストした型を <code>TermF</code> みたいな何か単純な表現に収束してくれるものを求めている。</p>
+<h2 id="fix">Fix</h2>
+<p>ここで奇妙なデータ型を導入する。</p>
+<pre style="background-color:#2b303b;">
+<code>newtype Fix f = In (f (Fix f))
+</code></pre>
+<p>定義方法はこちらに従った: <a href="https://bartoszmilewski.com/2013/06/10/understanding-f-algebras/">Understanding F-Algebras</a></p>
+<p>複雑な型を内部にもっており、僕も最初に見た時は面食らった。</p>
+<p>この <code>Fix</code> を使うと先ほどの<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的にネストしていく型を収束できる。 ただしデータの構成時にちょっとおまけが必要。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; let absxfix = In $ AbsF &quot;x&quot; $ In $ VarF &quot;x&quot; \&gt; :t absxfix absxfix :: Fix TermF
+</code></pre>
+<p>お、型のネストが消えた。 読みやすさのために括弧を使ってみる。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; let absxfix = In ( AbsF &quot;x&quot; ( In ( VarF &quot;x&quot; ) ) ) \&gt; :t absxfix absxfix :: Fix TermF
+</code></pre>
+<p><code>TermF</code> を構成したら必ず <code>In</code> でラップしてやるのがミソ。<br />
+すると <code>Fix TermF</code> という型が表れて<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>を隠してくれる。 もう少し深い項を構成してみよう。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; let absxyfix = In $ AbsF &quot;x&quot; $ In $ AbsF &quot;y&quot; $ In $ VarF &quot;y&quot; \&gt; :t absxyfix absxyfix :: Fix TermF
+</code></pre>
+<p>やっぱり <code>Fix TermF</code> に収束した。</p>
+<h3 id="shou-shu-noguo-cheng-shi-zu-mi">収束の過程・仕組み</h3>
+<p>単純に型合わせの過程を観察して、確かに <code>Fix TermF</code> になることを見てみよう。</p>
+<p><em>と言いつつ気力が湧いてきたら書く (ごめんなさい)</em></p>
+<h2 id="fixhaxing-reberunofixdatuta">Fixは型レベルのfixだった</h2>
+<p><code>Fix</code> はデータ型だけどこれと同じような定義を持つ関数がある。</p>
+<p><a href="https://hackage.haskell.org/package/base-4.10.1.0/docs/Control-Monad-Fix.html#v:fix">Control.Monad.Fix.fix</a></p>
+<p>型はこんな感じ。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; :t fix fix :: (a -\&gt; a) -\&gt; a
+</code></pre>
+<p>関数を渡すと値が出てくる変なヤツ。</p>
+<p>一方でFixの種 (kind) はどうだろうか？</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; :k Fix Fix :: (\* -\&gt; \*) -\&gt; \*
+</code></pre>
+<p>似すぎ。</p>
+<p>もしやと思ってそれぞれの定義を見比べる。</p>
+<p>まずfixの定義。 ( <a href="https://ja.wikibooks.org/wiki/Haskell/%E4%B8%8D%E5%8B%95%E7%82%B9%E3%81%A8%E5%86%8D%E5%B8%B0#fix_%E3%81%AE%E5%B0%8E%E5%85%A5">こちらを参照</a> )</p>
+<pre style="background-color:#2b303b;">
+<code>fix :: (a -\&gt; a) -\&gt; a fix f = f (fix f)
+</code></pre>
+<p><a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に呼び出す <code>fix f</code> の結果に <code>f</code> を適用している。</p>
+<pre style="background-color:#2b303b;">
+<code>newtype Fix f = In (f (Fix f))
+</code></pre>
+<p><a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に呼び出す <code>Fix f</code> の結果に <code>f</code> を適用している。</p>
+<p>一緒じゃん。</p>
+<p>形が似ていることは解った。<code>fix</code> を既に知っている人にとっては <code>Fix</code> の振る舞いはもはや疑問の余地がないものだろう。</p>
+<p>ただ僕はよく解らないのでちゃんと考える必要がある。</p>
+<h2 id="fixhahe-nanoka">Fixは何なのか</h2>
+<p>下記のリンクを読めば解る人には解るかもしれない。</p>
+<p><a href="https://ja.wikibooks.org/wiki/Haskell/%E4%B8%8D%E5%8B%95%E7%82%B9%E3%81%A8%E5%86%8D%E5%B8%B0">HaskellWiki - 不動点と再帰</a></p>
+<p>僕は解らない。</p>
+<p>試してみた僕の理解だと <code>Fix f</code> とは</p>
+<p><em>fを<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に適用して収束するとこを見つける関数のようなもの</em></p>
+<p>という認識。</p>
+<p><code>Fix f</code> とするとき、 <code>Fix</code> の定義により</p>
+<pre style="background-color:#2b303b;">
+<code>Fix f = f(f(f(f(...))))
+</code></pre>
+<p>となる。<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に型コンスト<a href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>タ <code>f</code> を適用していくことを表現している。</p>
+<p>この <code>Fix</code> というデータ型と似た関数版もやはり<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>に関わる。</p>
+<p><a href="https://hackage.haskell.org/package/base-4.10.1.0/docs/Control-Monad-Fix.html#v:fix">Control.Monad.Fix.fix</a></p>
+<pre style="background-color:#2b303b;">
+<code>fix f = f(f(f(f(f(...)))))
+</code></pre>
+<p>こうなる。 こちらも同様に関数 <code>f</code> を<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に適用していくことを表現している。</p>
+<p>データ型版も関数版も<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に <code>f</code> を<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的に適用することを表現しているのがポイント。</p>
+<h2 id="fixdede-tamonoshi-tutamono">Fixで得たもの・失ったもの</h2>
+<p><code>Fix</code> を使うことで任意の深さで<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>する型 (例えば <code>TermF</code> ) を同一の型で表現することができるようになった。 この統一的な表現方式により、冒頭のリンクで言及されているような</p>
+<ul>
+<li><a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>的なデータの走査</li>
+<li>データ構造の<a href="http://d.hatena.ne.jp/keyword/%BA%C6%B5%A2">再帰</a>と作用の分離</li>
+</ul>
+<p>などを手にすることができる。</p>
+<p>この <code>Fix</code> によってもたらされた恩恵の向こうに <code>Cofree</code> が待っているようだ。</p>
+<h3 id="de-tamono">得たもの</h3>
+<p>Cofreeという抽象構造へのステップ。 あと少しっぽい。</p>
+<p>うまくいけばASTに<a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を <em>きれいに</em> 載せられるかもしれない！</p>
+<h3 id="shi-tutamono">失ったもの</h3>
+<p>単純に項を構成する方法。 Fix導入前は項を構成して比較することも容易だった。</p>
+<pre style="background-color:#2b303b;">
+<code>\&gt; ( Abs &quot;x&quot; ( Var &quot;x&quot; ) ) == ( Abs &quot;x&quot; ( Var &quot;x&quot; ) ) True
+</code></pre>
+<p>なのでテストを書くのが楽だった。</p>
+<p>ところが今回は <code>Fix</code> で構文データをラップする必要が出てくる。</p>
+<p>しかしFixという構造自体はEqの<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>にできなさそう。同値という性質を定義できない。 なのでFixを使って作られた項は単純な比較ができなくなる。</p>
+<p>2019-03-03</p>
+<p>コメントにて <code>Fix</code> の同値性は定義できる旨をアド<a href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>頂いたので検証。 ご指摘の通り <code>Fix</code> の導入にあたり前述のようなデメリットは無いと分った。</p>
+<pre style="background-color:#2b303b;">
+<code>import Data.Functor.Classes (Eq1, eq1)instance Eq1 TermF where liftEq \_ (VarF i) (VarF j) = i == j liftEq f (AbsF i x) (AbsF j y) = i == j &amp;&amp; f x y liftEq f (AppF a b) (AppF c d) = f a c &amp;&amp; f b d liftEq \_ \_ \_ = Falseinstance (Eq1 f) =\&gt; Eq (Fix f) where (In x) == (In y) = eq1 x y
+</code></pre>
+<p>上記のように2つの定義、すなわち 1. <code>TermF</code> に <code>Eq1</code>2. <code>Fix f</code> に <code>Eq</code>を与えることで同値性のテストもできるようになる。</p>
+<pre style="background-color:#2b303b;">
+<code>\*Main Lib Data.Functor.Classes\&gt; lhs = In $ AbsF &quot;x&quot; $ In $ AbsF &quot;y&quot; $ In $ VarF &quot;y&quot; \*Main Lib Data.Functor.Classes\&gt; rhs = In $ AbsF &quot;x&quot; $ In $ AbsF &quot;y&quot; $ In $ VarF &quot;y&quot; \*Main Lib Data.Functor.Classes\&gt; lhs == rhs True
+</code></pre>
+<p>こんな風に <code>Fix</code> で包んだ項も比較できる。</p>
+<p><a href="http://d.hatena.ne.jp/keyword/GHC">GHC</a> 8.6系から使える <code>QuantifiedConstraints</code> を使ってさらに無駄なく定義できるかは確認中。</p>
+<ul>
+<li>
+<p><code>Eq (Fix f)</code> を定義するためには <code>Eq f</code> を仮定したい</p>
+</li>
+<li>
+<p><code>Eq f</code>を仮定したいところだが <code>f</code> はカインドが <code>* -&gt; *</code> なので <code>Eq (f a)</code> を仮定しようとする (ここが自信ない)</p>
+</li>
+<li>
+<p><code>Eq (f a)</code> を仮定することで導入される型変数 <code>a</code> が、定義　<code>Eq (Fix f)</code> に現れないためにエラーとなる</p>
+<p>* Variable <code>a' occurs more often in the constraint </code>Eq (f a)' than in the instance head <code>Eq (Fix f)' (Use UndecidableInstances to permit this) * In the instance declaration for </code>Eq (Fix f)' | 31 | instance Eq (f a) =&gt; Eq (Fix f) where | ^^^^^^^^^^^^^^^^^^^^^^ |</p>
+</li>
+</ul>
+<p><code>Free f a</code> みたいなデータ型に <code>Eq</code> の<a href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>定義を与えるならいけそう。</p>
+<h2 id="fixyacofreehaben-dang-nibi-yao-ka">FixやCofreeは本当に必要か？</h2>
+<p>エレガントに見えるけど率直さを失った。 本当に必要な抽象か？</p>
+<h3 id="bi-jiao-sitemiru">比較してみる</h3>
+<h4 id="1-metadetawobao-cun-surutamenozhi-konsutorakutawoastnoburantitositeding-yi-suru">1. <a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するための値コンスト<a href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>タをASTのブランチとして定義する</h4>
+<p>ASTに位置情報という付加情報のためのブランチを作る。 簡単、率直だが美しくはない。</p>
+<p>ASTの規模が小さいならブランチを作るコスト、それらを分解するコストは大したことないのでこれでいい。 というかSML/NJがこれを導入している実績あるので、 同程度の規模ならなんとかなると思っていいんじゃないかな。</p>
+<p>人生はエレガンス、がスローガンの人だけ次を読むべき。</p>
+<h4 id="2-metadetawobao-cun-sururatupawoding-yi-suru">2. <a href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BF%A5%C7%A1%BC%A5%BF">メタデータ</a>を保存するラッパーを定義する</h4>
+<p>位置情報を保存するラッパーを作る。 ASTそれ自体の定義はピュアに保てる。</p>
+<p>今回の <code>Fix</code> も所詮ラッパーなので導入コストについていえば、実は2と変わらなかったりする。 その上で構文が <code>Functor</code> や <code>Traversable</code> <code>Foldable</code> を備えるなら 応用力では今回の <code>Fix</code> アプローチが勝る。</p>
+<p>と、言えなくもない。</p>
+<p>ただし、僕はこの <code>Fix</code> ベースの構文定義を使っている実用的な<a href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>をまだ目撃していない。 事例が無いので何か本質的な瑕疵でもあるのでは、と恐怖している。</p>
+<p>誰か <code>Fix</code> 使った構文定義している<a href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>実装の例を知っていたら教えてほしい。</p>
+<p>うそ。教えてなくてもいい。 <em>僕が <code>Fix</code> の餌食になるので。</em></p>
+<p>まあ、せっかく学んだのでこのアプローチを簡単に捨てるのはまだ少し惜しい気もしている。 ということで、もう少し調査を続行。</p>
+<h2 id="ci-nohua-ti">次の話題</h2>
+<p>どうもこの手法、 Recursion <a href="http://d.hatena.ne.jp/keyword/Scheme">Scheme</a> と呼ばれるアプローチらしい。</p>
+<p><a href="http://blog.sumtypeofway.com/an-introduction-to-recursion-schemes/">An Introduction to Recursion Schemes</a></p>
+<p>ということで冒頭のリンクにたどり着いたのだった。</p>
+<p>この記事の基礎になっている論文が下記。</p>
+<p><a href="https://research.utwente.nl/files/6142047/db-utwente-40501F46.pdf">Functional Programming with Bananas, Lenses, Envelopes and Barbed Wire</a></p>
+<p><a href="http://d.hatena.ne.jp/keyword/%CC%DA%B9%BD%C2%A4">木構造</a>の簡約・走査に関連する発想の一つみたいだ。 読みたい。読もう。</p>
+<p>直近の懸念は、この <code>Fix</code> を導入したとして、 派手に壊れたテストをどうやって直して行くか、だ。</p>
+<p>その問題に対して何かヒントがあるか拾っていきたい。</p>
+<h2 id="zui-jin">最近</h2>
+<p>ずっと<a href="http://d.hatena.ne.jp/keyword/vtuber">vtuber</a>の動画観てる。</p>
+<ul>
+<li>ときのそら</li>
+<li>ぜったい天使くるみちゃん (もう活動一時停止してる)</li>
+</ul>
+<p>歌う人好きっぽい。</p>
+<p>(技術の話をして)</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>
