@@ -28,6 +28,7 @@ publish:
 
 	# Overwrite existing files with new files
 	cp -a public/. .
+	rm -rf ./public
 
 	# Commit
 	git add -A
