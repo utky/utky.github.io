@@ -97,17 +97,86 @@
   </header>
   <div class="body row">
     <div class="col">
-    <h2 id="dong-ji">動機</h2>
+    <p>いつも環境移行する時に当時の動機とかを忘れるので記録しておく。</p>
+<h2 id="yatutakoto">やったこと</h2>
+<p>作業環境をArchLinuxラップトップからWindowsデスクトップに移行した。
+これまでの環境をVMの中に構築した。</p>
+<p>特に目立って変わったことはやってないので、Windowsで開発している人は大体こんな感じだと思われる。 
+想像していたよりもつっかえる部分が少なくて良い環境だな、と思えるようになってきた。</p>
+<h2 id="bei-jing">背景</h2>
 <p>あんまりない。ArchLinuxそれ自体にはそんなに不満ない。</p>
-<p>DAWが入っている比較的新しいPCと</p>
+<p>一方でDAWが入っているデスクトップが有効活用できていなかったのでもやもやしていた。</p>
+<p>エディタをVSCodeに移行したことにより、Remote Developmentが使えるようになってVM上で
+十分不満なく開発できそうな気運が高まった。
+今までArchLinux上に作っていた環境をVM上に再現すればよくなったので、
+Windowsを使うことに障壁がなくなった。</p>
 <h2 id="archlinuxnoliang-isuo">ArchLinuxの良い所</h2>
-<h2 id="windowshuan-jing-nogou-cheng">Windows環境の構成</h2>
-<p>開発関連の作業は専用仮想マシン上で行うようにする。</p>
 <ul>
-<li>VirtualBox：VM管理</li>
-<li>VSCode Remote Development: エディタ環境</li>
-<li>Windows Terminal: ターミナル</li>
+<li>
+<ol>
+<li>無駄なものがなくて必要なものだけインストールできる</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>サーバサイド開発の道具立てがそのまま使える</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>ローリングリリースなのでメジャーバージョンのアップグレード作業が要らない</li>
+</ol>
+</li>
 </ul>
+<p>この辺がWindowsでも再現できれば問題ないことになる。</p>
+<h2 id="yi-xing-sitemitajie-guo">移行してみた結果</h2>
+<p>VSCodeのおかけですごく良い感じに使えている。
+ArchLinuxで感じていたメリットは結局VM上にそれを再現することで得られているので、
+ありがとうVirtualBoxというだけの話だった。</p>
+<h3 id="1-wu-tuo-namonoganakutebi-yao-namonodakeinsutorudekiru">1) 無駄なものがなくて必要なものだけインストールできる</h3>
+<p>Windows自体には無駄なものがある。。。
+こればっかりはどうしようもなかった。
+せめてVMくらいは最小限の環境を作るようにする。</p>
+<h3 id="2-sabasaidokai-fa-nodao-ju-li-tegasonomamashi-eru">2) サーバサイド開発の道具立てがそのまま使える</h3>
+<p>これもVM上での作業を中心にすることで解消した。
+Windows上で直接開発する気はさらさらない。</p>
+<h3 id="3-roringuririsunanodemeziyabaziyonnoatupuguredozuo-ye-gayao-ranai">3) ローリングリリースなのでメジャーバージョンのアップグレード作業が要らない</h3>
+<p>まあ、Windows10もローリングリリースだし。
+ローリングリリースしているLinux DistributionをVMに採用すればそれで良いのだった。</p>
+<h2 id="windowshuan-jing-nogou-cheng">Windows環境の構成</h2>
+<p>開発関連の作業は専用VM上で行うようにする。</p>
+<ul>
+<li>VM管理: VirtualBox</li>
+<li>エディタ環境: VSCode Remote Development</li>
+<li>ターミナル: Windows Terminal</li>
+</ul>
+<h3 id="virtualbox">VirtualBox</h3>
+<p><a href="https://www.virtualbox.org">VirtualBox</a> を <a href="https://www.vagrantup.com/">Vagrant</a> と組み合わせて使っている。WSL w/ Hyper-V よりは慣れた道具で作れる方を選んだ。</p>
+<p>VirtualBox 6.1.8 + Vagrant 2.2.9 だとVM起動後のSSH接続でタイムアウトしてしまう問題があったので、
+VirtualBox 6.0.22 を使ったら解消した。</p>
+<p>イメージはUbuntu 20にしてみたけど、今考えたらArchLinuxにすればよかった。。。
+新しいものが使いたくて脳死でUbuntu 20入れてしまった。
+あとでArchLinuxで再構築したい。</p>
+<h3 id="vscode">VSCode</h3>
+<p>これがあったからWindows移行する気持ちになった。
+こんな良いエディタが無料で使えるとはどういうこと。。。</p>
+<h4 id="vim-extension">Vim Extension</h4>
+<p>そんなに使い込めてるわけじゃないけどVimキーバインドが欲しくて使っている。</p>
+<h4 id="ime-nozhi-yu">IME の制御</h4>
+<p><a href="https://github.com/iuchim/zenhan">zenhan</a></p>
+<p>こちらにお世話になった。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    &quot;</span><span style="color:#a3be8c;">vim.autoSwitchInputMethod.obtainIMCmd</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">C:</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">Users</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">xxx</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">.local</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">bin</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">zenhan.exe</span><span style="color:#c0c5ce;">&quot;,
+    &quot;</span><span style="color:#a3be8c;">vim.autoSwitchInputMethod.switchIMCmd</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">C:</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">Users</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">xxx</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">.local</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">bin</span><span style="color:#96b5b4;">\\\\</span><span style="color:#a3be8c;">zenhan.exe {im}</span><span style="color:#c0c5ce;">&quot;,
+    &quot;</span><span style="color:#a3be8c;">vim.autoSwitchInputMethod.defaultIM</span><span style="color:#c0c5ce;">&quot;: &quot;</span><span style="color:#a3be8c;">0</span><span style="color:#c0c5ce;">&quot;,
+    &quot;</span><span style="color:#a3be8c;">vim.autoSwitchInputMethod.enable</span><span style="color:#c0c5ce;">&quot;: </span><span style="color:#d08770;">true</span><span style="color:#c0c5ce;">,
+</span></code></pre>
+<p>下記の選択肢もあったけど、キーボードの配列をスイッチする動作になってしまいちょっと使い心地が悪かったので使わなかった。</p>
+<p><a href="https://github.com/daipeihust/im-select">im-select</a></p>
+<h2 id="windows-terminal">Windows Terminal</h2>
+<p>開発用VMにSSHでつなぐために使っている。
+(VSCodeのterminal機能でもよさそうだけど)</p>
+<p>今まで使ってたLinux環境でのterminalとそんなにギャップなく使えるのですごく良い。</p>
 
     </div>
   </div>
