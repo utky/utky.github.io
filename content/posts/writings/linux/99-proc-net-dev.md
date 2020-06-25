@@ -142,8 +142,8 @@ static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
 }
 ```
 
-統計データ `rtnl_link_stats64` は下記の関数から netdev のメソッド経由で取得される。
-`ndo_get_stats64`/`ndo_get_stats` のメソッド実装があればそれを使うしなければ、netdev の stats を使う。
+統計データ `rtnl_link_stats64` は下記の関数から netdev のハンドラ経由で取得される。
+`ndo_get_stats64`/`ndo_get_stats` のハンドラ実装があればそれを使うし、なければ netdev の stats を使う。
 net/core/dev.c
 ```c
 /**
@@ -174,9 +174,13 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
 }
 ```
 
-`ndo_get_stats64` のメソッドは各デバイスの初期化時にデバイスドライバ側で設定される。
+`ops->ndo_get_stats64` のハンドラは各デバイスの初期化時にデバイスドライバ側で設定されており、
+ドライバ固有の操作となる。
 
 ## 統計情報 rtnl_link_stats64
+
+印字されているメトリクスは結局のところドライバ側で計測したものであることが分かった。
+メトリクスを保存している構造体は下記のような定義となっている。
 
 include/uapi/linux/if_link.h
 ```c
@@ -213,29 +217,168 @@ struct rtnl_link_stats64 {
 	__u64	tx_compressed;
 };
 ```
-最初のひとかたまりのメンバーはよく見るので疑問はない。
-一方でエラーの統計以下のメンバーについては詳細をよく知らないものも多いためここで確認しておく。
 
-統計の更新はドライバ側で行う。
+フィールド数が多いので、ここでは rx_packets ~ collisions に絞って、
+これらのよく見る統計がどうやって加算されているのかを、具体的なドライバのコードを見つつ確認してみる。
+
 今回は Realtek のドライバで確認してみる。
 `drivers/net/ethernet/realtek/8139cp.c` 
 
-## RX 系エラー
+[ドライバのデータシート](http://realtek.info/pdf/rtl8139cp.pdf)
 
-#### __u64	rx_length_errors;
-#### __u64	rx_over_errors;		/* receiver ring buff overflow	*/
-#### __u64	rx_crc_errors;		/* recved pkt with crc error	*/
-#### __u64	rx_frame_errors;	/* recv'd frame alignment error */
-#### __u64	rx_fifo_errors;		/* recv'r fifo overrun		*/
-#### __u64	rx_missed_errors;	/* receiver missed packet	*/
+### rx_packets & rx_bytes
 
-## TX 系エラー
+パケット受信時に更新される下記の指標を表す。
 
-#### __u64	tx_aborted_errors;
-#### __u64	tx_carrier_errors;
-#### __u64	tx_fifo_errors;
-#### __u64	tx_heartbeat_errors;
-#### __u64	tx_window_errors;
+* 受信パケット数
+* 受信データ量(bytes)
 
-#### __u64	rx_compressed;
-#### __u64	tx_compressed;
+`skb` (ネットワークパケットのデータが乗っている) の長さを `rx_bytes` としてカウントしているのがわかる。
+
+```c
+static inline void cp_rx_skb (struct cp_private *cp, struct sk_buff *skb,
+                  struct cp_desc *desc)
+{
+    u32 opts2 = le32_to_cpu(desc->opts2);
+
+    skb->protocol = eth_type_trans (skb, cp->dev);
+
+    cp->dev->stats.rx_packets++;
+    cp->dev->stats.rx_bytes += skb->len;
+
+    if (opts2 & RxVlanTagged)
+        __vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), swab16(opts2 & 0xffff));
+
+    napi_gro_receive(&cp->napi, skb);
+}
+```
+
+カウンタ更新後に `napi_gro_receive` ネットワークスタック層での処理を依頼する。
+
+`cp_rx_skb` という関数自体は `cp_rx_poll` というパケットの受信ループから呼ばれる。
+`cp_rx_poll` はデバイスがパケット受信時の割り込みを契機として起動される。
+
+### tx_packets & tx_bytes & tx_errors & collisions
+
+パケット送信時に更新される下記の指標を表す。
+
+* 送信パケット数
+* 送信データ量(bytes)
+* 送信エラー
+* Ethernet の衝突検知
+
+`cp_tx` という関数にて、 ring buffer の中身からとりだした `status` の結果を確認し成功なら送信系のカウンタを更新する。
+
+```c
+static void cp_tx (struct cp_private *cp)
+{
+<snip>
+        if (status & LastFrag) {
+            if (status & (TxError | TxFIFOUnder)) {
+                netif_dbg(cp, tx_err, cp->dev,
+                      "tx err, status 0x%x\n", status);
+                cp->dev->stats.tx_errors++;
+                if (status & TxOWC)
+                    cp->dev->stats.tx_window_errors++;
+                if (status & TxMaxCol)
+                    cp->dev->stats.tx_aborted_errors++;
+                if (status & TxLinkFail)
+                    cp->dev->stats.tx_carrier_errors++;
+                if (status & TxFIFOUnder)
+                    cp->dev->stats.tx_fifo_errors++;
+            } else {
+                cp->dev->stats.collisions +=
+                    ((status >> TxColCntShift) & TxColCntMask);
+                cp->dev->stats.tx_packets++;
+                cp->dev->stats.tx_bytes += skb->len;
+                netif_dbg(cp, tx_done, cp->dev,
+                      "tx done, slot %d\n", tx_tail);
+            }
+```
+
+パケットの送信をデバイスに依頼した後、デバイスから完了通知の割り込みを受け取ると
+`cp_tx` が呼び出されてカウンタ更新が行われる。
+
+いずれもデバイスから設定されたフラグに応じてカウンタを更新しているだけなので、
+ドライバ側では特別な操作は何もしていないことになる。
+
+### rx_errors
+
+何らかの理由で受信に失敗したパケット数を表す。
+
+rx_errors カウンタは専用のエラーハンドル用関数で計測されている。
+```c
+static void cp_rx_err_acct (struct cp_private *cp, unsigned rx_tail,
+                u32 status, u32 len)
+{
+    netif_dbg(cp, rx_err, cp->dev, "rx err, slot %d status 0x%x len %d\n",
+          rx_tail, status, len);
+    cp->dev->stats.rx_errors++;
+    if (status & RxErrFrame)
+        cp->dev->stats.rx_frame_errors++;
+    if (status & RxErrCRC)
+        cp->dev->stats.rx_crc_errors++;
+    if ((status & RxErrRunt) || (status & RxErrLong))
+        cp->dev->stats.rx_length_errors++;
+    if ((status & (FirstFrag | LastFrag)) != (FirstFrag | LastFrag))
+        cp->dev->stats.rx_length_errors++;
+    if (status & RxErrFIFO)
+        cp->dev->stats.rx_fifo_errors++;
+}
+```
+
+このハンドラはデバイスからDMA経由で設定されたフラグのエラービットが立っていた場合に呼び出されるようになっている。
+```c
+        if (status & (RxError | RxErrFIFO)) {
+            cp_rx_err_acct(cp, rx_tail, status, len);
+            goto rx_next;
+        }
+```
+
+### tx_errors
+### rx_dropped
+### tx_dropped
+
+送信用 skb を解放するときにデータが残っていれば、
+それはデバイスから取り出されなかったものと見なして drop 扱いになる。
+
+```c
+static void cp_clean_rings (struct cp_private *cp)
+{
+    struct cp_desc *desc;
+    unsigned i;
+
+    for (i = 0; i < CP_RX_RING_SIZE; i++) {
+        if (cp->rx_skb[i]) {
+            desc = cp->rx_ring + i;
+            dma_unmap_single(&cp->pdev->dev,le64_to_cpu(desc->addr),
+                     cp->rx_buf_sz, PCI_DMA_FROMDEVICE);
+            dev_kfree_skb(cp->rx_skb[i]);
+        }
+    }
+
+    for (i = 0; i < CP_TX_RING_SIZE; i++) {
+        if (cp->tx_skb[i]) {
+            struct sk_buff *skb = cp->tx_skb[i];
+
+            desc = cp->tx_ring + i;
+            dma_unmap_single(&cp->pdev->dev,le64_to_cpu(desc->addr),
+                     le32_to_cpu(desc->opts1) & 0xffff,
+                     PCI_DMA_TODEVICE);
+            if (le32_to_cpu(desc->opts1) & LastFrag)
+                dev_kfree_skb(skb);
+            cp->dev->stats.tx_dropped++;
+        }
+    }
+```
+
+この `cp_clean_rings` はドライバの開始・終了時にも呼び出されるが、
+送信タイムアウト時のハンドラ `cp_tx_timeout` にも呼び出される。
+ネットワークデバイスが起動中に drop カウンタが増えるのはこの `cp_tx_timeout` 経由での呼び出しの場合が主であるようだ。
+
+```
+cp_tx_timeout
+  cp_clean_rings
+```
+
+### multicast
