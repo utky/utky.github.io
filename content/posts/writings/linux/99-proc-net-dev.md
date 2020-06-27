@@ -1,7 +1,6 @@
 +++
 title = "procfs ネットワーク周りを覗き見る /proc/net/dev 編"
-date = 2020-05-10
-aliases = ["/posts/linux/99-proc-net-dev.html"]
+date = 2020-06-27
 [taxonomies]
 tags = ["linux","network","procfs"]
 +++
@@ -16,6 +15,11 @@ Inter-|   Receive                                                |  Transmit
   eth0: 5067818364 3512860    0    0    0     0          0         0 17158713  213446    0    0    0     0       0          0
     lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
 ```
+
+ここではネットワークインタフェースのドライバのコードに少し触れるけれど、
+動作の詳細は [Linuxカーネル解析入門](https://www.amazon.co.jp/dp/4777516156) の「第６章 ネットワーク・ドライバを読む」に書いてある。
+
+というかもうそこ読んでカウンタ更新部分のコード読めば終わりなのでこんな記事は読まなくても良いのだ。。。
 
 ## カーネルとディストリビューション
 
@@ -220,18 +224,18 @@ struct rtnl_link_stats64 {
 
 フィールド数が多いので、ここでは rx_packets ~ collisions に絞って、
 これらのよく見る統計がどうやって加算されているのかを、具体的なドライバのコードを見つつ確認してみる。
+ちなみに multicast のカウンタ更新している箇所は今回のドライバのコードには見つからなかった。
 
-今回は Realtek のドライバで確認してみる。
-`drivers/net/ethernet/realtek/8139cp.c` 
+今回は [Realtek のドライバ 8319C+](http://realtek.info/pdf/rtl8139cp.pdf) で確認してみる。
 
-[ドライバのデータシート](http://realtek.info/pdf/rtl8139cp.pdf)
+コードは [drivers/net/ethernet/realtek/8139cp.c](https://github.com/torvalds/linux/blob/v3.10/drivers/net/ethernet/realtek/8139cp.c) にある。
 
-### rx_packets & rx_bytes
+### rx_packets, rx_bytes
 
 パケット受信時に更新される下記の指標を表す。
 
-* 受信パケット数
-* 受信データ量(bytes)
+* rx_packets: 受信パケット数
+* rx_bytes: 受信データ量(bytes)
 
 `skb` (ネットワークパケットのデータが乗っている) の長さを `rx_bytes` としてカウントしているのがわかる。
 
@@ -253,19 +257,19 @@ static inline void cp_rx_skb (struct cp_private *cp, struct sk_buff *skb,
 }
 ```
 
-カウンタ更新後に `napi_gro_receive` ネットワークスタック層での処理を依頼する。
+カウンタ更新後に `napi_gro_receive` を呼び出してカーネルのネットワークスタック層での処理を依頼する。
 
 `cp_rx_skb` という関数自体は `cp_rx_poll` というパケットの受信ループから呼ばれる。
 `cp_rx_poll` はデバイスがパケット受信時の割り込みを契機として起動される。
 
-### tx_packets & tx_bytes & tx_errors & collisions
+### tx_packets, tx_bytes, tx_errors, collisions
 
 パケット送信時に更新される下記の指標を表す。
 
-* 送信パケット数
-* 送信データ量(bytes)
-* 送信エラー
-* Ethernet の衝突検知
+* tx_packets: 送信パケット数
+* tx_bytes: 送信データ量(bytes)
+* tx_errors: 送信エラー
+* collisions: Ethernet の衝突検知
 
 `cp_tx` という関数にて、 ring buffer の中身からとりだした `status` の結果を確認し成功なら送信系のカウンタを更新する。
 
@@ -327,7 +331,7 @@ static void cp_rx_err_acct (struct cp_private *cp, unsigned rx_tail,
 }
 ```
 
-このハンドラはデバイスからDMA経由で設定されたフラグのエラービットが立っていた場合に呼び出されるようになっている。
+この関数はデバイスからDMA経由で設定されたフラグのエラービットが立っていた場合に呼び出されるようになっている。
 ```c
         if (status & (RxError | RxErrFIFO)) {
             cp_rx_err_acct(cp, rx_tail, status, len);
@@ -335,12 +339,40 @@ static void cp_rx_err_acct (struct cp_private *cp, unsigned rx_tail,
         }
 ```
 
-### tx_errors
 ### rx_dropped
+
+受信パケットのドロップは以下の二つのケースで更新される。
+
+* セグメンテーションが行われている場合（未サポート）
+* デバイスから受け取ったパケットを `skb` にコピーするための領域が確保できない
+
+```c
+static int cp_rx_poll(struct napi_struct *napi, int budget)
+{
+<snip>
+        if ((status & (FirstFrag | LastFrag)) != (FirstFrag | LastFrag)) {
+            /* we don't support incoming fragmented frames.
+             * instead, we attempt to ensure that the
+             * pre-allocated RX skbs are properly sized such
+             * that RX fragments are never encountered
+             */
+            cp_rx_err_acct(cp, rx_tail, status, len);
+            dev->stats.rx_dropped++;
+            cp->cp_stats.rx_frags++;
+            goto rx_next;
+        }
+<snip>
+      new_skb = netdev_alloc_skb_ip_align(dev, buflen);
+        if (!new_skb) {
+            dev->stats.rx_dropped++;
+            goto rx_next;
+        }
+```
+
 ### tx_dropped
 
-送信用 skb を解放するときにデータが残っていれば、
-それはデバイスから取り出されなかったものと見なして drop 扱いになる。
+送信用 ring buffer の skb 用領域を解放するときにデータが残っていれば、
+それはデバイスから取り出されなかったものと見なしてドロップ扱いになる。
 
 ```c
 static void cp_clean_rings (struct cp_private *cp)
@@ -348,14 +380,7 @@ static void cp_clean_rings (struct cp_private *cp)
     struct cp_desc *desc;
     unsigned i;
 
-    for (i = 0; i < CP_RX_RING_SIZE; i++) {
-        if (cp->rx_skb[i]) {
-            desc = cp->rx_ring + i;
-            dma_unmap_single(&cp->pdev->dev,le64_to_cpu(desc->addr),
-                     cp->rx_buf_sz, PCI_DMA_FROMDEVICE);
-            dev_kfree_skb(cp->rx_skb[i]);
-        }
-    }
+<snip>
 
     for (i = 0; i < CP_TX_RING_SIZE; i++) {
         if (cp->tx_skb[i]) {
@@ -374,11 +399,8 @@ static void cp_clean_rings (struct cp_private *cp)
 
 この `cp_clean_rings` はドライバの開始・終了時にも呼び出されるが、
 送信タイムアウト時のハンドラ `cp_tx_timeout` にも呼び出される。
-ネットワークデバイスが起動中に drop カウンタが増えるのはこの `cp_tx_timeout` 経由での呼び出しの場合が主であるようだ。
+ネットワークデバイスが起動中に tx_dropped カウンタが増えるのはこの `cp_tx_timeout` 経由での呼び出しの場合が主であるようだ。
 
-```
-cp_tx_timeout
-  cp_clean_rings
-```
+## 読んでみて
 
-### multicast
+もう少しドライバのデータシートちゃんと読まないとだなって思いました。
