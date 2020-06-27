@@ -82,7 +82,7 @@
       <h1 class="title">procfs ネットワーク周りを覗き見る &#x2F;proc&#x2F;net&#x2F;dev 編</h1>
       
       <p>
-      <small> 2020-05-10 / 
+      <small> 2020-06-27 / 
       
       
       <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
@@ -107,7 +107,11 @@ Inter-|   Receive                                                |  Transmit
  face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
   eth0: 5067818364 3512860    0    0    0     0          0         0 17158713  213446    0    0    0     0       0          0
     lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
-</span></code></pre><h2 id="kanerutodeisutoribiyusiyon">カーネルとディストリビューション</h2>
+</span></code></pre>
+<p>ここではネットワークインタフェースのドライバのコードに少し触れるけれど、
+動作の詳細は <a href="https://www.amazon.co.jp/dp/4777516156">Linuxカーネル解析入門</a> の「第６章 ネットワーク・ドライバを読む」に書いてある。</p>
+<p>というかもうそこ読んでカウンタ更新部分のコード読めば終わりなのでこんな記事は読まなくても良いのだ。。。</p>
+<h2 id="kanerutodeisutoribiyusiyon">カーネルとディストリビューション</h2>
 <pre style="background-color:#2b303b;">
 <code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> cat /etc/redhat-release 
 </span><span style="color:#bf616a;">CentOS</span><span style="color:#c0c5ce;"> Linux release 7.6.1810 (Core)
@@ -218,8 +222,8 @@ Linux</span><span style="color:#c0c5ce;"> 3.10.0-957.12.2.el7.x86_64 </span><spa
 		   stats-&gt;tx_compressed);
 }
 </span></code></pre>
-<p>統計データ <code>rtnl_link_stats64</code> は下記の関数から netdev のメソッド経由で取得される。
-<code>ndo_get_stats64</code>/<code>ndo_get_stats</code> のメソッド実装があればそれを使うしなければ、netdev の stats を使う。
+<p>統計データ <code>rtnl_link_stats64</code> は下記の関数から netdev のハンドラ経由で取得される。
+<code>ndo_get_stats64</code>/<code>ndo_get_stats</code> のハンドラ実装があればそれを使うし、なければ netdev の stats を使う。
 net/core/dev.c</p>
 <pre style="background-color:#2b303b;">
 <code><span style="color:#65737e;">/**
@@ -249,8 +253,11 @@ net/core/dev.c</p>
 	</span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> storage;
 }
 </span></code></pre>
-<p><code>ndo_get_stats64</code> のメソッドは各デバイスの初期化時にデバイスドライバ側で設定される。</p>
+<p><code>ops-&gt;ndo_get_stats64</code> のハンドラは各デバイスの初期化時にデバイスドライバ側で設定されており、
+ドライバ固有の操作となる。</p>
 <h2 id="tong-ji-qing-bao-rtnl-link-stats64">統計情報 rtnl_link_stats64</h2>
+<p>印字されているメトリクスは結局のところドライバ側で計測したものであることが分かった。
+メトリクスを保存している構造体は下記のような定義となっている。</p>
 <p>include/uapi/linux/if_link.h</p>
 <pre style="background-color:#2b303b;">
 <code><span style="color:#65737e;">/* The main device statistics structure */
@@ -286,26 +293,162 @@ net/core/dev.c</p>
 	__u64	tx_compressed;
 };
 </span></code></pre>
-<p>最初のひとかたまりのメンバーはよく見るので疑問はない。
-一方でエラーの統計以下のメンバーについては詳細をよく知らないものも多いためここで確認しておく。</p>
-<p>統計の更新はドライバ側で行う。
-今回は Realtek のドライバで確認してみる。
-<code>drivers/net/ethernet/realtek/8139cp.c</code> </p>
-<h2 id="rx-xi-era">RX 系エラー</h2>
-<h4 id="u64-rx-length-errors">__u64	rx_length_errors;</h4>
-<h4 id="u64-rx-over-errors-receiver-ring-buff-overflow">__u64	rx_over_errors;		/* receiver ring buff overflow	*/</h4>
-<h4 id="u64-rx-crc-errors-recved-pkt-with-crc-error">__u64	rx_crc_errors;		/* recved pkt with crc error	*/</h4>
-<h4 id="u64-rx-frame-errors-recv-d-frame-alignment-error">__u64	rx_frame_errors;	/* recv'd frame alignment error */</h4>
-<h4 id="u64-rx-fifo-errors-recv-r-fifo-overrun">__u64	rx_fifo_errors;		/* recv'r fifo overrun		*/</h4>
-<h4 id="u64-rx-missed-errors-receiver-missed-packet">__u64	rx_missed_errors;	/* receiver missed packet	*/</h4>
-<h2 id="tx-xi-era">TX 系エラー</h2>
-<h4 id="u64-tx-aborted-errors">__u64	tx_aborted_errors;</h4>
-<h4 id="u64-tx-carrier-errors">__u64	tx_carrier_errors;</h4>
-<h4 id="u64-tx-fifo-errors">__u64	tx_fifo_errors;</h4>
-<h4 id="u64-tx-heartbeat-errors">__u64	tx_heartbeat_errors;</h4>
-<h4 id="u64-tx-window-errors">__u64	tx_window_errors;</h4>
-<h4 id="u64-rx-compressed">__u64	rx_compressed;</h4>
-<h4 id="u64-tx-compressed">__u64	tx_compressed;</h4>
+<p>フィールド数が多いので、ここでは rx_packets ~ collisions に絞って、
+これらのよく見る統計がどうやって加算されているのかを、具体的なドライバのコードを見つつ確認してみる。
+ちなみに multicast のカウンタ更新している箇所は今回のドライバのコードには見つからなかった。</p>
+<p>今回は <a href="http://realtek.info/pdf/rtl8139cp.pdf">Realtek のドライバ 8319C+</a> で確認してみる。</p>
+<p>コードは <a href="https://github.com/torvalds/linux/blob/v3.10/drivers/net/ethernet/realtek/8139cp.c">drivers/net/ethernet/realtek/8139cp.c</a> にある。</p>
+<h3 id="rx-packets-rx-bytes">rx_packets, rx_bytes</h3>
+<p>パケット受信時に更新される下記の指標を表す。</p>
+<ul>
+<li>rx_packets: 受信パケット数</li>
+<li>rx_bytes: 受信データ量(bytes)</li>
+</ul>
+<p><code>skb</code> (ネットワークパケットのデータが乗っている) の長さを <code>rx_bytes</code> としてカウントしているのがわかる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">static inline void </span><span style="color:#8fa1b3;">cp_rx_skb </span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_private *</span><span style="color:#bf616a;">cp</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> sk_buff *</span><span style="color:#bf616a;">skb</span><span style="color:#c0c5ce;">,
+                  </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_desc *</span><span style="color:#bf616a;">desc</span><span style="color:#c0c5ce;">)
+{
+    u32 opts2 = </span><span style="color:#bf616a;">le32_to_cpu</span><span style="color:#c0c5ce;">(desc-&gt;opts2);
+
+    skb-&gt;protocol = </span><span style="color:#bf616a;">eth_type_trans </span><span style="color:#c0c5ce;">(skb, cp-&gt;dev);
+
+    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_packets</span><span style="color:#c0c5ce;">++;
+    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_bytes </span><span style="color:#c0c5ce;">+= skb-&gt;len;
+
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(opts2 &amp; RxVlanTagged)
+        </span><span style="color:#bf616a;">__vlan_hwaccel_put_tag</span><span style="color:#c0c5ce;">(skb, </span><span style="color:#bf616a;">htons</span><span style="color:#c0c5ce;">(ETH_P_8021Q), </span><span style="color:#bf616a;">swab16</span><span style="color:#c0c5ce;">(opts2 &amp; </span><span style="color:#d08770;">0xffff</span><span style="color:#c0c5ce;">));
+
+    </span><span style="color:#bf616a;">napi_gro_receive</span><span style="color:#c0c5ce;">(&amp;cp-&gt;napi, skb);
+}
+</span></code></pre>
+<p>カウンタ更新後に <code>napi_gro_receive</code> を呼び出してカーネルのネットワークスタック層での処理を依頼する。</p>
+<p><code>cp_rx_skb</code> という関数自体は <code>cp_rx_poll</code> というパケットの受信ループから呼ばれる。
+<code>cp_rx_poll</code> はデバイスがパケット受信時の割り込みを契機として起動される。</p>
+<h3 id="tx-packets-tx-bytes-tx-errors-collisions">tx_packets, tx_bytes, tx_errors, collisions</h3>
+<p>パケット送信時に更新される下記の指標を表す。</p>
+<ul>
+<li>tx_packets: 送信パケット数</li>
+<li>tx_bytes: 送信データ量(bytes)</li>
+<li>tx_errors: 送信エラー</li>
+<li>collisions: Ethernet の衝突検知</li>
+</ul>
+<p><code>cp_tx</code> という関数にて、 ring buffer の中身からとりだした <code>status</code> の結果を確認し成功なら送信系のカウンタを更新する。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">cp_tx </span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_private *</span><span style="color:#bf616a;">cp</span><span style="color:#c0c5ce;">)
+{
+&lt;snip&gt;
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; LastFrag) {
+            </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; (TxError | TxFIFOUnder)) {
+                </span><span style="color:#bf616a;">netif_dbg</span><span style="color:#c0c5ce;">(cp, tx_err, cp-&gt;dev,
+                      &quot;</span><span style="color:#a3be8c;">tx err, status 0x</span><span style="color:#d08770;">%x</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, status);
+                cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_errors</span><span style="color:#c0c5ce;">++;
+                </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; TxOWC)
+                    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_window_errors</span><span style="color:#c0c5ce;">++;
+                </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; TxMaxCol)
+                    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_aborted_errors</span><span style="color:#c0c5ce;">++;
+                </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; TxLinkFail)
+                    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_carrier_errors</span><span style="color:#c0c5ce;">++;
+                </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; TxFIFOUnder)
+                    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_fifo_errors</span><span style="color:#c0c5ce;">++;
+            } </span><span style="color:#b48ead;">else </span><span style="color:#c0c5ce;">{
+                cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">collisions </span><span style="color:#c0c5ce;">+=
+                    ((status &gt;&gt; TxColCntShift) &amp; TxColCntMask);
+                cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_packets</span><span style="color:#c0c5ce;">++;
+                cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_bytes </span><span style="color:#c0c5ce;">+= skb-&gt;len;
+                </span><span style="color:#bf616a;">netif_dbg</span><span style="color:#c0c5ce;">(cp, tx_done, cp-&gt;dev,
+                      &quot;</span><span style="color:#a3be8c;">tx done, slot </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;, tx_tail);
+            }
+</span></code></pre>
+<p>パケットの送信をデバイスに依頼した後、デバイスから完了通知の割り込みを受け取ると
+<code>cp_tx</code> が呼び出されてカウンタ更新が行われる。</p>
+<p>いずれもデバイスから設定されたフラグに応じてカウンタを更新しているだけなので、
+ドライバ側では特別な操作は何もしていないことになる。</p>
+<h3 id="rx-errors">rx_errors</h3>
+<p>何らかの理由で受信に失敗したパケット数を表す。</p>
+<p>rx_errors カウンタは専用のエラーハンドル用関数で計測されている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">cp_rx_err_acct </span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_private *</span><span style="color:#bf616a;">cp</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">unsigned </span><span style="color:#bf616a;">rx_tail</span><span style="color:#c0c5ce;">,
+                u32 </span><span style="color:#bf616a;">status</span><span style="color:#c0c5ce;">, u32 </span><span style="color:#bf616a;">len</span><span style="color:#c0c5ce;">)
+{
+    </span><span style="color:#bf616a;">netif_dbg</span><span style="color:#c0c5ce;">(cp, rx_err, cp-&gt;dev, &quot;</span><span style="color:#a3be8c;">rx err, slot </span><span style="color:#d08770;">%d</span><span style="color:#a3be8c;"> status 0x</span><span style="color:#d08770;">%x</span><span style="color:#a3be8c;"> len </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span style="color:#c0c5ce;">&quot;,
+          rx_tail, status, len);
+    cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_errors</span><span style="color:#c0c5ce;">++;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; RxErrFrame)
+        cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_frame_errors</span><span style="color:#c0c5ce;">++;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; RxErrCRC)
+        cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_crc_errors</span><span style="color:#c0c5ce;">++;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">((status &amp; RxErrRunt) || (status &amp; RxErrLong))
+        cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_length_errors</span><span style="color:#c0c5ce;">++;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">((status &amp; (FirstFrag | LastFrag)) != (FirstFrag | LastFrag))
+        cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_length_errors</span><span style="color:#c0c5ce;">++;
+    </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; RxErrFIFO)
+        cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">rx_fifo_errors</span><span style="color:#c0c5ce;">++;
+}
+</span></code></pre>
+<p>この関数はデバイスからDMA経由で設定されたフラグのエラービットが立っていた場合に呼び出されるようになっている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(status &amp; (RxError | RxErrFIFO)) {
+            </span><span style="color:#bf616a;">cp_rx_err_acct</span><span style="color:#c0c5ce;">(cp, rx_tail, status, len);
+            </span><span style="color:#b48ead;">goto</span><span style="color:#c0c5ce;"> rx_next;
+        }
+</span></code></pre><h3 id="rx-dropped">rx_dropped</h3>
+<p>受信パケットのドロップは以下の二つのケースで更新される。</p>
+<ul>
+<li>セグメンテーションが行われている場合（未サポート）</li>
+<li>デバイスから受け取ったパケットを <code>skb</code> にコピーするための領域が確保できない</li>
+</ul>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">static int </span><span style="color:#8fa1b3;">cp_rx_poll</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> napi_struct *</span><span style="color:#bf616a;">napi</span><span style="color:#c0c5ce;">, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">budget</span><span style="color:#c0c5ce;">)
+{
+&lt;snip&gt;
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">((status &amp; (FirstFrag | LastFrag)) != (FirstFrag | LastFrag)) {
+            </span><span style="color:#65737e;">/* we don&#39;t support incoming fragmented frames.
+             * instead, we attempt to ensure that the
+             * pre-allocated RX skbs are properly sized such
+             * that RX fragments are never encountered
+             */
+            </span><span style="color:#bf616a;">cp_rx_err_acct</span><span style="color:#c0c5ce;">(cp, rx_tail, status, len);
+            dev-&gt;stats.</span><span style="color:#bf616a;">rx_dropped</span><span style="color:#c0c5ce;">++;
+            cp-&gt;cp_stats.</span><span style="color:#bf616a;">rx_frags</span><span style="color:#c0c5ce;">++;
+            </span><span style="color:#b48ead;">goto</span><span style="color:#c0c5ce;"> rx_next;
+        }
+&lt;snip&gt;
+      new_skb = </span><span style="color:#bf616a;">netdev_alloc_skb_ip_align</span><span style="color:#c0c5ce;">(dev, buflen);
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(!new_skb) {
+            dev-&gt;stats.</span><span style="color:#bf616a;">rx_dropped</span><span style="color:#c0c5ce;">++;
+            </span><span style="color:#b48ead;">goto</span><span style="color:#c0c5ce;"> rx_next;
+        }
+</span></code></pre><h3 id="tx-dropped">tx_dropped</h3>
+<p>送信用 ring buffer の skb 用領域を解放するときにデータが残っていれば、
+それはデバイスから取り出されなかったものと見なしてドロップ扱いになる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">cp_clean_rings </span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_private *</span><span style="color:#bf616a;">cp</span><span style="color:#c0c5ce;">)
+{
+    </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> cp_desc *desc;
+    </span><span style="color:#b48ead;">unsigned</span><span style="color:#c0c5ce;"> i;
+
+&lt;snip&gt;
+
+    </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">(i = </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">; i &lt; CP_TX_RING_SIZE; i++) {
+        </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(cp-&gt;tx_skb[i]) {
+            </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> sk_buff *skb = cp-&gt;tx_skb[i];
+
+            desc = cp-&gt;tx_ring + i;
+            </span><span style="color:#bf616a;">dma_unmap_single</span><span style="color:#c0c5ce;">(&amp;cp-&gt;pdev-&gt;dev,</span><span style="color:#bf616a;">le64_to_cpu</span><span style="color:#c0c5ce;">(desc-&gt;addr),
+                     </span><span style="color:#bf616a;">le32_to_cpu</span><span style="color:#c0c5ce;">(desc-&gt;opts1) &amp; </span><span style="color:#d08770;">0xffff</span><span style="color:#c0c5ce;">,
+                     PCI_DMA_TODEVICE);
+            </span><span style="color:#b48ead;">if </span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">le32_to_cpu</span><span style="color:#c0c5ce;">(desc-&gt;opts1) &amp; LastFrag)
+                </span><span style="color:#bf616a;">dev_kfree_skb</span><span style="color:#c0c5ce;">(skb);
+            cp-&gt;dev-&gt;stats.</span><span style="color:#bf616a;">tx_dropped</span><span style="color:#c0c5ce;">++;
+        }
+    }
+</span></code></pre>
+<p>この <code>cp_clean_rings</code> はドライバの開始・終了時にも呼び出されるが、
+送信タイムアウト時のハンドラ <code>cp_tx_timeout</code> にも呼び出される。
+ネットワークデバイスが起動中に tx_dropped カウンタが増えるのはこの <code>cp_tx_timeout</code> 経由での呼び出しの場合が主であるようだ。</p>
+<h2 id="du-ndemite">読んでみて</h2>
+<p>もう少しドライバのデータシートちゃんと読まないとだなって思いました。</p>
 
     </div>
   </div>

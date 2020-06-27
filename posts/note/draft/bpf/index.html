@@ -98,22 +98,22 @@
   <div class="body row">
     <div class="col">
     <p>https://lwn.net/Articles/740157/</p>
-<p>BPF の進化</p>
+<h2 id="bpf-nojin-hua">BPF の進化</h2>
 <p>もともとはパケットキャプチャのルールを記述するためのレジスタマシンとして実装されていた。</p>
-<p><a href="http://www.tcpdump.org/papers/bpf-usenix94.pdf"></a></p>
-<p>BPF が抱えていた課題</p>
+<p><a href="http://www.tcpdump.org/papers/bpf-usenix94.pdf">Berkeley Packet Filter (BPF)</a></p>
+<h3 id="bpf-gabao-eteitake-ti">BPF が抱えていた課題</h3>
 <p>ユーザのプログラムをカーネル内で実行するというアイデアは良かった</p>
 <ul>
 <li>モダンなプロセッサを活用できる命令セットではなかった</li>
 </ul>
-<p>eBPF のポイント</p>
+<h2 id="ebpf-nopointo">eBPF のポイント</h2>
 <ul>
 <li>最近のプロセッサと親和性の高い仮想マシンになった → 性能が向上した</li>
 <li>レジスタが64 bit になりレジスタ数も増えたことで →  関数に渡す引数が表現できるようになった (もともとレジスタ 2 本)</li>
 <li><code>BPF_CALL</code> 命令でカーネルから提供された関数を呼び出せるようになった</li>
 </ul>
 <p>x86_64 において eBPF の性能は cBPF の 4 倍になったと <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bd4cf0ed331a275e9bf5a49e6d0fd55dffc551b8">kernel 3.15 で取り込まれたパッチ</a> では提示されている。</p>
-<p>使いみち</p>
+<h3 id="shi-imiti">使いみち</h3>
 <ul>
 <li>高性能パケット処理</li>
 <li></li>
@@ -125,20 +125,20 @@
 <p>おそらくその背景で書かれたと思われるスライドがあった。</p>
 <p><a href="https://www.slideshare.net/PLUMgrid/ebpf-and-linux-networking">EBPF and Linux Networking</a></p>
 <p>データセンターにおける仮想化ベースのワークロード間のネットワーキング（主にスイッチング）を主眼において eBPF の適用という感じ。</p>
-<p>昔のデータセンターのアーキテクチャ</p>
+<h3 id="xi-nodetasentanoakitekutiya">昔のデータセンターのアーキテクチャ</h3>
 <ul>
 <li>1サーバに1OS</li>
 <li>Access, Distribution, Core という三層構成ネットワーク</li>
 <li>伝統的なL2/L3プロトコル (spanning treeとか)</li>
 </ul>
-<p>課題</p>
+<h4 id="ke-ti">課題</h4>
 <p>これだとスケールしないのでワークロードを仮想化していくことになった。</p>
-<p>新たな課題</p>
+<h3 id="xin-tanake-ti">新たな課題</h3>
 <ul>
 <li>East-West トラフィックが激増した</li>
 <li>MAC, VLAN の数が増大してスイッチのHW容量を超える</li>
 </ul>
-<p>解法の歴史</p>
+<h3 id="jie-fa-noli-shi">解法の歴史</h3>
 <ol>
 <li>vSwitch</li>
 <li>vRouter</li>
