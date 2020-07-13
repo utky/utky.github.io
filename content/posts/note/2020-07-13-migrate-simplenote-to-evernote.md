@@ -16,7 +16,7 @@ tags = ["scheme","evernote"]
 Evernoteのエクスポートを表現するマークアップの説明は下記のリンクが参考になる。
 
 * [ENEX エクスポート用マークアップ](https://evernote.com/blog/how-evernotes-xml-export-format-works/)
-* [ENML Note記述用マークアップ](https://dev.evernote.com/doc/articles/enml.php))
+* [ENML Note記述用マークアップ](https://dev.evernote.com/doc/articles/enml.php)
 
 これを大して読まずに雰囲気で作ったSimplenote JSON -> ENEX変換用のSchemeプログラムがこちら。
 
