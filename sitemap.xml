@@ -248,6 +248,10 @@
         <lastmod>2020-05-31</lastmod>
     </url>
     <url>
+        <loc>https://utky.github.io/posts/note/migrate-simplenote-to-evernote/</loc>
+        <lastmod>2020-07-13</lastmod>
+    </url>
+    <url>
         <loc>https://utky.github.io/posts/note/minimal-api-design-step-by-step/</loc>
         <lastmod>2016-07-21</lastmod>
     </url>
@@ -370,6 +374,10 @@
         <lastmod>2020-06-16</lastmod>
     </url>
     <url>
+        <loc>https://utky.github.io/posts/writings/linux/proc-net-arp/</loc>
+        <lastmod>2020-07-02</lastmod>
+    </url>
+    <url>
         <loc>https://utky.github.io/tags/</loc>
     </url>
     <url>
@@ -407,6 +415,9 @@
     </url>
     <url>
         <loc>https://utky.github.io/tags/elm/</loc>
+    </url>
+    <url>
+        <loc>https://utky.github.io/tags/evernote/</loc>
     </url>
     <url>
         <loc>https://utky.github.io/tags/excel/</loc>
@@ -476,6 +487,9 @@
     </url>
     <url>
         <loc>https://utky.github.io/tags/reading/</loc>
+    </url>
+    <url>
+        <loc>https://utky.github.io/tags/scheme/</loc>
     </url>
     <url>
         <loc>https://utky.github.io/tags/sdn/</loc>

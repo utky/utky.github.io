@@ -6,9 +6,9 @@
         <meta name='viewport' content='width=device-width, initial-scale=1'>
 
         
-        <title> - Hash λ Bye</title>
-        <meta name="twitter:title" content=" - Hash λ Bye">
-        <meta property="og:title" content=" - Hash λ Bye">
+        <title>SimplenoteからEvernoteへ移行した - Hash λ Bye</title>
+        <meta name="twitter:title" content="SimplenoteからEvernoteへ移行した - Hash λ Bye">
+        <meta property="og:title" content="SimplenoteからEvernoteへ移行した - Hash λ Bye">
         
 
         <meta name="twitter:card" content="summary_large_image">
@@ -76,114 +76,55 @@
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
         
-<section class="row">
-  <div class="col">
-    <h1>Hash λ Bye</h1>
-    <p>
-      関数型プログラミングのことやLinuxのことなどについて書いたりします。
-    </p>
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">SimplenoteからEvernoteへ移行した</h1>
+      
+      <p>
+      <small> 2020-07-13 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;scheme&#x2F;">[scheme]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;evernote&#x2F;">[evernote]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>数年前にEvernoteのiOS版アプリの動作が遅すぎて発狂した結果、<a href="https://app.simplenote.com/">Simplenote</a>に移行した。SimplenoteはMarkdownプレビューモードもあるしタグによる分類もあるし、 正直メモとるにはそれで十分ではあった。</p>
+<p>ただその後、一部のメモが<a href="https://scrapbox.io/">Scrapbox</a>にも散乱してきたりして、正直何がどこにあるのか自分でも混乱するようになってきた。加えて読みたい記事のブックマーク管理をはてなブックマークから移行する先を探しているところでもあった。ブックマークと読書メモはセットになるのでメモ機能がまともにあった方がいい。</p>
+<p>という背景からこうしたnote takingアプリとして再度Evernoteを使うことにしたのだった。</p>
+<p>幸いSimplenoteにもエクスポート機能は具備されており、さらにJSON形式でコンテンツを吐き出してくれるので意味不明な独自規格のEvernoteと違ってとても優しい。つまりこのエクスポートされたJSONからEvernoteがインポート可能な形式を生成すればしれっとデータを移行できると踏んだ。</p>
+<p>Evernoteのエクスポートを表現するマークアップの説明は下記のリンクが参考になる。</p>
+<ul>
+<li><a href="https://evernote.com/blog/how-evernotes-xml-export-format-works/">ENEX エクスポート用マークアップ</a></li>
+<li><a href="https://dev.evernote.com/doc/articles/enml.php">ENML Note記述用マークアップ</a>)</li>
+</ul>
+<p>これを大して読まずに雰囲気で作ったSimplenote JSON -&gt; ENEX変換用のSchemeプログラムがこちら。</p>
+<p><a href="https://gist.github.com/utky/09d3ab02fc164ae64fe5abd688d7e023">simplenote-json2evernote.scm</a></p>
+<p>標準入力からJSONをとって標準出力にENEXを吐き出すの下記のような感じで使うと大丈夫。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">cat</span><span style="color:#c0c5ce;"> source/notes.json | </span><span style="color:#bf616a;">gosh</span><span style="color:#c0c5ce;"> simplenote-json2evernote.scm &gt; export.enex
+</span></code></pre>
+<p>これで <em>だいたい</em> インポートできたのだけど、Evernoteへの取り込みの途中でエラーになったので多分まだなんか潜んでいる。
+まあ、いいか。。。。</p>
+<p>津島善子の誕生日中に記事を書きれるかと思ったけど開発マシンの不調で間に合わんかった。。。</p>
+
+    </div>
   </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-flash"></span> Updates</h2>
-    <ul>
-    
-    
-    
-      <li>2020-07-13 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;migrate-simplenote-to-evernote&#x2F;">SimplenoteからEvernoteへ移行した</a></li>
-    
-      <li>2020-07-02 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;writings&#x2F;linux&#x2F;proc-net-arp&#x2F;">procfs ネットワーク周りを覗き見る &#x2F;proc&#x2F;net&#x2F;arp 編</a></li>
-    
-      <li>2020-06-27 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;writings&#x2F;linux&#x2F;99-proc-net-dev&#x2F;">procfs ネットワーク周りを覗き見る &#x2F;proc&#x2F;net&#x2F;dev 編</a></li>
-    
-      <li>2020-05-31 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;migrate-from-archlinux-to-windows&#x2F;">メインPCをArchLinuxからWindowsに移行する</a></li>
-    
-      <li>2020-03-27 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;tech-lead&#x2F;">SREチームのtech leadになった</a></li>
-    
-      <li>2020-03-13 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;aws-performance-test&#x2F;">『Amazon Web Service 負荷試験入門』読んだ</a></li>
-    
-      <li>2020-02-22 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;how-to-beat-cap-theorem&#x2F;">「How to beat the CAP theorem」読んだ</a></li>
-    
-      <li>2020-02-01 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;big-data-book&#x2F;">『ビッグデータを支える技術』を読んだ データインジェスチョンについて</a></li>
-    
-      <li>2020-01-26 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;srenext&#x2F;">SRE NEXT 2020 参加した</a></li>
-    
-      <li>2019-10-01 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;writings&#x2F;linux&#x2F;99-working-with-netlink-in-go&#x2F;">WIP - GoでNetlinkを操作する</a></li>
-    
-    </ul>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-book"></span> Writings</h2>
-
-    <dl>
-
-      <dt>
-        <a href="./posts/linux.html">Linux Kernel</a>
-      </dt>
-      <dd>
-        <p>
-          Linux Kenel 探訪記。つねに Work In Progress.   
-        </p>
-      </dd>
-
-      <dt>
-        <a href="https://scrapbox.io/ilyaletre/"><span class="glyphicon glyphicon-link"></span> Scrapbox</a>
-      </dt>
-      <dd>
-        <p>
-          気になった用語とかを拾ってはメモしている。
-        </p>
-      </dd>
-
-    </dl>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-wrench"></span> Programming</h2>
-    <dl>
-      <dt>
-        <a href="http://vtfeed.herokuapp.com/"><span class="glyphicon glyphicon-link"></span> vtfeed</a>
-      </dt>
-      <dd>
-        <p>
-          バーチャル YouTuber の更新情報を一覧で見ることができる tiny web application。Clojure の duct を使って書かれています。
-        </p>
-      </dd>
-    </dl>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-headphones"></span> Music</h2>
-    <dl>
-      <dt>
-        <a href="https://soundcloud.com/moda-republica"><span class="glyphicon glyphicon-link"></span> República Moda (on SoundCloud)</a>
-      </dt>
-      <dd>
-        <p>
-          まれに活動しているバンド。僕はドラムで参加しています。
-        </p>
-      </dd>
-      <dt>
-        <a href="https://soundcloud.com/yutaka-imamura-448534769/s-to-a-art"><span class="glyphicon glyphicon-link"></span> S to A Art (on SoundCloud)</a>
-      </dt>
-      <dd>
-        <p>
-          バーチャルアイドルのときのそらさんが好き過ぎて書いたイメージソング。
-        </p>
-      </dd>
-    </dl>
-  </div>
-</section>
-
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
 
       </main>
       <footer>
