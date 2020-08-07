@@ -34,10 +34,13 @@
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
         <script>
           if (window.location.hostname == "utky.github.io") {
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'UA-156288666-1');
+            const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+            if (!dont_track_me) {
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-156288666-1');
+            }
           }
         </script>
     </head>
