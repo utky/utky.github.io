@@ -188,6 +188,10 @@
         <lastmod>2016-06-11</lastmod>
     </url>
     <url>
+        <loc>https://utky.github.io/posts/note/generate-note-via-github-actions/</loc>
+        <lastmod>2020-08-28</lastmod>
+    </url>
+    <url>
         <loc>https://utky.github.io/posts/note/haskell-design-note/</loc>
         <lastmod>2016-03-20</lastmod>
     </url>
@@ -491,6 +495,9 @@
     </url>
     <url>
         <loc>https://utky.github.io/tags/reading/</loc>
+    </url>
+    <url>
+        <loc>https://utky.github.io/tags/scala/</loc>
     </url>
     <url>
         <loc>https://utky.github.io/tags/scheme/</loc>

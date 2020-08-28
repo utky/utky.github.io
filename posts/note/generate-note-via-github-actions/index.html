@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>Evernoteのノートを自動生成して振り返りをする - Hash λ Bye</title>
+        <meta name="twitter:title" content="Evernoteのノートを自動生成して振り返りをする - Hash λ Bye">
+        <meta property="og:title" content="Evernoteのノートを自動生成して振り返りをする - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <script>
+          const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+          if (dont_track_me) {
+            window['ga-disable-UA-156288666-1'] = true;
+          }
+        </script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-156288666-1');
+        </script>
+
+        <script>
+          if (window.location.hostname == "utky.github.io") {
+            const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+            if (!dont_track_me) {
+              var s = document.createElement('script');
+              s.setAttribute( 'src', "https://www.googletagmanager.com/gtag/js?id=UA-156288666-1");
+              s.setAttribute( 'async', true);
+              document.body.appendChild( s );
+
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-156288666-1');
+            }
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">Evernoteのノートを自動生成して振り返りをする</h1>
+      
+      <p>
+      <small> 2020-08-28 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;scala&#x2F;">[scala]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;evernote&#x2F;">[evernote]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <h2 id="bei-jing">背景</h2>
+<p>毎日の記録を取るためにEvernoteを使ってる。
+日記というほどまとまっていない走り書きの蓄積のようなもの。
+毎日記録は取るのは別にいいのですが、活用に問題を抱えていた。
+記録を取るだけとって振り返ることができず次に活かせるサイクルができていなかった。
+振り返りがうまく回っていないために「何のために記録しているのだろう」ともやっとする時期がしばらく続いていた。
+理想的には毎週振り返りを行って次にやるべきことの軌道修正をしたり、その週達成した成果を次のモチベーションにつなげたりしたいという思いはありつつも、
+「まあ振り返りはいずれ。。。」みたいな感じで腰が重いまま後回しにしていた。</p>
+<p>ところがここ最近やりたいことや勉強したいこと、しなきゃいけないことが輻輳して頭が混乱気味になることが増えてきた。
+さすがにこまめにやることを振り返って進むべき道を調整していかないといけないと思い、振り返りイベントをEvernote上で表現するための作戦を考えることにした。</p>
+<h2 id="wen-ti">問題</h2>
+<p>Evernoteには既に振り返りなどにつけるテンプレートがあるようだ。</p>
+<p><a href="https://evernote.com/intl/jp/templates">Evernote テンプレート</a></p>
+<p>ところがこれらのテンプレートは自分の用途にはいまいち合わなそうだった。
+かといって過去1週間の内容を改めてサマライズを手書きでやるのも面倒くさがって絶対に続かないことがわかっていた。</p>
+<p>ということで自分のやりかたに適したノートを何とか自動生成する方法を考える必要があった。</p>
+<p>毎週振り返りを行うことを前提に下記のような内容のノートが作られるイメージを持って取り組むことにした。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">2020-08-30 の振り返り
+
+## todo
+
+(その週のやるべきこと)
+</span><span style="color:#bf616a;">* Aを読む
+* Bの書籍の練習問題を解く
+
+## done
+
+(その週の雑多なトピック)
+
+* 2020-08-24
+    + Aを読んだ
+* 2020-08-25
+    + 呼吸をした
+* 2020-08-26
+    + おなか減った
+* 2020-08-27
+    + 早く寝た
+* 2020-08-28
+    + 仕事終わらなかった
+* 2020-08-29
+    + 特になにもしなかった
+
+## plan
+
+(翌週やりたいこと)
+
+* 
+
+</span></code></pre><h2 id="jie-jue-fang-fa">解決方法</h2>
+<p><a href="https://github.com/utky/utky-note-processor">utky-note-processor</a></p>
+<p>普通にEvernote Java SDKを使ったScalaのバッチ処理を作ってGitHub Actionsで回すようにした。</p>
+<p>コード書くよりはトークン使うまでの準備の方が面倒だったかもしれない。</p>
+<h3 id="tokunwoshi-eruyounisurumade-2020-08shi-dian">トークンを使えるようにするまで (2020-08時点)</h3>
+<p>API Keyを発行するに当たってApplication Nameを決めておく必要があるが、
+無邪気に決めるとEvernoteの商標登録とぶつかってサポートから突っ込みを受けることがある。
+なので無駄なやり取りを省くためにも <a href="https://evernote.com/legal/trademark-use">商標登録に関するページ</a> を読んでおくこと推奨する。</p>
+<ol>
+<li>API Key の発行
+<ul>
+<li><a href="https://dev.evernote.com/doc/#start">このページ</a> の右上にある「GET AN API KEY」からフォームを埋めて発行依頼を出す</li>
+</ul>
+</li>
+<li>Activate
+<ul>
+<li>デフォルトではテスト用のSandboxでしかこのAPI Keyを使えないので、Activateする</li>
+<li><a href="https://dev.evernote.com/support/">サポートページ</a> から「Activate an API Key」のフォームを開き必要事項を入力して依頼を出す</li>
+</ul>
+</li>
+<li>Developer Tokenの発行
+<ul>
+<li><a href="https://dev.evernote.com/get-token/">Token発行用ページ</a> で「Production」を指定して発行依頼を出す</li>
+</ul>
+</li>
+</ol>
+<p>2はサポート側での承認がおりるまで数日かかる。</p>
+<h3 id="scalanoshi-zhuang-mawari">Scalaの実装まわり</h3>
+<h4 id="tagless-final-cats">Tagless Final : Cats</h4>
+<p>日々そんなにScalaをたくさん書くわけではないので、毎回探り探りでやっている。
+多少お作法的なものに従うべく、<a href="https://typelevel.org/cats/">Cats</a>を入れたうえでTagless Final形式でDIするようにした。</p>
+<p><code>F[Unit]</code> を返す大きなfor式がバッチ処理のメインロジックになる。</p>
+<p><a href="https://github.com/utky/utky-note-processor/blob/8d73ee06a16012b1c62cb263886ba719f29b89b8/src/main/scala/ilyaletre/evernote/tasks/Task.scala#L31-L65">こういう感じ</a></p>
+<p><code>F</code> には下記のような型クラスの制約をつけている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">  </span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">apply</span><span style="color:#c0c5ce;">[</span><span style="color:#ebcb8b;">F</span><span style="color:#c0c5ce;">[</span><span style="color:#bf616a;">_</span><span style="color:#c0c5ce;">]
+    : </span><span style="color:#ebcb8b;">GetTemplate
+    </span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">CreateNote
+    </span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">FindNotes
+    </span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">GetNote
+    </span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">Monad</span><span style="color:#c0c5ce;">]
+    (</span><span style="color:#bf616a;">date</span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">ZonedDateTime</span><span style="color:#c0c5ce;">): </span><span style="color:#ebcb8b;">F</span><span style="color:#c0c5ce;">[</span><span style="color:#b48ead;">Unit</span><span style="color:#c0c5ce;">]
+</span></code></pre>
+<p>これは <code>F</code> がノートを作ったり検索したりMonadであったりすることを満たしてくれるものであれば何でもいいということ。
+実際にこれらの制約を満たす実装の選択はこのapplyを呼び出す側に委ねられる。</p>
+<p>例えばこの <code>F</code> が要求される制約を満たす <code>Evernote</code> というデータ型を定義した上で、上記のapplyを呼び出してみるとこうなる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">val </span><span style="color:#bf616a;">result</span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">Evernote</span><span style="color:#c0c5ce;">[</span><span style="color:#b48ead;">Unit</span><span style="color:#c0c5ce;">] = WeeklyReview(date) </span><span style="color:#65737e;">// WeeklyReview() でapplyが呼ばれる
+</span></code></pre>
+<p>型推論により <code>F</code> は <code>Evernote</code> であると決定されるため、applyに渡される型クラスのインスタンスは <code>Evernote</code> になる。</p>
+<p>もしテスト用に <code>Evernote</code> とは別の実装を使いたい場合は、やはり上記の型クラスの制約を満たすデータ型 <code>Test</code> を定義した上で</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">val </span><span style="color:#bf616a;">result</span><span style="color:#c0c5ce;">: </span><span style="color:#ebcb8b;">Test</span><span style="color:#c0c5ce;">[</span><span style="color:#b48ead;">Unit</span><span style="color:#c0c5ce;">] = WeeklyReview(date)
+</span></code></pre>
+<p>とすることでapply内で使われる型クラスの実装を切り替えることができる。
+という感じでScalaの型推論を援用した実装の切替を使っている。</p>
+<p>なんかでもCatsのコード覗いていると <a href="https://github.com/typelevel/simulacrum">simulacrum</a> のマクロ使っているっぽいところがあり、「ああ、やっぱりみんな型クラスの定義するのめんどくさいんだな」っていう波動を感じた。めんどくさいよね。主に型クラスのメソッドをオブジェクトのメソッドに生やし直すところ（<a href="https://scalac.io/typeclasses-in-scala/">ここ</a>でいうOpsクラスの定義をしなければいけないところ)</p>
+<h4 id="notonosheng-cheng-scalate">ノートの生成 : Scalate</h4>
+<p>EvernoteのノートはHTMLっぽいXMLで表現される。
+今回は過去1週間のノートの内容を基にこの振り返り用のノートの内容を生成するので <a href="https://scalate.github.io/scalate/">Scalate</a> というテンプレートエンジンを使った。
+下記の3点が特徴的であり、ライブラリとしては結構巨大な印象だった。</p>
+<ul>
+<li>動的HTMLページのレンダリングなどで使われることを想定</li>
+<li>テンプレートへの不正な変数束縛を防止するコンパイラ支援</li>
+<li>複数のテンプレート構文をサポート</li>
+</ul>
+<p>自分に必要なのはただmustache構文でテキストデータを作る機能だけなので
+やや大仰ではあったがAPI自体は特に難しい印象なかったので使った。</p>
+<p>テンプレートは <a href="https://github.com/utky/utky-note-processor/blob/master/templates/weekly-review.xml.mustache">こんな感じ</a> でいい加減に書いたがまあ動くのでよし。</p>
+<h2 id="github-actions">GitHub Actions</h2>
+<p>特に変なところはなくプレーンに書いた。</p>
+<p><a href="https://github.com/utky/utky-note-processor/blob/8d73ee06a16012b1c62cb263886ba719f29b89b8/.github/workflows/ci.yml#L12-L28">ci.yml</a></p>
+<p>cron schedule で起動しないことがあったり、job登録しなおしたりがちゃがちゃいじってしまった。
+ActionsタブからScala用のworkflowを作るUIに導かれてYAMLファイルを作り直したら何故か普通に動くようになったので、若干もやっとしている。</p>
+<h2 id="matome">まとめ</h2>
+<p>ScalaでEvernote APIを読んだけどトークン作る過程がなんかめんどかった。
+まあ大体動く。</p>
+<p>ちまちました定期処理にGitHub Actions使うのは悪くなさそう。
+計算リソースをありがとう。</p>
+<h2 id="ta-niyaritaikoto">他にやりたいこと</h2>
+<p>タニタのHealthPlanetでデータ集めて真面目にトラックしたい。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="https://www.getzola.org/">Zola</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>
