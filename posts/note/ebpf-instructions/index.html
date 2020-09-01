@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>eBPF命令をデータ型で表す - Hash λ Bye</title>
+        <meta name="twitter:title" content="eBPF命令をデータ型で表す - Hash λ Bye">
+        <meta property="og:title" content="eBPF命令をデータ型で表す - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <script>
+          const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+          if (dont_track_me) {
+            window['ga-disable-UA-156288666-1'] = true;
+          }
+        </script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-156288666-1');
+        </script>
+
+        <script>
+          if (window.location.hostname == "utky.github.io") {
+            const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+            if (!dont_track_me) {
+              var s = document.createElement('script');
+              s.setAttribute( 'src', "https://www.googletagmanager.com/gtag/js?id=UA-156288666-1");
+              s.setAttribute( 'async', true);
+              document.body.appendChild( s );
+
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-156288666-1');
+            }
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">eBPF命令をデータ型で表す</h1>
+      
+      <p>
+      <small> 2020-09-01 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ebpf&#x2F;">[ebpf]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;network&#x2F;">[network]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p><a href="/posts/note/run-ebpf-socket-filter/">前回</a>はeBPFのごく単純なプログラムを書いて実行可能なユーザ空間側のプログラムを作ることに専念した。
+今回は色々な命令を試していくにあたっての準備として、命令をRust上で作りやすいようにする。</p>
+<p>参考にするのは</p>
+<ul>
+<li><a href="https://www.kernel.org/doc/Documentation/networking/filter.txt">Linux Socket Filtering aka Berkeley Packet Filter (BPF)</a>
+<ul>
+<li>ざっくり命令の分類を把握する</li>
+</ul>
+</li>
+<li><a href="https://elixir.bootlin.com/linux/v5.7.7/source/kernel/bpf/disasm.c">disasm.c</a>
+<ul>
+<li>オペレータの記号的な表現をつかむ</li>
+</ul>
+</li>
+</ul>
+<p><a href="https://elixir.bootlin.com/linux/v5.7.7/source/arch/x86/net/bpf_jit_comp.c">JIT</a>の実装を読む、という手もあるがそもそもEMITされている命令が何なのか読み解けないので諦めた。</p>
+<p>##　TLDR</p>
+<p><a href="https://github.com/utky/rbc/blob/ffe9ad1/src/asm/mod.rs">こんな感じの素朴なやつになった</a></p>
+<h2 id="huomatuto">フォーマット</h2>
+<p>eBPFの命令フォーマットは下記のように定義されている。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">op:8, dst_reg:4, src_reg:4, off:16, imm:32
+</span></code></pre>
+<p>合計64bitで一つの命令を表し、これが配列として並べられたものをeBPFプログラムと呼ぶ。</p>
+<p>例えばC言語上で作った下記の命令があるとする。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">  </span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> bpf_insn insns[] = {
+    { BPF_ALU64 | BPF_MOV | BPF_K, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, -</span><span style="color:#d08770;">1 </span><span style="color:#c0c5ce;">},
+    { BPF_JMP | BPF_EXIT, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, </span><span style="color:#d08770;">0</span><span style="color:#c0c5ce;">, </span><span style="color:#d08770;">0 </span><span style="color:#c0c5ce;">}
+  };
+</span></code></pre>
+<p>これらをメモリ上で表現すると下記のようになる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">0x7fffffffe800: 0xb7    0x00    0x00    0x00    0xff    0xff    0xff    0xff
+0x7fffffffe808: 0x95    0x00    0x00    0x00    0x00    0x00    0x00    0x00
+</span></code></pre>
+<p>最初の <code>BPF_MOV</code> 命令をフィールドに分解すると下記のようになる。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">0xb7    0x00    0x00    0x00    0xff    0xff    0xff    0xff
+|opcode |reg    |off            |imm                        |
+</span></code></pre>
+<p>カーネルはメモリに配置されたこのバイト列を64bitごとに命令として解析していることになる。
+このような命令をRustから作れるようにするべくデータ構造を考える。</p>
+<h2 id="ming-ling-nozhong-lei">命令の種類</h2>
+<p>eBPFの命令の種類をクラス(BPF_CLASS)と呼び、命令の大きな分類を表現する。</p>
+<ul>
+<li>BPF_LD</li>
+<li>BPF_LDX</li>
+<li>BPF_ST</li>
+<li>BPF_STX</li>
+<li>BPF_ALU</li>
+<li>BPF_JMP</li>
+<li>BPF_JMP32</li>
+<li>BPF_ALU64</li>
+</ul>
+<p>これらには暗黙的にグループ分けが存在しており、そのグループによって opcode フィールドの形式がやや異なる。
+現時点の実装では2種類のグループがある。</p>
+<h3 id="arithmetic-and-jump">arithmetic and jump</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">  +----------------+--------+--------------------+
+  |   4 bits       |  1 bit |   3 bits           |
+  | operation code | source | instruction class  |
+  +----------------+--------+--------------------+
+  (MSB)                                      (LSB)
+</span></code></pre>
+<p>算術演算とジャンプを行うための命令グループ。</p>
+<h3 id="load-and-store">load and store</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">  +--------+--------+-------------------+
+  | 3 bits | 2 bits |   3 bits          |
+  |  mode  |  size  | instruction class |
+  +--------+--------+-------------------+
+  (MSB)                             (LSB)
+</span></code></pre>
+<p>メモリからレジスタへのデータの移動を行うための命令グループ。</p>
+<p>Rust上ではこの命令クラス別のフィールドの違いを<code>enum</code>で下記のように表現する。
+各フィールドが取りうる値の範囲を正しく制限できるように、<code>Mode</code>、<code>Size</code>、<code>Alu</code>、<code>Jmp</code>、<code>Src</code>もそれぞれ<code>enum</code>として定義しておく。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">#[</span><span style="color:#bf616a;">derive</span><span style="color:#c0c5ce;">(Debug)]
+</span><span style="color:#b48ead;">pub enum </span><span style="color:#c0c5ce;">Opcode {
+  Ld(Mode, Size),
+  Ldx(Mode, Size),
+  St(Mode, Size),
+  Stx(Mode, Size),
+  Alu(Alu, Src),
+  Jmp(Jmp, Src),
+  Jmp32(Jmp, Src),
+  Alu64(Alu, Src),
+}
+</span></code></pre>
+<p>クラスを8ビットのデータに変換する方法は<code>From</code>トレイトを使う。
+<code>Mode</code>や<code>Size</code>等の各フィールドのデータも<code>From</code>トレイトで<code>u8</code>にエンコードできるようにしておく。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">impl </span><span style="color:#c0c5ce;">From&lt;Opcode&gt; </span><span style="color:#b48ead;">for </span><span style="color:#c0c5ce;">u8 {
+  </span><span style="color:#b48ead;">fn </span><span style="color:#8fa1b3;">from</span><span style="color:#c0c5ce;">(</span><span style="color:#bf616a;">o</span><span style="color:#c0c5ce;">: Opcode) -&gt; </span><span style="color:#b48ead;">u8 </span><span style="color:#c0c5ce;">{
+    </span><span style="color:#b48ead;">match</span><span style="color:#c0c5ce;"> o {
+      Opcode::Ld(mode, size)  =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(mode) | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(size) | </span><span style="color:#d08770;">0x00</span><span style="color:#c0c5ce;">,
+      Opcode::Ldx(mode, size) =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(mode) | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(size) | </span><span style="color:#d08770;">0x01</span><span style="color:#c0c5ce;">,
+      Opcode::St(mode, size)  =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(mode) | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(size) | </span><span style="color:#d08770;">0x02</span><span style="color:#c0c5ce;">,
+      Opcode::Stx(mode, size) =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(mode) | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(size) | </span><span style="color:#d08770;">0x03</span><span style="color:#c0c5ce;">,
+      Opcode::Alu(alu, src)   =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(alu)  | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(src)  | </span><span style="color:#d08770;">0x04</span><span style="color:#c0c5ce;">,
+      Opcode::Jmp(jmp, src)   =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(jmp)  | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(src)  | </span><span style="color:#d08770;">0x05</span><span style="color:#c0c5ce;">,
+      Opcode::Jmp32(jmp, src) =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(jmp)  | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(src)  | </span><span style="color:#d08770;">0x06</span><span style="color:#c0c5ce;">,
+      Opcode::Alu64(alu, src) =&gt; </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(alu)  | </span><span style="color:#b48ead;">u8</span><span style="color:#c0c5ce;">::from(src)  | </span><span style="color:#d08770;">0x07</span><span style="color:#c0c5ce;">,
+    }
+  }
+}
+</span></code></pre>
+<p>ALU、JMPのクラスはさらに細分化された命令があるため、それぞれどういう操作が可能なのかを把握しておく必要がある。</p>
+<p>あまりアセンブリ言語や抽象機械の命令をまじまじと眺めたことがないので、
+結構よく解らない命令もちょくちょくあるので分からないところを拾っている。</p>
+<p>どんな命令かを直感的につかむには <a href="https://elixir.bootlin.com/linux/v5.7.7/source/kernel/bpf/disasm.c">disasm.c</a> でのhuman readableなオペレータの記号を読むと大体わかる。</p>
+<h3 id="suan-shu-yan-suan">算術演算</h3>
+<p>算術演算オペレータ。</p>
+<p>disasm上での表記は下記を参考にする。
+<a href="https://elixir.bootlin.com/linux/v5.7.7/source/kernel/bpf/disasm.c#L66">disasm.c#L66</a></p>
+<ul>
+<li>BPF_ADD: <code>+=</code></li>
+<li>BPF_SUB: <code>-=</code></li>
+<li>BPF_MUL: <code>*=</code></li>
+<li>BPF_DIV: <code>/=</code></li>
+<li>BPF_OR: <code>|=</code></li>
+<li>BPF_AND: <code>&amp;=</code></li>
+<li>BPF_LSH: <code>&lt;&lt;=</code></li>
+<li>BPF_RSH: <code>&gt;&gt;=</code></li>
+<li>BPF_NEG: <code>neg</code></li>
+<li>BPF_MOD: <code>%=</code></li>
+<li>BPF_XOR: <code>^=</code></li>
+<li>BPF_MOV: <code>=</code></li>
+<li>BPF_ARSH: <code>s&gt;&gt;=</code> 符号を維持したまま右シフト</li>
+<li>BPF_END: <code>endian</code> エンディアンの変換</li>
+</ul>
+<p><a href="https://www.kernel.org/doc/Documentation/networking/filter.txt">Linux Socket Filtering aka Berkeley Packet Filter (BPF)</a> にはとくに言及がないけど、
+BPF_ENDはendinessを指定する必要がある。</p>
+<p><a href="https://elixir.bootlin.com/linux/v5.7.7/source/include/uapi/linux/bpf.h#L32">変換先endinessの定義</a></p>
+<h3 id="ziyanpu">ジャンプ</h3>
+<p>dst_reg と (src_reg または imm) を比較して true なら off の分だけプログラムカウンタに加算した場所へ飛ぶ。
+false なら fall-through でそのままプログラムカウンタをインクリメントする。</p>
+<p>disasm上での表記は下記を参考にする
+<a href="https://elixir.bootlin.com/linux/v5.7.7/source/kernel/bpf/disasm.c#L90">disasm.c#L90</a></p>
+<h4 id="tong-zhi-xing-tesuto">同値性テスト</h4>
+<ul>
+<li>BPF_JEQ: <code>==</code></li>
+<li>BPF_JNE: <code>!=</code></li>
+</ul>
+<h4 id="fu-hao-nasizheng-shu-nobi-jiao">符号なし整数の比較</h4>
+<ul>
+<li>BPF_JGT: <code>&gt;</code></li>
+<li>BPF_JGE: <code>&gt;=</code></li>
+<li>BPF_JLT: <code>&lt;</code></li>
+<li>BPF_JLE: <code>&lt;=</code></li>
+<li>BPF_JSET: <code>&amp;</code></li>
+</ul>
+<h4 id="fu-hao-tukizheng-shu-nobi-jiao">符号つき整数の比較</h4>
+<ul>
+<li>BPF_JSGT: <code>s&gt;</code></li>
+<li>BPF_JSGE: <code>s&gt;=</code></li>
+<li>BPF_JSLT: <code>s&lt;</code></li>
+<li>BPF_JSLE <code>s&lt;=</code>:</li>
+</ul>
+<h4 id="sonota">その他</h4>
+<ul>
+<li>BPF_JA: プログラムカウンタにimmを加算した場所へ飛ぶ</li>
+<li>BPF_CALL: 関数を呼び出す</li>
+<li>BPF_EXIT: 関数呼び出しから復帰する</li>
+</ul>
+<h2 id="matome">まとめ</h2>
+<p>カーネルのドキュメントでも網羅はされていないので、各所から情報を集めましょう。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="https://www.getzola.org/">Zola</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>
