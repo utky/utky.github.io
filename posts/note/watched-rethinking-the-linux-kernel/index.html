@@ -6,9 +6,9 @@
         <meta name='viewport' content='width=device-width, initial-scale=1'>
 
         
-        <title>Hash λ Bye</title>
-        <meta name="twitter:title" content="Hash λ Bye">
-        <meta property="og:title" content="Hash λ Bye">
+        <title>Thomas Graf「eBPF - Rethinking the Linux Kernel」観た - Hash λ Bye</title>
+        <meta name="twitter:title" content="Thomas Graf「eBPF - Rethinking the Linux Kernel」観た - Hash λ Bye">
+        <meta property="og:title" content="Thomas Graf「eBPF - Rethinking the Linux Kernel」観た - Hash λ Bye">
         
 
         <meta name="twitter:card" content="summary_large_image">
@@ -98,20 +98,65 @@
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
         
-<h1 class="title">
-  ebpf
-</h1>
-<ul>
-  
-  <li><a href="https://utky.github.io/posts/note/watched-rethinking-the-linux-kernel/">Thomas Graf「eBPF - Rethinking the Linux Kernel」観た</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/ebpf-instructions/">eBPF命令をデータ型で表す</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/run-ebpf-socket-filter/">eBPFプログラムの実行方法を調べる</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/draft/bpf/">「A thorough introduction to eBPF」を読む</a></li>
-  
-</ul>
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">Thomas Graf「eBPF - Rethinking the Linux Kernel」観た</h1>
+      
+      <p>
+      <small> 2020-12-08 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ebpf&#x2F;">[ebpf]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p><a href="https://www.infoq.com/presentations/facebook-google-bpf-linux-kernel/">eBPF - Rethinking the Linux Kernel</a></p>
+<h2 id="matome">まとめ</h2>
+<p>今後はeBPFによってLinuxはマイクロカーネルのような性質を手にすることになるだろう。
+今まではカーネルモジュールやメインラインへのパッチによって機能拡張されていた。しかしeBPFによってより安全にかつ互換性を保った方法で拡張できるようになった。
+eBPFによる道的なコード挿入によっていずれはゼロデイ脆弱性に即座に対応するためのホットパッチなども可能になるだろう。</p>
+<p>Linuxカーネルがプログラマビリティを獲得したことによってこれらの見通しが現実的となった。
+これはあたかもかつてWebがJavascriptによってプログラマビリティを獲得したことで大きく進化したことと似ている。
+Javascriptは下記のような性質によってプログラマビリティをもたらした。</p>
+<ol>
+<li>安全性: 不正なコードをブラウザ内で実行させないサンドボックス</li>
+<li>継続的デリバリ: ユーザ側に操作を要求することなくロジックを更新できる</li>
+<li>パフォーマンス: 最小限のオーバヘッドでプログラムを実行できるようにするJITコンパイラ</li>
+</ol>
+<p>eBPFもまたこれらの性質を満たしているといえる。</p>
+<ol>
+<li>安全性: 不正なコードをブラウザ内で実行させないverifier</li>
+<li>継続的デリバリ: eBPFプログラムは動的にアトミックに更新することができる</li>
+<li>パフォーマンス: eBPFプログラムのバイトコードをネイティブコードに変換するJITコンパイラ</li>
+</ol>
+<p>以上のようにeBPFはLinuxカーネルに大きなプログラマビリティをもたらした。</p>
+<h2 id="gan-xiang">感想</h2>
+<p>大きな意味で目新しい話はなかった。
+ずっとモノリシックなスタイルを貫いてきたLinuxカーネルがBPFの拡張によって結果的に(たぶんたまたま？)マイクロカーネル的な機構を生み出してしまったのは結構皮肉な気はする。(<a href="https://www.youtube.com/watch?v=f-oTe-dmfyI&amp;lc=UgwPglyAu6EfUurOOH94AaABAg">Linuxは太りすぎた</a>、とコメントしている人もいたので、このような拡張性を備えることに反感を持つ人はやはりいると思われる)</p>
+<p>ここで比較として語られているブラウザとJavascriptの進化と同じ経路を辿るのか、と考えるとちょっと心配になるところもある。
+Javascriptは最初に開発された当初のユースケースを大きく越えて、アプリケーションのコアを支える言語として重用されている。このためにJavascript単体では不十分な機能をツールや代替言語で補うようになった。本当に多くのツールが生まれて開発者も技術選定が悩ましいのは想像にかたくない。これと同じことがeBPFでも起きうるのだろうか？</p>
+<p>と思ったけど、Linuxカーネル的にはバイトコードとヘルパー関数などをAPIとして提供しているだけで、ハイレベルな言語については何も規定していないのでいくらか収束しやすいかもしれない。またブラウザのように複数のバラバラな実装が開発されるのではなく、eBPFではあくまでもLinuxという一つのカーネルなので混乱の度合は小さくなりそうにも思う。</p>
+<p>ネットワーク周辺の仕事をしていた自分の目線だと、カーネルモジュールを使ってパケット転送機能を拡張していたのがXDPでeBPF化できるなら、カーネルアップグレードごとにモジュールビルドするような辛さともおさらばできて運用が楽になる、という嬉しさはあるし面白そうだな、と思っている。</p>
+<p>この講演のMapの説明のところで「Prefix Longest Match」というまさしくルーティングで使うために生まれてきたようなタイプのMapがあることを知った。ちょうどMapのタイプについて調査していたところだったので、なおさら調査するモチベーションが出てきた。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
 
       </main>
       <footer>
