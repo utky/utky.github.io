@@ -340,9 +340,9 @@ Error: failed prog detach from map
 </span></code></pre>
 <p>が、<code>-d</code>つきで<code>docker run</code>をしてこのメッセージを見逃しており、bpftoolを使い始めるまでに時間がかかった。
 Stage1と同様にサーバ用コンテナはdaemon起動して置けば端末開けておく必要がなくて楽だと思って勝手に<code>-d</code>をつけたのが失敗だった。</p>
-<h4 id="stage2-ebpfpuroguramuwonantokauploadsiyoutosita">Stage2 eBPFプログラムをなんとかuploadしようとした</h4>
+<h4 id="stage2-ebpfpuroguramuwonantokaunloadsiyoutosita">Stage2 eBPFプログラムをなんとかunloadしようとした</h4>
 <p>対象のeBPFプログラムはpinされておらず、openしているプロセスを止めて解放するしか無いのだが、この辺の仕掛けがあまり頭に入っていなかった。
-なので、bpftoolでなんとかできるだろうと思い込んで、余計に調査をして時間をとった。</p>
+なので、bpftoolでなんとかプログラムをdetachかunloadできるだろうと思い込んで、余計に調査をして時間をとった。</p>
 <h2 id="gan-xiang-tokorekara">感想とこれから</h2>
 <p>自分でも解けるくらいなので難易度は大したことなかったようだ。（本編の動画でもStage2は10～20分くらいで解いている）</p>
 <p>eBPFの開発やデバッグに使う道具立てとしてbpftoolがとても有用なことが解ったのは収穫だった。</p>
