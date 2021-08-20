@@ -254,10 +254,10 @@ sudo docker run --privileged --name ctf-3 --rm --tty --interactive "quay.io/isov
 が、`-d`つきで`docker run`をしてこのメッセージを見逃しており、bpftoolを使い始めるまでに時間がかかった。
 Stage1と同様にサーバ用コンテナはdaemon起動して置けば端末開けておく必要がなくて楽だと思って勝手に`-d`をつけたのが失敗だった。
 
-#### Stage2 eBPFプログラムをなんとかuploadしようとした
+#### Stage2 eBPFプログラムをなんとかunloadしようとした
 
 対象のeBPFプログラムはpinされておらず、openしているプロセスを止めて解放するしか無いのだが、この辺の仕掛けがあまり頭に入っていなかった。
-なので、bpftoolでなんとかできるだろうと思い込んで、余計に調査をして時間をとった。
+なので、bpftoolでなんとかプログラムをdetachかunloadできるだろうと思い込んで、余計に調査をして時間をとった。
 
 ## 感想とこれから
 
