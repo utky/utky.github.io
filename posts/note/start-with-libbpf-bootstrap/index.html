@@ -6,9 +6,9 @@
         <meta name='viewport' content='width=device-width, initial-scale=1'>
 
         
-        <title>Hash λ Bye</title>
-        <meta name="twitter:title" content="Hash λ Bye">
-        <meta property="og:title" content="Hash λ Bye">
+        <title>(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye</title>
+        <meta name="twitter:title" content="(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye">
+        <meta property="og:title" content="(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye">
         
 
         <meta name="twitter:card" content="summary_large_image">
@@ -98,24 +98,55 @@
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
         
-<h1 class="title">
-  ebpf
-</h1>
-<ul>
-  
-  <li><a href="https://utky.github.io/posts/note/ebpf-summit-2021-ctf/">eBPF Summit 2021 CTF Stage1, Stage2を解いてみた</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/start-with-libbpf-bootstrap/">(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/watched-rethinking-the-linux-kernel/">Thomas Graf「eBPF - Rethinking the Linux Kernel」観た</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/ebpf-instructions/">eBPF命令をデータ型で表す</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/run-ebpf-socket-filter/">eBPFプログラムの実行方法を調べる</a></li>
-  
-  <li><a href="https://utky.github.io/posts/note/draft/bpf/">「A thorough introduction to eBPF」を読む</a></li>
-  
-</ul>
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う</h1>
+      
+      <p>
+      <small> 2021-04-30 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;wip&#x2F;">[wip]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ebpf&#x2F;">[ebpf]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p><a href="https://nakryiko.com/posts/libbpf-bootstrap/">Building BPF applications with libbpf-bootstrap</a></p>
+<p>上記を読むとlibbpfとその他のツールチェインを組み合わせながらどのようにしてeBPFプログラムの開発をしていくかのプラクティスがおさらいできるようになっている。
+記事内では古めのLinuxカーネルでも動作するminimalとBTFの機能を駆使してよりポータブルになったbootstrapというプログラムの例が解説されている。</p>
+<p>この例のうちminimalをlibbpfのRust版ラッパーであるlibbpf-rsで動作させるように作ってみることで、libbpf-rsでの開発プラクティスを学んでみることとする。
+minimalのみに絞ったのは、仕事でちょっと古めのカーネル向けにもeBPFを活用していきたいため。より便利な機能は新しいカーネルほど実装されているが、なかなか既存のproduction環境のカーネルをむやみにアップグレードできないのでminimalの方に拘泥することにする。</p>
+<p><a href="https://github.com/libbpf/libbpf-bootstrap">libbpf-bootstrap</a></p>
+<h2 id="minimaldeyatuteirukotonomatome">minimalでやっていることのまとめ</h2>
+<p>本記事の方を見れば詳細まで分かるがざっと説明しておくと下記のようになる。</p>
+<ol>
+<li>minimal.bfp.cをclang/llvmでeBPFオブジェクトコードにコンパイルする</li>
+<li>オブジェクトコードを元にbpftoolがスケルトンを生成してオブジェクトのバイナリをスケルトンヘッダに埋め込む</li>
+<li>ユーザ側プログラムがこのスケルトンをincludeしつつコンパイルされる</li>
+<li>libbpfと静的リンクされて実行ファイルが作られる</li>
+</ol>
+<p>それぞれのステップがlibbpf-rsではどうなるのか確認していく。</p>
+<h2 id="libbpf-rshenoyi-zhi">libbpf-rsへの移植</h2>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
 
       </main>
       <footer>
