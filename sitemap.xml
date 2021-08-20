@@ -248,6 +248,10 @@
         <lastmod>2014-09-09</lastmod>
     </url>
     <url>
+        <loc>https://utky.github.io/posts/note/libbpf-rs-bootstrap/</loc>
+        <lastmod>2021-08-22</lastmod>
+    </url>
+    <url>
         <loc>https://utky.github.io/posts/note/lycopene-issues/</loc>
         <lastmod>2014-11-04</lastmod>
     </url>
@@ -322,10 +326,6 @@
     <url>
         <loc>https://utky.github.io/posts/note/stack-extra-lib-problem/</loc>
         <lastmod>2016-07-26</lastmod>
-    </url>
-    <url>
-        <loc>https://utky.github.io/posts/note/start-with-libbpf-bootstrap/</loc>
-        <lastmod>2021-04-30</lastmod>
     </url>
     <url>
         <loc>https://utky.github.io/posts/note/starting-clojure/</loc>

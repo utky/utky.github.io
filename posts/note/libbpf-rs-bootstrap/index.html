@@ -6,9 +6,9 @@
         <meta name='viewport' content='width=device-width, initial-scale=1'>
 
         
-        <title> - Hash λ Bye</title>
-        <meta name="twitter:title" content=" - Hash λ Bye">
-        <meta property="og:title" content=" - Hash λ Bye">
+        <title>(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye</title>
+        <meta name="twitter:title" content="(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye">
+        <meta property="og:title" content="(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う - Hash λ Bye">
         
 
         <meta name="twitter:card" content="summary_large_image">
@@ -98,123 +98,55 @@
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
         
-<section class="row">
-  <div class="col">
-    <h1>Hash λ Bye</h1>
-    <p>
-      関数型プログラミングのことやLinuxのことなどについて書いたりします。
-    </p>
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う</h1>
+      
+      <p>
+      <small> 2021-08-22 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;wip&#x2F;">[wip]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ebpf&#x2F;">[ebpf]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p><a href="https://nakryiko.com/posts/libbpf-bootstrap/">Building BPF applications with libbpf-bootstrap</a></p>
+<p>上記を読むとlibbpfとその他のツールチェインを組み合わせながらどのようにしてeBPFプログラムの開発をしていくかのプラクティスがおさらいできるようになっている。
+記事内では古めのLinuxカーネルでも動作するminimalとBTFの機能を駆使してよりポータブルになったbootstrapというプログラムの例が解説されている。</p>
+<p>この例のうちminimalをlibbpfのRust版ラッパーであるlibbpf-rsで動作させるように作ってみることで、libbpf-rsでの開発プラクティスを学んでみることとする。
+minimalのみに絞ったのは、仕事でちょっと古めのカーネル向けにもeBPFを活用していきたいため。より便利な機能は新しいカーネルほど実装されているが、なかなか既存のproduction環境のカーネルをむやみにアップグレードできないのでminimalの方に拘泥することにする。</p>
+<p><a href="https://github.com/libbpf/libbpf-bootstrap">libbpf-bootstrap</a></p>
+<h2 id="minimaldeyatuteirukotonomatome">minimalでやっていることのまとめ</h2>
+<p>本記事の方を見れば詳細まで分かるがざっと説明しておくと下記のようになる。</p>
+<ol>
+<li>minimal.bfp.cをclang/llvmでeBPFオブジェクトコードにコンパイルする</li>
+<li>オブジェクトコードを元にbpftoolがスケルトンを生成してオブジェクトのバイナリをスケルトンヘッダに埋め込む</li>
+<li>ユーザ側プログラムがこのスケルトンをincludeしつつコンパイルされる</li>
+<li>libbpfと静的リンクされて実行ファイルが作られる</li>
+</ol>
+<p>それぞれのステップがlibbpf-rsではどうなるのか確認していく。</p>
+<h2 id="libbpf-rshenoyi-zhi">libbpf-rsへの移植</h2>
+
+    </div>
   </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-flash"></span> Updates</h2>
-    <ul>
-    
-    
-    
-      <li>2021-08-22 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;libbpf-rs-bootstrap&#x2F;">(WIP)libbpf-bootstrapのminimalを参考にlibbpf-rsを使う</a></li>
-    
-      <li>2021-08-22 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;ebpf-summit-2021-ctf&#x2F;">eBPF Summit 2021 CTF Stage1, Stage2を解いてみた</a></li>
-    
-      <li>2020-12-08 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;watched-rethinking-the-linux-kernel&#x2F;">Thomas Graf「eBPF - Rethinking the Linux Kernel」観た</a></li>
-    
-      <li>2020-09-01 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;ebpf-instructions&#x2F;">eBPF命令をデータ型で表す</a></li>
-    
-      <li>2020-08-28 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;generate-note-via-github-actions&#x2F;">Evernoteのノートを自動生成して振り返りをする</a></li>
-    
-      <li>2020-07-19 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;run-ebpf-socket-filter&#x2F;">eBPFプログラムの実行方法を調べる</a></li>
-    
-      <li>2020-07-13 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;migrate-simplenote-to-evernote&#x2F;">SimplenoteからEvernoteへ移行した</a></li>
-    
-      <li>2020-07-02 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;writings&#x2F;linux&#x2F;proc-net-arp&#x2F;">WIP procfs ネットワーク周りを覗き見る &#x2F;proc&#x2F;net&#x2F;arp 編</a></li>
-    
-      <li>2020-06-27 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;writings&#x2F;linux&#x2F;99-proc-net-dev&#x2F;">procfs ネットワーク周りを覗き見る &#x2F;proc&#x2F;net&#x2F;dev 編</a></li>
-    
-      <li>2020-05-31 - <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;posts&#x2F;note&#x2F;migrate-from-archlinux-to-windows&#x2F;">メインPCをArchLinuxからWindowsに移行する</a></li>
-    
-    </ul>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-book"></span> Writings</h2>
-
-    <dl>
-
-      <dt>
-        <a href="./posts/linux.html">Linux Kernel</a>
-      </dt>
-      <dd>
-        <p>
-          Linux Kenel 探訪記。つねに Work In Progress.   
-        </p>
-      </dd>
-
-      <dt>
-        <a href="https://scrapbox.io/ilyaletre/"><span class="glyphicon glyphicon-link"></span> Scrapbox</a>
-      </dt>
-      <dd>
-        <p>
-          気になった用語とかを拾ってはメモしている。
-        </p>
-      </dd>
-
-    </dl>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-wrench"></span> Programming</h2>
-    <dl>
-      <dt>
-        <a href="http://vtfeed.herokuapp.com/"><span class="glyphicon glyphicon-link"></span> (停止中)vtfeed</a>
-      </dt>
-      <dd>
-        <p>
-          バーチャル YouTuber の更新情報を一覧で見ることができる tiny web application。Clojure の duct を使って書かれています。<br/>
-          <a href="https://github.com/utky/vtfeed">コード</a>
-        </p>
-      </dd>
-      <dt>
-        <a href="https://github.com/utky/utky-note-processor"><span class="glyphicon glyphicon-link"></span> utky-note-processor</a>
-      </dt>
-      <dd>
-        <p>
-          毎週の行動振り返り用にEvernoteのノートを自動生成する
-        </p>
-      </dd>
-    </dl>
-  </div>
-</section>
-
-<section class="row">
-  <div class="col">
-    <h2><span class="glyphicon glyphicon-headphones"></span> Music</h2>
-    <dl>
-      <dt>
-        <a href="https://soundcloud.com/moda-republica"><span class="glyphicon glyphicon-link"></span> República Moda (on SoundCloud)</a>
-      </dt>
-      <dd>
-        <p>
-          まれに活動しているバンド。僕はドラムで参加しています。
-        </p>
-      </dd>
-      <dt>
-        <a href="https://soundcloud.com/yutaka-imamura-448534769/s-to-a-art"><span class="glyphicon glyphicon-link"></span> S to A Art (on SoundCloud)</a>
-      </dt>
-      <dd>
-        <p>
-          バーチャルアイドルのときのそらさんが好き過ぎて書いたイメージソング。
-        </p>
-      </dd>
-    </dl>
-  </div>
-</section>
-
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
 
       </main>
       <footer>
