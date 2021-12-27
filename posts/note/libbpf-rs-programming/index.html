@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        
+        <title>libbpf-rsを使ったRustとeBPFプログラミング - Hash λ Bye</title>
+        <meta name="twitter:title" content="libbpf-rsを使ったRustとeBPFプログラミング - Hash λ Bye">
+        <meta property="og:title" content="libbpf-rsを使ったRustとeBPFプログラミング - Hash λ Bye">
+        
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@ilyaletre">
+        <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
+        <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <!--
+        <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
+        <script src='/js/highlight.pack.js'></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        -->
+        <link rel="stylesheet" type="text/css" href="/css/default.css" />
+        <script>
+          const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+          if (dont_track_me) {
+            window['ga-disable-UA-156288666-1'] = true;
+          }
+        </script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156288666-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-156288666-1');
+        </script>
+
+        <script>
+          if (window.location.hostname == "utky.github.io") {
+            const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
+            if (!dont_track_me) {
+              var s = document.createElement('script');
+              s.setAttribute( 'src', "https://www.googletagmanager.com/gtag/js?id=UA-156288666-1");
+              s.setAttribute( 'async', true);
+              document.body.appendChild( s );
+
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'UA-156288666-1');
+            }
+          }
+        </script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+        <a class="navbar-brand" href="/"><span><img src="/images/avatar.jpg" width="32" height="32" alt="avatar"> Hash λ Bye </span></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/about.html">
+                <img src="/images/icons/person-fill.svg" alt="" width="32" height="32" title="About"> About
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/posts/note.html">
+                <img src="/images/icons/pencil.svg" alt="" width="32" height="32" title="Notes"> Notes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/writings.html">
+                <img src="/images/icons/book.svg" alt="" width="32" height="32" title="Writings"> Writings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://twitter.com/ilyaletre" target="_blank" >
+                <svg id="Logo_FIXED"  width="32" height="32" data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter</title><rect class="cls-1"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg> Twitter
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/utky" target="_blank" >
+                <img src="/images/icons/GitHub-Mark-32px.png" alt="" width="32" height="32" title="GitHub"> GitHub
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact.html">
+                <img src="/images/icons/envelope.svg" alt="" width="32" height="32" title="Writings"> Contact
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <main class="container mx-auto px-3" style="max-width: 760px;">
+        
+<article id="content">
+  <header class="row">
+    <div class="col">
+      <h1 class="title">libbpf-rsを使ったRustとeBPFプログラミング</h1>
+      
+      <p>
+      <small> 2021-12-27 / 
+      
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;linux&#x2F;">[linux]</a>
+      
+      <a href="https:&#x2F;&#x2F;utky.github.io&#x2F;tags&#x2F;ebpf&#x2F;">[ebpf]</a>
+      
+      
+      </small>
+      </p>
+      
+    </div>
+  </header>
+  <div class="body row">
+    <div class="col">
+    <p>この記事は、<a href="https://qiita.com/yu-imamura/items/3c354d84e2aa7d4d27a6">Qiitaの記事</a>とのクロスポストです。</p>
+<h2 id="hazimeni">はじめに</h2>
+<p>この記事ではeBPFを活用してLinuxカーネルにフック用プログラムを注入することにより、ネットワークパケット処理を拡張する例を示します。
+その実装にあたり、Rustとlibbpfの統合を行う<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>を使った開発体験を記したいと思います。</p>
+<h2 id="tl-dr">TL;DR</h2>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>によってRustとeBPFを組み合わせたプログラムのコンパイルやロード処理の手間は省けるようになります。実際、システムコールの呼び出し部分はほとんど意識する必要がありませんでした。
+一方でeBPFプログラミングで特に苦労したのは以下の点でした。</p>
+<ul>
+<li>デバッグとテスト</li>
+</ul>
+<p>つまりeBPFプログラミングにおいて周辺的な問題がツールによって解決されていき、よりプログラムの機能そのものの問題に時間を割くことができたと言えそうです。
+とはいえスムーズに開発するためにはやはりテストフレームワークやテストハーネスが欲しいと感じるようになったので、そのあたりは更に調査が必要です。</p>
+<h2 id="ebpf">eBPF</h2>
+<p>カーネル内部のイベントをトリガとして呼び出されるプログラムをユーザ空間から注入できる機能です。
+専用のバイトコードをカーネル内の仮想マシンに解釈させることで命令を実行します。
+ソース言語をこのeBPF専用バイトコードとしてコンパイルしてカーネルに組み込むことができる、という拡張性の高さからネットワーキングやセキュリティの分野で活用されています。</p>
+<p>eBPFの拡張性を活用したCiliumがGKEの新たなコンテナネットワーキングの実装に選ばれた実績を見ると、それなりに注目度が高いことが伺えます。</p>
+<p><a href="https://cloud.google.com/blog/ja/products/containers-kubernetes/bringing-ebpf-and-cilium-to-google-kubernetes-engine">コンテナのセキュリティと可視性が強化された GKE Dataplane V2 が登場</a></p>
+<h2 id="ebpfpuroguramingunodeng-chang-ren-wu">eBPFプログラミングの登場人物</h2>
+<p>eBPFプログラムはカーネル空間側で実行されますが、実用上はそのeBPFプログラムをカーネルにロードし、実行結果を取り出すためにユーザ空間側で動作するプログラムも必要となります。
+カーネル空間、ユーザ空間2種類のプログラムをビルドして配布しつつ、それぞれのプログラムごとにビルドツールが分かれがちであるため、ツールのつなぎをMakefileでなんとかすることが多いです。</p>
+<ul>
+<li>clang/llvm
+<ul>
+<li>カーネル空間のコードを(制限された)C言語で記述しeBPFバイトコードへとコンパイルするために必要</li>
+</ul>
+</li>
+<li>libbpfとその依存関係
+<ul>
+<li>カーネルが提供するeBPFシステムコールをラップするAPIやユーティリティを提供するライブラリ</li>
+</ul>
+</li>
+<li>eBPFプログラム
+<ul>
+<li>カーネル空間側で動作するバイトコード</li>
+</ul>
+</li>
+<li>アプリケーションプログラム (ユーザ側)
+<ul>
+<li>ユーザ空間側で動作し、eBPFプログラムをロードしたり実行結果を取り出したりするアプリケーション</li>
+</ul>
+</li>
+</ul>
+<p>今回はアプリケーションプログラム側としてRustを選択し、<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a> crateが提供するワークフローによって少しでも開発の手間をなくせるか実際に試してみます。</p>
+<h3 id="ebpfpuroguramingunoliu-re">eBPFプログラミングの流れ</h3>
+<p>eBPFプログラムを開発する場合、一般的には下記のようなステップが必要になります。</p>
+<ol>
+<li>カーネルで動作するeBPF用のC言語のプログラムを書く</li>
+<li>clang/llvmでコンパイルしeBPFのバイトコードを生成する(ELF形式)</li>
+<li>eBPFバイトコードをカーネルにロードするためのスケルトンを生成する</li>
+<li>スケルトンをincludeしユーザ空間側のプログラムを書く</li>
+<li>4をコンパイルし2の結果と合わせて配布・実行する</li>
+</ol>
+<h4 id="cdeshu-kuchang-he">Cで書く場合</h4>
+<p>たとえばCを基礎に置いたアプリケーション開発を行う場合は下記のように<code>clang</code>や<code>bpftool</code>などを組み合わせます。</p>
+<ol>
+<li>カーネルで動作するeBPF用のC言語のプログラムを書く</li>
+<li>clang/llvmでコンパイルしeBPFのバイトコードを生成する(ELF形式)
+<ul>
+<li><code>clang -target bpf -c something.bpf -o something.o</code></li>
+</ul>
+</li>
+<li>eBPFバイトコードをカーネルにロードするためのスケルトンを生成する
+<ul>
+<li><code>bpftool gen skelton something.o &gt; something.h</code></li>
+</ul>
+</li>
+<li>スケルトンをincludeしユーザ空間側のプログラムを書く
+<ul>
+<li>スケルトンはlibbpfのヘッダに依存しているため依存関係として別途インストールが必要</li>
+</ul>
+</li>
+<li>4をコンパイルし2の結果と合わせて配布・実行する</li>
+</ol>
+<p>このようにツールを組み合わせながら自前でMakefileなどを書いて、それぞれのステップで正しく成果物が作られるようにする必要があります。</p>
+<h4 id="rustdeshu-kuchang-he">Rustで書く場合</h4>
+<p>RustでeBPFのバインディングを利用する場合のcrateは、</p>
+<ul>
+<li><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a></li>
+<li><a href="https://github.com/aya-rs/aya">aya</a></li>
+</ul>
+<p>などがあります。
+今回は<a href="https://github.com/torvalds/linux/tree/master/tools/lib/bpf">linuxのソースツリーでもメンテされているlibbpf</a>を使ったバインディングである前者の<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>を使ってみます。</p>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>を使ってRustベースの開発を行う場合は以下のようになります。</p>
+<ol>
+<li>カーネルで動作するeBPF用のC言語のプログラムを書く</li>
+<li>eBPFバイトコードをカーネルにロードするユーザ空間側のプログラムを <em>Rust</em> で書く</li>
+<li><code>cargo build</code>で1, 2の成果物がバンドルされるのでそのまま配布・実行する
+<ul>
+<li>Rustのcrateがスケルトンを生成してくれるため<code>bpftool</code>は不要になる</li>
+</ul>
+</li>
+</ol>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>というライブラリが提供する道具立てのおかげで <strong>少し開発ステップが短縮できる</strong> というのがポイントです。
+また、ビルド全体のライフサイクルがcargoに包括されるため他のRustのcrateとほぼ同じ道具立てで開発を進めることができます。</p>
+<p>(参考) なお、GoのeBPFプログラミングでも概ねCと同様のツールチェインになっており、コマンド実行でスケルトンを生成するようです。
+<a href="https://github.com/cilium/ebpf/tree/master/cmd/bpf2go">ciliumのeBPFプログラムコンパイル</a></p>
+<h2 id="libbpf-rs">libbpf-rs</h2>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a></p>
+<p>RustのプログラムからeBPFのシステムコールおよびeBPF関連オブジェクトを取り扱いやすくしてくれるライブラリです。
+実体としてはlibbpfのRust用ラッパーですが、ただ関数シグニチャをRust側にポーティングしているだけではなく、Rustプログラミングと親和性が高くなるような仕掛けが追加されています。</p>
+<h3 id="ebpfnopuroguramunozhou-bian-cao-zuo-woxing-usukerutonwozi-dong-sheng-cheng-suru">eBPFのプログラムの周辺操作を行うスケルトンを自動生成する</h3>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>とそれに付随するツール<a href="https://docs.rs/libbpf-cargo/latest/libbpf_cargo/">libbpf-cargo</a>が提供するAPIを使うことで、ユーザ空間側のRustプログラムからeBPFプログラムを扱いやすくなります。
+<a href="https://docs.rs/libbpf-cargo/latest/libbpf_cargo/">libbpf-cargo</a>はclang/llvmで出力したeBPFのバイトコードをRust上から操作するための構造体やメソッドを定義したRustのソースコードをスケルトンとして生成します。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">// THIS FILE IS AUTOGENERATED BY CARGO-LIBBPF-GEN!
+&lt;snip&gt;
+pub struct OpenUdpRedirectProgs&lt;&#39;a&gt; {
+    inner: &amp;&#39;a libbpf_rs::OpenObject,
+}
+</span></code></pre>
+<p>さらにこのスケルトンからeBPFのシステムコールに直接eBPFのバイトコードを入力できるように、バイトコードそのものをスケルトンコードの定数として埋め込んでいます。(これもGo版eBPFのスケルトン実装と同様です)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">const DATA: &amp;[u8] = &amp;[
+    127, 69, 76, 70, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 247, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 248, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 64,
+&lt;snip&gt;
+</span></code></pre><h3 id="libbpfhajing-de-rinkusuru">libbpfは静的リンクする</h3>
+<p>これは<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>そのものの効用というよりは依存する<a href="https://github.com/libbpf/libbpf-sys">libbpf-sys</a>のおかげですが、<a href="https://github.com/libbpf/libbpf-sys#building">Building</a>で説明されている通り、libbpfのライブラリが<code>cargo build</code>の成果物に静的にリンクされるため実行環境でlibbpfをインストールしておく必要がありません。</p>
+<h2 id="libbpf-rswoshi-tutemiru">libbpf-rsを使ってみる</h2>
+<p>実際に<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>を使ってみます。
+コード全体は <a href="https://github.com/utky/xdp-sandbox-libbpf-rs">xdp-sandbox-libbpf-rs</a> にホストしてあります。</p>
+<h3 id="ke-ti-she-ding">課題設定</h3>
+<p>サーバ上のUDP 8000ポートに対する通信をUDP 8001ポートへとリダイレクトします。
+これをeBPFを使ったパケット処理の拡張機能であるXDP(eXpress Data Path)で実装します。</p>
+<p>とても現実にありえる正気のユースケースとは思えませんが、こうしたパケットのヘッダ書き換えが発展するともっといい感じのデータパスがLinuxカーネルで作れます。たぶん。</p>
+<h3 id="ebpfpuroguraminguhuan-jing-nosetutoatupu">eBPFプログラミング環境のセットアップ</h3>
+<p>CをベースにeBPFプログラムを開発するためのセットアップと手順については下記が詳しいです。
+<a href="https://nakryiko.com/posts/libbpf-bootstrap/">Building BPF applications with libbpf-bootstrap</a></p>
+<p>今回はこれを参考にしつつ<a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>を使ったRustのプロジェクトでのセットアップを確認します。</p>
+<h4 id="cargo-tomlnozhui-ji">Cargo.tomlの追記</h4>
+<p>依存関係として<code>libbpf-rs</code>を追加しておきます。<code>cargo build</code>でeBPFプログラムのコンパイルも起動するためには、ビルドスクリプトの依存関係として<code>libbpf-cargo</code>も追加しておきます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">[dependencies]
+</span><span style="color:#bf616a;">libbpf-rs </span><span style="color:#c0c5ce;">= &quot;</span><span style="color:#a3be8c;">0.14.0</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#bf616a;">libc </span><span style="color:#c0c5ce;">= &quot;</span><span style="color:#a3be8c;">0.2</span><span style="color:#c0c5ce;">&quot;
+
+[build-dependencies]
+</span><span style="color:#bf616a;">libbpf-cargo </span><span style="color:#c0c5ce;">= &quot;</span><span style="color:#a3be8c;">0.9</span><span style="color:#c0c5ce;">&quot;
+</span></code></pre><h4 id="ebpfnokodozhi-kichang-wozuo-ru">eBPFのコード置き場を作る</h4>
+<p>eBPFプログラムとしてカーネル空間で動作するコードは多くの場合Cで記述します。(正確には制限のついたC)</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">#include </span><span style="color:#c0c5ce;">&quot;</span><span style="color:#a3be8c;">vmlinux.h</span><span style="color:#c0c5ce;">&quot;
+</span><span style="color:#b48ead;">#include </span><span style="color:#c0c5ce;">&lt;</span><span style="color:#a3be8c;">bpf/bpf_helpers.h</span><span style="color:#c0c5ce;">&gt;
+
+</span><span style="color:#bf616a;">SEC</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">xdp</span><span style="color:#c0c5ce;">&quot;)
+</span><span style="color:#b48ead;">int </span><span style="color:#8fa1b3;">xdp_pass</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> xdp_md *</span><span style="color:#bf616a;">ctx</span><span style="color:#c0c5ce;">)
+{
+	</span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> XDP_PASS;
+}
+
+</span><span style="color:#b48ead;">char</span><span style="color:#c0c5ce;"> __license[] </span><span style="color:#bf616a;">SEC</span><span style="color:#c0c5ce;">(&quot;</span><span style="color:#a3be8c;">license</span><span style="color:#c0c5ce;">&quot;) = &quot;</span><span style="color:#a3be8c;">GPL</span><span style="color:#c0c5ce;">&quot;;
+</span></code></pre>
+<p>このようなコードをcargo経由で呼び出すclangがコンパイルします。
+eBPFプログラムのコードの置き場となるディレクトリを作っておきます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">mkdir -p</span><span style="color:#c0c5ce;"> src/bpf/c/
+</span></code></pre>
+<p><a href="https://github.com/libbpf/libbpf-rs">libbpf-rs</a>公式だと<code>src/bpf/</code>にeBPF用のCのコードを配置することが例として紹介されますが、個人的にはRustのプロジェクトの中にCのコードが混ざることを明示したいので下記のようなディレクトリを用意しています。</p>
+<p>それを元に作られるRustのスケルトンは<code>src/bpf/</code>に出力されるように、後でビルドスクリプトを調整します。</p>
+<h4 id="sheng-cheng-sarerusukerutonkodohagitguan-li-sinai">生成されるスケルトンコードはgit管理しない</h4>
+<p><code>.gitignore</code> に下記を追記しておきます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">src/bpf/*.rs
+</span></code></pre>
+<p>eBPF用のCのコードからスケルトンコードは導出できるため、特にgit管理する必要はありません。
+スケルトンコードを後から手動で修正することもありません。</p>
+<h4 id="libbpf-cargowoshi-tutabirudosukuriputowoyong-yi-suru">libbpf-cargoを使ったビルドスクリプトを用意する</h4>
+<p><a href="https://docs.rs/libbpf-cargo/latest/libbpf_cargo/">libbpf-cargo</a>はeBPFプログラムのコンパイルやRustへのインテグレーションをおこなうワークフローを自動化するためのcargo用ライブラリです。</p>
+<p><a href="https://docs.rs/libbpf-cargo/latest/libbpf_cargo/#build">Subcommands build</a></p>
+<p>上記にあるように</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">cargo</span><span style="color:#c0c5ce;"> libbpf make
+</span></code></pre>
+<p>などでcargoコマンド経由でclangを呼び出すことができます。
+しかし普通にRustプログラムを書いていて<code>cargo libbpf make</code>も忘れずに実行するのは普通にめんどくさいです。</p>
+<p><a href="https://docs.rs/libbpf-cargo/latest/libbpf_cargo/">libbpf-cargo</a>には幸いにしてビルドスクリプトから呼び出すことができるAPIがあるのでこれを使って<code>cargo build</code>時に合わせてeBPFプログラムもビルドできるようにします。</p>
+<p>crateのdocにも下記の説明があるので、むしろそちらが正攻法のようです。</p>
+<blockquote>
+<p>The build script interface is recommended over the cargo subcommand interface</p>
+</blockquote>
+<h5 id="birudosukuriputowoyong-yi-suru">ビルドスクリプトを用意する</h5>
+<p><a href="https://github.com/utky/xdp-sandbox-libbpf-rs/blob/main/build.rs">build.rs</a></p>
+<p>なんならここが今回一番Rustのコードを書いたかもしれません(それでいいのか)。</p>
+<p>やっていることはシンプルです。</p>
+<ol>
+<li><code>scan_input</code>: <code>src/bpf/c/</code> 配下を走査して <code>.bpf.c</code> の拡張子を持つファイルをeBPFのソースコードとしてピックアップする</li>
+<li><code>SkeletonBuilder</code>: libbpf-cargoのAPIにeBPFソースコードを渡してスケルトンを生成する</li>
+<li><code>gen_mods</code>: スケルトンコードをモジュールとしてcrate内に公開するための<code>mod.rs</code>を自動生成する</li>
+</ol>
+<p>一度書いてしまうと後はeBPFのソースコードが増えたところで変わらないので、割と作りっぱなしになります。</p>
+<h4 id="kanerukong-jian-ebpfpuroguramuwoshu-ku">カーネル空間: eBPFプログラムを書く</h4>
+<p><a href="https://github.com/utky/xdp-sandbox-libbpf-rs/blob/main/src/bpf/c/udp_redirect.bpf.c">udp_redirect.bpf.c</a></p>
+<p>今回はUDPヘッダの宛先ポートを書き換える処理が必要なのですが、実行が簡単などの理由からXDPというeBPFプログラムの種別で実装します。
+XDPではeBPFプログラムをカーネルへロードして、特定のネットワークデバイスにアタッチした場合、ネットワークデバイスがバケットを受信したタイミングでeBPFプログラムを呼び出します。
+eBPFプログラムはパケットの解析や編集などを行った後に、次の処理を指示する返却コードを返します。</p>
+<p>最も単純なXDPのeBPFプログラムだと下記のようなコードになります。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#b48ead;">int </span><span style="color:#8fa1b3;">xdp_pass</span><span style="color:#c0c5ce;">(</span><span style="color:#b48ead;">struct</span><span style="color:#c0c5ce;"> xdp_md *</span><span style="color:#bf616a;">ctx</span><span style="color:#c0c5ce;">)
+{
+  </span><span style="color:#65737e;">// XDP_PASSは受信したパケットをカーネルのネットワークスタックでそのまま処理するように依頼する
+	</span><span style="color:#b48ead;">return</span><span style="color:#c0c5ce;"> XDP_PASS;
+}
+</span></code></pre>
+<p>上記では<code>xdp_md</code>としてデバイスが受信したパケットの内容を含むメタデータを受け取っています。
+このeBPFコードを土台にして<code>xdp_md</code>の内容を参照・更新することで、パケットの解析・編集処理を肉付けしていきます。</p>
+<p>eBPFプログラムでパケット処理を行うXDPと呼ばれる技術のチュートリアルは<a href="https://github.com/xdp-project/xdp-tutorial">xdp-tutorial</a>が非常に詳しく、またidiomaticな作法が多数掲載されています。今回もこれを参考にしつつ実装してみました。
+コードのほとんどがヘッダの解析とデータのアクセス範囲チェックです。</p>
+<p>今回の課題で実現したいUDPの宛先ポートの書き換えを行っているのは下記です。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">  // 宛先ポートの書き換え
+  if (udp-&gt;dest == bpf_htons(TARGET_PORT))
+  {
+    udp-&gt;dest = bpf_htons(REDIRECT_PORT);
+  }
+</span></code></pre>
+<p>カーネル内で確保されているデータの書き換えをカーネルモジュールなしで実現することができるというeBPFの恩恵を端的に示しています。</p>
+<h4 id="yuzakong-jian-ebpfpuroguramuworodosuru">ユーザ空間: eBPFプログラムをロードする</h4>
+<p><a href="https://github.com/utky/xdp-sandbox-libbpf-rs/blob/main/src/main.rs">main.rs</a></p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#c0c5ce;">    let skel_builder = UdpRedirectSkelBuilder::default();
+    let open_skel = skel_builder.open()?;
+    let mut skel = open_skel.load()?;
+    let link = skel.progs_mut().xdp_main().attach_xdp(1)?;
+    skel.links = UdpRedirectLinks {
+        xdp_main: Some(link),
+    };
+</span></code></pre>
+<p>正直、スケルトンコードをmain関数から呼び出すだけなので、ほぼ定型文で面白みのあるコードにはなりませんでした。</p>
+<p>しかしユースケースが複雑になるにつれ、ユーザ空間側のプログラムもより複雑になります。
+今回はあまりに簡単な例だったのでこれだけで終わっていますが、ダイナミックにXDPの処理内容を変更するためにeBPFプログラムとデータをやりとりするようになると更に多くのコードがユーザ空間側にも必要になってくるでしょう。</p>
+<h2 id="dong-zuo-que-ren-xdpatatutiqian">動作確認: XDPアタッチ前</h2>
+<blockquote>
+<p>サーバ上のUDP 8000ポートに対する通信をUDP 8001ポートへとリダイレクトします。</p>
+</blockquote>
+<p>この課題がeBPFプログラムの実装で解決できたかを確認していきます。</p>
+<p>確認環境</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> cat /etc/redhat-release 
+</span><span style="color:#bf616a;">CentOS</span><span style="color:#c0c5ce;"> Linux release 8.4.2105
+</span><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> uname</span><span style="color:#bf616a;"> -a
+Linux</span><span style="color:#c0c5ce;"> imamura-test 4.18.0-305.25.1.el8_4.x86_64 </span><span style="color:#65737e;">#1 SMP Wed Nov 3 10:29:07 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+</span></code></pre>
+<p>まずはXDPのフィルタを設定する前の動作を確認します。</p>
+<h3 id="tcpdumpderupubatukudebaisuwokiyaputiya">tcpdumpでループバックデバイスをキャプチャ</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> sudo tcpdump</span><span style="color:#bf616a;"> -i</span><span style="color:#c0c5ce;"> lo</span><span style="color:#bf616a;"> -nn
+dropped</span><span style="color:#c0c5ce;"> privs to tcpdump
+</span><span style="color:#bf616a;">tcpdump:</span><span style="color:#c0c5ce;"> verbose output suppressed, use</span><span style="color:#bf616a;"> -v</span><span style="color:#c0c5ce;"> or</span><span style="color:#bf616a;"> -vv</span><span style="color:#c0c5ce;"> for full protocol decode
+</span><span style="color:#bf616a;">listening</span><span style="color:#c0c5ce;"> on lo, link-type EN10MB (Ethernet)</span><span style="color:#bf616a;">,</span><span style="color:#c0c5ce;"> capture size 262144 bytes
+</span></code></pre><h3 id="udpsabawo8000potodeqi-dong">UDPサーバを8000ポートで起動</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> nc</span><span style="color:#bf616a;"> -4 -l -u</span><span style="color:#c0c5ce;"> 8000
+</span></code></pre><h3 id="udpkuraiantokaradetasong-xin">UDPクライアントからデータ送信</h3>
+<p><code>1</code> と改行タイプします。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> nc</span><span style="color:#bf616a;"> -4u</span><span style="color:#c0c5ce;"> 127.0.0.1 8000 
+</span><span style="color:#bf616a;">1
+</span></code></pre><h3 id="paketutokiyaputiyanochu-li-woque-ren-suru">パケットキャプチャの出力を確認する</h3>
+<p>宛先8000番でUDPのデータグラムが確認できます。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">14:27:16.457557</span><span style="color:#c0c5ce;"> IP 127.0.0.1.44229 &gt; </span><span style="color:#d08770;">127</span><span style="color:#c0c5ce;">.0.0.1.8000: UDP, length 2
+</span></code></pre><h2 id="dong-zuo-que-ren-xdpatatutihou">動作確認: XDPアタッチ後</h2>
+<h3 id="xdpatatuti">XDPアタッチ</h3>
+<p>Rustで書いたユーザ空間側のプログラムを実行することでeBPFプログラムをロードしてXDPとしてループバックデバイスにアタッチします。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> sudo ./xdp-redirect
+</span></code></pre>
+<p>これでUDPの宛先ポートが8000から8001に書き換わるはずです。</p>
+<h3 id="udpkuraiantokaradetasong-xin-1">UDPクライアントからデータ送信</h3>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">$</span><span style="color:#c0c5ce;"> nc</span><span style="color:#bf616a;"> -4u</span><span style="color:#c0c5ce;"> 127.0.0.1 8000 
+</span><span style="color:#bf616a;">2
+</span></code></pre><h3 id="paketutokiyaputiyanochu-li-woque-ren-suru-1">パケットキャプチャの出力を確認する</h3>
+<p>予想通り宛先ポートが8001になりました。</p>
+<pre style="background-color:#2b303b;">
+<code><span style="color:#bf616a;">14:47:06.481427</span><span style="color:#c0c5ce;"> IP 127.0.0.1.37685 &gt; </span><span style="color:#d08770;">127</span><span style="color:#c0c5ce;">.0.0.1.8001: UDP, length 2
+</span><span style="color:#bf616a;">14:47:06.481454</span><span style="color:#c0c5ce;"> IP 127.0.0.1 &gt; </span><span style="color:#d08770;">127</span><span style="color:#c0c5ce;">.0.0.1: ICMP 127.0.0.1 udp port 8001 unreachable, length 38
+</span></code></pre>
+<p>8001ポートではlistenしているポートもないためunreachable扱いになっています。</p>
+<h2 id="yatutemitejie-tutake-ti">やってみて解った課題</h2>
+<h3 id="tesuto">テスト</h3>
+<p>eBPFプログラムをロードする際に、危険な操作がないかどうかカーネル側でもチェックをしてくれるverifierという機構があります。
+このverifierの検査が通りロードに成功すれば、ひとまず安全なコードであるとは言えそうなのですが、業務として正しく動作するかは相変わらずテストする必要があります。
+特にeBPFでカバーする領域が増えれば増えるほどテストは必要になるし、カーネルで動作させたい程度には重要なプログラムではあるはずなので、十分にテストしておきたくなるのが人情です。
+が、現状では確立されたテストフレームワークは無さそうなので自前で道具を作っていくことになるようです。</p>
+<p>Ciliumではユニットテスト環境をコンテナで作ってモックをはさみながら <a href="https://github.com/cilium/cilium/pull/16862">テストしているようです</a>。</p>
+<h3 id="souhayan-tutemopu-tong-nisetutoatupugamian-dao-kusai">そうは言っても普通にセットアップが面倒くさい</h3>
+<p>libbpfをビルドするために必要な<code>libz</code>や<code>libelf</code>は開発環境に入れておく必要はあるし、cargoのビルドスクリプトも最初だけとはいえやっぱり手書きしているわけです。
+<code>Cargo.toml</code>にdependenciesを追加したらすぐに開発を始められるというものではないのが難しいところです。</p>
+<p>しかしpure RustをうたったeBPFライブラリ <a href="https://github.com/aya-rs/aya">Aya</a> というプロジェクトがあるので、もしかしたらそちらではいくらかセットアップが楽になっているのかもしれない、という期待もあります。
+ちょうどタイムリーに記事が出た <a href="https://qiita.com/moriai/items/c96636d35ae39809b45e">RustでeBPFを操れるayaを触ってみた</a> を拝見するとプロジェクトテンプレートを使って足場を作るようです。
+これがセットアップの手間を軽減しているかというとなんとも言えませんが。</p>
+<h3 id="xin-simenokaneruziyanaitoyan-sii">新しめのカーネルじゃないと厳しい</h3>
+<p>eBPFの機能はLinuxカーネルのバージョンアップとともに徐々に追加されているため、使っているディストリビューションの最新バージョンのカーネルじゃないと使いたい機能が入っていなかったりします。</p>
+<p><a href="https://github.com/iovisor/bcc/blob/master/docs/kernel-versions.md">BPF Features by Linux Kernel Version</a> を見るだけではなく、各ディストリビューションのドキュメントも探してみる必要があります。読んでも自明じゃないものもあったりするので難しいです。</p>
+<h2 id="jin-hou-yatutemitaikoto">今後やってみたいこと</h2>
+<p>今回はパケットのヘッダをいじってそのまま下流に丸投げする無責任なXDPプログラムでしたが、今後はもう少しユーザ空間との連携をeBPF Mapを活用した実装を試してみたいところです。</p>
+
+    </div>
+  </div>
+  <footer class="row">
+    <div class="col">
+      <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+    </div>
+  </footer>
+</article>
+
+      </main>
+      <footer>
+        <hr>
+        <div class="footer-copyright">
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Site generated by
+              <a href="https://www.getzola.org/">Zola</a>
+              </i>
+              </small>
+            </span>
+          </div>
+          <div>
+            <span class="right">
+              <small>
+              <i>
+              Copyright © 2020 Yutaka Imamura
+              </i>
+              </small>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+      <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+      <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['\\(','\\)']]},
+        processEscape: true
+      });
+      </script>
+    </body>
+</html>
