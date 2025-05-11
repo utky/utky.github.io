@@ -1,10 +1,10 @@
-+++
+---
 title = "Excelログを掃討する"
 date = 2016-06-11
 aliases = ["/posts/note/2016-06-11-eliminate-excel-logging.html"]
 [taxonomies]
 tags = ["excel"]
-+++
+---
 
 問題
 ----------------------

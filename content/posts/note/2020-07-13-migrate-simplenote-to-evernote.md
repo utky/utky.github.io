@@ -1,9 +1,9 @@
-+++
+---
 title = "SimplenoteからEvernoteへ移行した"
 date = 2020-07-13
 [taxonomies]
 tags = ["scheme","evernote"]
-+++
+---
 
 数年前にEvernoteのiOS版アプリの動作が遅すぎて発狂した結果、[Simplenote](https://app.simplenote.com/)に移行した。SimplenoteはMarkdownプレビューモードもあるしタグによる分類もあるし、 正直メモとるにはそれで十分ではあった。
 

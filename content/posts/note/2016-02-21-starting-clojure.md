@@ -1,10 +1,10 @@
-+++
+---
 title = "Starting clojure"
 date = 2016-02-21
 aliases = ["/posts/note/2016-02-21-starting-clojure.html"]
 [taxonomies]
 tags = ["clojure"]
-+++
+---
 
 Clojureを始める
 ---------

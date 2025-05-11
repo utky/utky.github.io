@@ -1,10 +1,10 @@
-+++
+---
 title = "Stackと外部ライブラリの問題"
 date = 2016-07-26
 aliases = ["/posts/note/2016-07-26-stack-extra-lib-problem.html"]
 [taxonomies]
 tags = ["haskell"]
-+++
+---
 
 Haskellのビルドユーティリティであるstackを使っているけど、
 気持ちの萎える問題に直面している。

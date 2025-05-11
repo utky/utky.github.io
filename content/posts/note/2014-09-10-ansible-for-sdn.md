@@ -1,8 +1,8 @@
-+++
+---
 title = "AnsibleでSDNコントローラ開発環境をセットアップする"
 date = 2014-09-10
 aliases = ["/posts/note/2014-09-10-ansible-for-sdn.html"]
-+++
+---
 
 ## AnsibleでSDNコントローラ開発環境をセットアップする
 

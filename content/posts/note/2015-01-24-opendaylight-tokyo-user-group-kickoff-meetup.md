@@ -1,10 +1,10 @@
-+++
+---
 title = "OpenDaylight Tokyo User Group Kickoff Meetup"
 date = 2015-01-24
 aliases = ["/posts/note/2015-01-24-opendaylight-tokyo-user-group-kickoff-meetup.html"]
 [taxonomies]
 tags = ["sdn","tech"]
-+++
+---
 
 ## 第一回 ODL Tokyo User Group
 

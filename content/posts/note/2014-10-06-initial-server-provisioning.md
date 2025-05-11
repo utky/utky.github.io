@@ -1,8 +1,8 @@
-+++
+---
 title = "サーバ構築時の初期設定について"
 date = 2014-10-06
 aliases = ["/posts/note/2014-10-06-initial-server-provisioning.html"]
-+++
+---
 
 ある開発環境でベアメタルサーバやVMサーバを追加することはよくある。
 （今そんなんばっか）

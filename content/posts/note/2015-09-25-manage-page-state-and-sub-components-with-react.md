@@ -1,10 +1,10 @@
-+++
+---
 title = "Manage page state and sub-components with React.js"
 date = 2015-09-25
 aliases = ["/posts/note/2015-09-25-manage-page-state-and-sub-components-with-react.html"]
 [taxonomies]
 tags = ["js","react"]
-+++
+---
 
 *注意事項*
 

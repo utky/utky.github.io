@@ -1,8 +1,8 @@
-+++
+---
 title = "Ansible でCIサーバを構築する"
 date = 2014-10-04
 aliases = ["/posts/note/2014-10-04-ansible-jenkins.html"]
-+++
+---
 
 ## Ansible でCIサーバを構築する
 

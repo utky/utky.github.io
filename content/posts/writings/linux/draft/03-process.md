@@ -1,8 +1,8 @@
-+++
+---
 title = "Process"
 date = 2017-12-24
 aliases = ["/posts/linux/03-process.html"]
-+++
+---
 
 プロセスディスクリプタとは, `task_struct`, のこと
 

@@ -1,10 +1,10 @@
-+++
+---
 title = "小さくプロトタイピングする"
 date = 2016-07-21
 aliases = ["/posts/note/2016-07-21-minimal-api-design-step-by-step.html"]
 [taxonomies]
 tags = ["haskell"]
-+++
+---
 
 Haskellでアプリケーションを作る時にどんな順番で部品を組んでいくかについての雑感。
 

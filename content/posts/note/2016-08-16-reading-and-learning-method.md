@@ -1,10 +1,10 @@
-+++
+---
 title = "効率良く読書する"
 date = 2016-08-16
 aliases = ["/posts/note/2016-08-16-reading-and-learning-method.html"]
 [taxonomies]
 tags = ["reading"]
-+++
+---
 
 こうするといいよ、ではなくてこうしてみようかと思う、という草案と計画の話です。
 できるとは言ってない案件。

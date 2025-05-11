@@ -1,10 +1,10 @@
-+++
+---
 title = "『ビッグデータを支える技術』を読んだ データインジェスチョンについて"
 date = 2020-02-01
 aliases = ["/posts/note/2020-02-01-big-data-book.html"]
 [taxonomies]
 tags = ["database","book"]
-+++
+---
 
 [ビッグデータを支える技術―刻々とデータが脈打つ自動化の世界](https://www.amazon.co.jp/dp/4774192252)
 

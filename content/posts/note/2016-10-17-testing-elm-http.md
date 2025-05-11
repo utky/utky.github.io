@@ -1,10 +1,10 @@
-+++
+---
 title = "WIP ElmのHttp処理部をスタブする"
 date = 2016-10-17
 aliases = ["/posts/note/2016-10-17-testing-elm-http.html"]
 [taxonomies]
 tags = ["elm"]
-+++
+---
 
 [Elm Advent Calendar 2016](http://qiita.com/advent-calendar/2016/elm) 2日目の記事です。
 

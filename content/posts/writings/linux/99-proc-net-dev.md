@@ -1,9 +1,9 @@
-+++
+---
 title = "procfs ネットワーク周りを覗き見る /proc/net/dev 編"
 date = 2020-06-27
 [taxonomies]
 tags = ["linux","network","procfs"]
-+++
+---
 
 procfs からシステムの統計データが色々採取できる。
 ネットワーク周りの統計データとしてどんなものがどうやって収集されているのかを追ってみることにした。

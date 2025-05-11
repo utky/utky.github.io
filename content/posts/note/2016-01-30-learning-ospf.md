@@ -1,10 +1,10 @@
-+++
+---
 title = "OSPF reading note"
 date = 2016-01-30
 aliases = ["/posts/note/2016-01-30-learning-ospf.html"]
 [taxonomies]
 tags = ["network"]
-+++
+---
 
 OSPFの処理ステップ
 

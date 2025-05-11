@@ -1,10 +1,10 @@
-+++
+---
 title = "Elmの設計で悩むところメモ"
 date = 2017-01-22
 aliases = ["/posts/note/2017-01-22-view-model-in-elm.html"]
 [taxonomies]
 tags = ["programming","elm"]
-+++
+---
 
 View Modelのあるべき姿が解らなくなってきたので整理。
 
