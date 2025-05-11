@@ -1,4 +1,17 @@
 {
-	"image": "mcr.microsoft.com/vscode/devcontainers/base:alpine",
-  "postCreateCommand": "sudo apk add zola"
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "haskell.haskell"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "PATH": "/home/vscode/.cabal/bin:/home/vscode/.ghcup/bin:${containerEnv:PATH}"
+  },
+  "onCreateCommand": ".devcontainer/install-script.sh"
 }
