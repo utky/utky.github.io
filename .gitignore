@@ -18,3 +18,5 @@ _cache/
 _site/
 zola/public/
 public/
+.shake
+dist-newstyle
