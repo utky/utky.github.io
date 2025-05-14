@@ -1,7 +1,7 @@
 ---
 title = "eBPF Summit 2021 CTF Stage1, Stage2を解いてみた"
 date = 2021-08-22
-[taxonomies]
+
 tags = ["linux","ebpf"]
 ---
 

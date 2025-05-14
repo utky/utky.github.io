@@ -1,7 +1,7 @@
 ---
 title = "TAPLを読む 02"
 date = 2020-06-18
-[taxonomies]
+
 tags = ["tapl"]
 ---
 

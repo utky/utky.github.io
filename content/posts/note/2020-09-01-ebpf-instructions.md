@@ -1,7 +1,7 @@
 ---
 title = "eBPF命令をデータ型で表す"
 date = 2020-09-01
-[taxonomies]
+
 tags = ["linux","ebpf","network"]
 ---
 

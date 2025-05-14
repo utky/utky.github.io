@@ -1,7 +1,7 @@
 ---
 title = "Thomas Graf「eBPF - Rethinking the Linux Kernel」観た"
 date = 2020-12-08
-[taxonomies]
+
 tags = ["linux","ebpf"]
 ---
 

@@ -73,6 +73,7 @@ executable build-site
     build-depends:
       base ^>=4.18.3.0
       , aeson
+      , mustache
       , shake
       , slick
       , text

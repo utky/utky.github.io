@@ -2,7 +2,7 @@
 title = "プロセッサを支える技術"
 date = 2016-07-13
 aliases = ["/posts/note/2016-07-13-learning-processor-introduction.html"]
-[taxonomies]
+
 tags = ["reading"]
 ---
 

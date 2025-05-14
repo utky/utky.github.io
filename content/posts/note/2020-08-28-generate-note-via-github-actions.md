@@ -1,7 +1,7 @@
 ---
 title = "Evernoteのノートを自動生成して振り返りをする"
 date = 2020-08-28
-[taxonomies]
+
 tags = ["scala","evernote"]
 ---
 

@@ -2,7 +2,7 @@
 title = "OpenFlowのメッセージをAttoparsecで解析する"
 date = 2016-05-15
 aliases = ["/posts/note/2016-05-07-parsing-with-attoparsec.html"]
-[taxonomies]
+
 tags = ["network","haskell","openflow"]
 ---
 

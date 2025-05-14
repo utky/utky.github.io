@@ -2,7 +2,7 @@
 title = "AWSで実施する負荷試験ツール JMeter と locust"
 date = 2020-03-29
 aliases = ["/posts/note/2020-03-29-load-test-tool-in-aws.html"]
-[taxonomies]
+
 tags = ["aws","testing"]
 ---
 

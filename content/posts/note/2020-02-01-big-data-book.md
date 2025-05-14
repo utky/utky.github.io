@@ -2,7 +2,7 @@
 title = "『ビッグデータを支える技術』を読んだ データインジェスチョンについて"
 date = 2020-02-01
 aliases = ["/posts/note/2020-02-01-big-data-book.html"]
-[taxonomies]
+
 tags = ["database","book"]
 ---
 

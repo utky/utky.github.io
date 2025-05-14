@@ -2,7 +2,7 @@
 title = "stackとNixを使って安定したビルド環境を作る"
 date = 2016-03-12
 aliases = ["/posts/note/2016-03-12-stack-and-nix.html"]
-[taxonomies]
+
 tags = ["haskell","stack","nix"]
 ---
 

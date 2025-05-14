@@ -2,7 +2,7 @@
 title = "Starting React.js"
 date = 2015-08-16
 aliases = ["/posts/note/2015-08-16-starting-react-js.html"]
-[taxonomies]
+
 tags = ["js","react"]
 ---
 

@@ -2,7 +2,7 @@
 title = "Clojureを使った関数型プログラミングデザインのメモ"
 date = 2016-12-29
 aliases = ["/posts/note/2016-12-29-design-clojure-program.html"]
-[taxonomies]
+
 tags = ["clojure"]
 ---
 

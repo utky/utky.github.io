@@ -2,7 +2,7 @@
 title = "Network Device"
 date = 2018-12-16
 aliases = ["/posts/linux/01-network-device.html"]
-[taxonomies]
+
 tags = ["linux","network"]
 ---
 

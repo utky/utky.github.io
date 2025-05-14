@@ -2,7 +2,7 @@
 title = "Goでツールを作る"
 date = 2017-01-29
 aliases = ["/posts/note/2017-01-29-write-tool-in-go.html"]
-[taxonomies]
+
 tags = ["programming","go"]
 ---
 

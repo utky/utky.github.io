@@ -2,7 +2,7 @@
 title = "『Amazon Web Service 負荷試験入門』読んだ"
 date = 2020-03-13
 aliases = ["/posts/note/2020-03-13-aws-performance-test.html"]
-[taxonomies]
+
 tags = ["aws","testing"]
 ---
 

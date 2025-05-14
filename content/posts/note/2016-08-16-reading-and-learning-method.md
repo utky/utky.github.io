@@ -2,7 +2,7 @@
 title = "効率良く読書する"
 date = 2016-08-16
 aliases = ["/posts/note/2016-08-16-reading-and-learning-method.html"]
-[taxonomies]
+
 tags = ["reading"]
 ---
 

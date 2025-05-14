@@ -2,7 +2,7 @@
 title = "WIP ElmのHttp処理部をスタブする"
 date = 2016-10-17
 aliases = ["/posts/note/2016-10-17-testing-elm-http.html"]
-[taxonomies]
+
 tags = ["elm"]
 ---
 

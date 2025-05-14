@@ -1,7 +1,7 @@
 ---
 title = "procfs ネットワーク周りを覗き見る /proc/net/dev 編"
 date = 2020-06-27
-[taxonomies]
+
 tags = ["linux","network","procfs"]
 ---
 

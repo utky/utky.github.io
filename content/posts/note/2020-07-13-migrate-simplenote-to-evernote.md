@@ -1,7 +1,7 @@
 ---
 title = "SimplenoteからEvernoteへ移行した"
 date = 2020-07-13
-[taxonomies]
+
 tags = ["scheme","evernote"]
 ---
 

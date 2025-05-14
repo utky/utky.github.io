@@ -2,7 +2,7 @@
 title = "BGP reading note"
 date = 2016-03-13
 aliases = ["/posts/note/2016-03-13-learning-bgp.html"]
-[taxonomies]
+
 tags = ["network","bgp"]
 ---
 

@@ -2,7 +2,7 @@
 title = "「How to beat the CAP theorem」読んだ"
 date = 2020-02-22
 aliases = ["/posts/note/2020-02-22-how-to-beat-cap-theorem.html"]
-[taxonomies]
+
 tags = ["architecture","pipeline","bigdata"]
 ---
 

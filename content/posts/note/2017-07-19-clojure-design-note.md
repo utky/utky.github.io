@@ -2,7 +2,7 @@
 title = "ClojureのAPI設計について考える"
 date = 2016-07-19
 aliases = ["/posts/note/2017-07-19-clojure-design-note.html"]
-[taxonomies]
+
 tags = ["clojure"]
 ---
 

@@ -1,7 +1,7 @@
 ---
 title = "libbpf-rsを使ったRustとeBPFプログラミング"
 date = 2021-12-27
-[taxonomies]
+
 tags = ["linux","ebpf"]
 ---
 

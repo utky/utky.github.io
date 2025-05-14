@@ -2,7 +2,7 @@
 title = "証明を学ぶ"
 date = 2016-05-20
 aliases = ["/posts/note/2016-05-20-learning-proof.html"]
-[taxonomies]
+
 tags = ["math","proof"]
 ---
 
