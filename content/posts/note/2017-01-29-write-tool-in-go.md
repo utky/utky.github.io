@@ -1,9 +1,9 @@
 ---
-title = "Goでツールを作る"
-date = 2017-01-29
-aliases = ["/posts/note/2017-01-29-write-tool-in-go.html"]
+title: "Goでツールを作る"
+date: 2017-01-29
+aliases: ["/posts/note/2017-01-29-write-tool-in-go.html"]
 
-tags = ["programming","go"]
+tags: ["programming","go"]
 ---
 
 Goをツールを書いた。

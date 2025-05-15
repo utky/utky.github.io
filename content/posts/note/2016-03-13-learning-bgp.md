@@ -1,9 +1,9 @@
 ---
-title = "BGP reading note"
-date = 2016-03-13
-aliases = ["/posts/note/2016-03-13-learning-bgp.html"]
+title: "BGP reading note"
+date: 2016-03-13
+aliases: ["/posts/note/2016-03-13-learning-bgp.html"]
 
-tags = ["network","bgp"]
+tags: ["network","bgp"]
 ---
 
 # BGPについて勉強する

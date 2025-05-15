@@ -1,9 +1,9 @@
 ---
-title = "ClojureのAPI設計について考える"
-date = 2016-07-19
-aliases = ["/posts/note/2017-07-19-clojure-design-note.html"]
+title: "ClojureのAPI設計について考える"
+date: 2016-07-19
+aliases: ["/posts/note/2017-07-19-clojure-design-note.html"]
 
-tags = ["clojure"]
+tags: ["clojure"]
 ---
 
 解決してないけど詰まったところをメモ。

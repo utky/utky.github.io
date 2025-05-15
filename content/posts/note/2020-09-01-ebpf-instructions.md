@@ -1,8 +1,8 @@
 ---
-title = "eBPF命令をデータ型で表す"
-date = 2020-09-01
+title: "eBPF命令をデータ型で表す"
+date: 2020-09-01
 
-tags = ["linux","ebpf","network"]
+tags: ["linux","ebpf","network"]
 ---
 
 [前回]はeBPFのごく単純なプログラムを書いて実行可能なユーザ空間側のプログラムを作ることに専念した。

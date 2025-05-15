@@ -1,7 +1,7 @@
 ---
-title = "基礎的なことを勉強する"
-date = 2016-07-02
-aliases = ["/posts/note/2016-07-02-learning-basics.html"]
+title: "基礎的なことを勉強する"
+date: 2016-07-02
+aliases: ["/posts/note/2016-07-02-learning-basics.html"]
 ---
 
 ## はじめに

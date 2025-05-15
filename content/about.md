@@ -1,6 +1,6 @@
 ---
-title = "About"
-aliases = ["/about.html"]
+title: "About"
+aliases: ["/about.html"]
 ---
 
 [utky (Yutaka Imamura)](https://github.com/utky), 神奈川圏の対象

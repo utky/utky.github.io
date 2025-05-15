@@ -1,8 +1,8 @@
 ---
-title = "procfs ネットワーク周りを覗き見る /proc/net/dev 編"
-date = 2020-06-27
+title: "procfs ネットワーク周りを覗き見る /proc/net/dev 編"
+date: 2020-06-27
 
-tags = ["linux","network","procfs"]
+tags: ["linux","network","procfs"]
 ---
 
 procfs からシステムの統計データが色々採取できる。

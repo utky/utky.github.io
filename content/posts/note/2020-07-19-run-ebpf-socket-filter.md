@@ -1,8 +1,8 @@
 ---
-title = "eBPFプログラムの実行方法を調べる"
-date = 2020-07-19
+title: "eBPFプログラムの実行方法を調べる"
+date: 2020-07-19
 
-tags = ["linux","ebpf","network"]
+tags: ["linux","ebpf","network"]
 ---
 
 ## はじめに

@@ -1,7 +1,7 @@
 ---
-title = "Lycopeneで作っていく機能について"
-date = 2014-11-04
-aliases = ["/posts/note/2014-11-04-lycopene-issues.html"]
+title: "Lycopeneで作っていく機能について"
+date: 2014-11-04
+aliases: ["/posts/note/2014-11-04-lycopene-issues.html"]
 ---
 
 [Lycopene](https://github.com/utky/lycopene)

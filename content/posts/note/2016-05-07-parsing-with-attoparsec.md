@@ -1,9 +1,9 @@
 ---
-title = "OpenFlowのメッセージをAttoparsecで解析する"
-date = 2016-05-15
-aliases = ["/posts/note/2016-05-07-parsing-with-attoparsec.html"]
+title: "OpenFlowのメッセージをAttoparsecで解析する"
+date: 2016-05-15
+aliases: ["/posts/note/2016-05-07-parsing-with-attoparsec.html"]
 
-tags = ["network","haskell","openflow"]
+tags: ["network","haskell","openflow"]
 ---
 
 ## はじめに

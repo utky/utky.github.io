@@ -1,9 +1,9 @@
 ---
-title = "Stackと外部ライブラリの問題"
-date = 2016-07-26
-aliases = ["/posts/note/2016-07-26-stack-extra-lib-problem.html"]
+title: "Stackと外部ライブラリの問題"
+date: 2016-07-26
+aliases: ["/posts/note/2016-07-26-stack-extra-lib-problem.html"]
 
-tags = ["haskell"]
+tags: ["haskell"]
 ---
 
 Haskellのビルドユーティリティであるstackを使っているけど、

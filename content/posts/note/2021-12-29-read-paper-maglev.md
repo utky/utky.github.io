@@ -1,8 +1,8 @@
 ---
-title = "「Maglev: A Fast and Reliable Software Network Load Balancer」読んだ"
-date = 2021-12-29
+title: "「Maglev: A Fast and Reliable Software Network Load Balancer」読んだ"
+date: 2021-12-29
 
-tags = ["linux","network"]
+tags: ["linux","network"]
 ---
 
 https://www.usenix.org/system/files/conference/nsdi16/nsdi16-paper-eisenbud-update.pdf

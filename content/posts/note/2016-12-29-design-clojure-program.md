@@ -1,9 +1,9 @@
 ---
-title = "Clojureを使った関数型プログラミングデザインのメモ"
-date = 2016-12-29
-aliases = ["/posts/note/2016-12-29-design-clojure-program.html"]
+title: "Clojureを使った関数型プログラミングデザインのメモ"
+date: 2016-12-29
+aliases: ["/posts/note/2016-12-29-design-clojure-program.html"]
 
-tags = ["clojure"]
+tags: ["clojure"]
 ---
 
 ## はじめに

@@ -1,9 +1,9 @@
 ---
-title = "「How to beat the CAP theorem」読んだ"
-date = 2020-02-22
-aliases = ["/posts/note/2020-02-22-how-to-beat-cap-theorem.html"]
+title: "「How to beat the CAP theorem」読んだ"
+date: 2020-02-22
+aliases: ["/posts/note/2020-02-22-how-to-beat-cap-theorem.html"]
 
-tags = ["architecture","pipeline","bigdata"]
+tags: ["architecture","pipeline","bigdata"]
 ---
 
 ビッグデータを支える技術を読んでいて言及された「ラムダアーキテクチャ」を提唱した記事（だったはず）

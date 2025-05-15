@@ -1,7 +1,7 @@
 ---
-title = "メモリアドレッシング"
-date = 2017-12-24
-aliases = ["/posts/linux/02-memory-addressing.html"]
+title: "メモリアドレッシング"
+date: 2017-12-24
+aliases: ["/posts/linux/02-memory-addressing.html"]
 ---
 
 アドレスというのはメモリの番地を指す。

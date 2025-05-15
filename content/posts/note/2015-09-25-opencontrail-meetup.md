@@ -1,9 +1,9 @@
 ---
-title = "OpenContrail Meetup"
-date = 2015-09-25
-aliases = ["/posts/note/2015-09-25-opencontrail-meetup.html"]
+title: "OpenContrail Meetup"
+date: 2015-09-25
+aliases: ["/posts/note/2015-09-25-opencontrail-meetup.html"]
 
-tags = ["sdn"]
+tags: ["sdn"]
 ---
 
 ## Zabbix w/ Contrail

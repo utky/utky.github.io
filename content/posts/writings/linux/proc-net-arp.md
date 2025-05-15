@@ -1,8 +1,8 @@
 ---
-title = "WIP procfs ネットワーク周りを覗き見る /proc/net/arp 編"
-date = 2020-07-02
+title: "WIP procfs ネットワーク周りを覗き見る /proc/net/arp 編"
+date: 2020-07-02
 
-tags = ["linux","network","procfs"]
+tags: ["linux","network","procfs"]
 ---
 
 前回に続きネットワーク回りの procfs のデータの出どころを追いかける。

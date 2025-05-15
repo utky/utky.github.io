@@ -1,9 +1,9 @@
 ---
-title = "メインPCをArchLinuxからWindowsに移行する"
-date = 2020-05-31
-aliases = ["/posts/note/2020-05-31-migrate-from-archlinux-to-windows.html"]
+title: "メインPCをArchLinuxからWindowsに移行する"
+date: 2020-05-31
+aliases: ["/posts/note/2020-05-31-migrate-from-archlinux-to-windows.html"]
 
-tags = ["windows","linux"]
+tags: ["windows","linux"]
 ---
 
 いつも環境移行する時に当時の動機とかを忘れるので記録しておく。

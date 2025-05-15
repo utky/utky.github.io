@@ -1,6 +1,6 @@
 ---
-title = "Contact"
-aliases = ["/contact.html"]
+title: "Contact"
+aliases: ["/contact.html"]
 ---
 
 - ilyaletre at gmail dot com

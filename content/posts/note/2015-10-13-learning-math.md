@@ -1,9 +1,9 @@
 ---
-title = "数学は言葉#1"
-date = 2015-10-13
-aliases = ["/posts/note/2015-10-13-learning-math.html"]
+title: "数学は言葉#1"
+date: 2015-10-13
+aliases: ["/posts/note/2015-10-13-learning-math.html"]
 
-tags = ["math"]
+tags: ["math"]
 ---
 
 『数学は言葉』を読んでいる。

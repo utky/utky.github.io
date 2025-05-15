@@ -1,9 +1,9 @@
 ---
-title = "プロセッサを支える技術"
-date = 2016-07-13
-aliases = ["/posts/note/2016-07-13-learning-processor-introduction.html"]
+title: "プロセッサを支える技術"
+date: 2016-07-13
+aliases: ["/posts/note/2016-07-13-learning-processor-introduction.html"]
 
-tags = ["reading"]
+tags: ["reading"]
 ---
 
 [プロセッサを支える技術](https://www.amazon.co.jp/dp/4774145211/)

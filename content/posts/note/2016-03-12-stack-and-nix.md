@@ -1,9 +1,9 @@
 ---
-title = "stackとNixを使って安定したビルド環境を作る"
-date = 2016-03-12
-aliases = ["/posts/note/2016-03-12-stack-and-nix.html"]
+title: "stackとNixを使って安定したビルド環境を作る"
+date: 2016-03-12
+aliases: ["/posts/note/2016-03-12-stack-and-nix.html"]
 
-tags = ["haskell","stack","nix"]
+tags: ["haskell","stack","nix"]
 ---
 
 ## 問題点

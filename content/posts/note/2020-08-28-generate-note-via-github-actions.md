@@ -1,8 +1,8 @@
 ---
-title = "Evernoteのノートを自動生成して振り返りをする"
-date = 2020-08-28
+title: "Evernoteのノートを自動生成して振り返りをする"
+date: 2020-08-28
 
-tags = ["scala","evernote"]
+tags: ["scala","evernote"]
 ---
 
 ## 背景
