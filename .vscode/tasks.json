@@ -43,7 +43,8 @@
             "label": "generate",
             "type": "shell",
             "command": "cabal run build-site",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "dependsOn": ["build"]
         },
     ]
 }
