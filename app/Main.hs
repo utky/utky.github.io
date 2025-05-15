@@ -27,6 +27,7 @@ import Development.Shake
     writeFile',
   )
 import Development.Shake.Classes (Binary)
+import Development.Shake.FilePath (dropDirectory1, (-<.>), (</>))
 import Development.Shake.Forward (shakeArgsForward)
 import GHC.Generics (Generic)
 import Slick (compileTemplate', convert, markdownToHTML, markdownToHTML', substitute)
@@ -79,9 +80,8 @@ data Post
   = Post
   { title :: String,
     content :: T.Text,
-    url :: String,
     date :: String,
-    tags :: [Tag]
+    tags :: Maybe [Tag]
   }
   deriving (Generic, Eq, Ord, Show, FromJSON, ToJSON, Binary)
 
@@ -123,10 +123,11 @@ buildPost :: [Template] -> FilePath -> Action Post
 buildPost templates src = do
   liftIO . putStrLn $ "Building post: " ++ src
   postContent <- liftIO . T.readFile $ src
-  liftIO . putStrLn $ "Read content: " ++ T.unpack postContent
   postData <- markdownToHTML' postContent
-  liftIO . putStrLn $ "PostData : " ++ show postData
-  applyTemplates templates postData
+  renderedPost@Post {content = renderedContent} <- applyTemplates templates postData
+  let relativeDestPath = dropDirectory1 $ src -<.> "html"
+  writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
+  return renderedPost
 
 buildPosts :: [Template] -> Action [Post]
 buildPosts templates = do
@@ -137,6 +138,9 @@ buildPostTemplates :: Action [Template]
 buildPostTemplates = do
   let templatePaths = ["templates/page.html", "templates/base.html"]
   mapM compileTemplate' templatePaths
+
+outputDirectory :: FilePath
+outputDirectory = "_site/"
 
 -- | Specific build rules for the Shake system
 --   defines workflow to build the website

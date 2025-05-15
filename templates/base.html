@@ -5,19 +5,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name='viewport' content='width=device-width, initial-scale=1'>
 
-        {% if page %}
-        <title>{{ page.title }} - {{ config.title }}</title>
+        <!-- <title>{{ page.title }} - {{ config.title }}</title> -->
+        <title>{{ title }} - TODO: サイト名</title>
         <meta name="twitter:title" content="{{ page.title }} - {{ config.title }}">
         <meta property="og:title" content="{{ page.title }} - {{ config.title }}">
-        {% elif section %}
-        <title>{{ section.title }} - {{ config.title }}</title>
-        <meta name="twitter:title" content="{{ section.title }} - {{ config.title }}">
-        <meta property="og:title" content="{{ section.title }} - {{ config.title }}">
-        {% else %}
-        <title>{{ config.title }}</title>
-        <meta name="twitter:title" content="{{ config.title }}">
-        <meta property="og:title" content="{{ config.title }}">
-        {% endif %}
 
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:creator" content="@ilyaletre">
@@ -105,7 +96,7 @@
         </div>
       </nav>
       <main class="container mx-auto px-3" style="max-width: 760px;">
-        {% block content %} {% endblock %}
+        {{ content }}
       </main>
       <footer>
         <hr>

@@ -1,26 +1,15 @@
-{% extends "base.html" %}
-
-{% block content %}
 <article id="content">
   <header class="row">
     <div class="col">
-      <h1 class="title">{{ page.title }}</h1>
-      {% if page.date %}
+      <h1 class="title">{{ title }}</h1>
       <p>
-      <small> {{ page.date }} / 
-      {% for key, taxonomy in page.taxonomies %}
-      {% for tag in taxonomy %}
-      <a href="{{  get_taxonomy_url(kind="tags", name=tag) }}">[{{ tag }}]</a>
-      {% endfor %}
-      {% endfor %}
-      </small>
+      <small> {{ date }} </small>
       </p>
-      {% endif %}
     </div>
   </header>
   <div class="body row">
     <div class="col">
-    {{ page.content | safe }}
+    {{ content }}
     </div>
   </div>
   <footer class="row">
@@ -30,4 +19,3 @@
     </div>
   </footer>
 </article>
-{% endblock content %}
