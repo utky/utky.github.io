@@ -1,9 +1,9 @@
 ---
-title = "Starting clojure"
-date = 2016-02-21
-aliases = ["/posts/note/2016-02-21-starting-clojure.html"]
+title: "Starting clojure"
+date: 2016-02-21
+aliases: ["/posts/note/2016-02-21-starting-clojure.html"]
 
-tags = ["clojure"]
+tags: ["clojure"]
 ---
 
 Clojureを始める

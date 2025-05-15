@@ -1,8 +1,8 @@
 ---
-title = "TAPLを読む 02"
-date = 2020-06-18
+title: "TAPLを読む 02"
+date: 2020-06-18
 
-tags = ["tapl"]
+tags: ["tapl"]
 ---
 
 (過去のメモを掘り返した、いつ書いたか不明)

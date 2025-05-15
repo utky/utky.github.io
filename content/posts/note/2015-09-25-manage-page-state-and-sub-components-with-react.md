@@ -1,9 +1,9 @@
 ---
-title = "Manage page state and sub-components with React.js"
-date = 2015-09-25
-aliases = ["/posts/note/2015-09-25-manage-page-state-and-sub-components-with-react.html"]
+title: "Manage page state and sub-components with React.js"
+date: 2015-09-25
+aliases: ["/posts/note/2015-09-25-manage-page-state-and-sub-components-with-react.html"]
 
-tags = ["js","react"]
+tags: ["js","react"]
 ---
 
 *注意事項*

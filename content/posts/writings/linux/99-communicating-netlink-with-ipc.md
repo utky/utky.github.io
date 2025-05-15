@@ -1,9 +1,9 @@
 ---
-title = "Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする"
-date = 2019-09-01
-aliases = ["/posts/linux/99-communicating-netlink-with-ipc.html"]
+title: "Netlink IPCを使ってLinuxカーネルのネットワーク情報にアクセスする"
+date: 2019-09-01
+aliases: ["/posts/linux/99-communicating-netlink-with-ipc.html"]
 
-tags = ["linux","network","netlink"]
+tags: ["linux","network","netlink"]
 ---
 
 背景

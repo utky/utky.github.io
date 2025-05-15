@@ -8,14 +8,23 @@ build-depends:
 -}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.Text (Text, pack, replace, unpack)
+import Data.Text (Text, intercalate, pack, replace, splitOn, unpack)
 import qualified Data.Text.IO as TIO
 import System.Directory (doesDirectoryExist, listDirectory)
 import System.FilePath (takeExtension, (</>))
 
+tomlToYaml :: Text -> Text
+tomlToYaml input =
+  let chunk = splitOn "---\n" input
+   in case chunk of
+        _ : metadata : rest ->
+          let yaml = replace " = " ": " metadata
+           in "---\n" <> yaml <> "---\n" <> intercalate "---\n" rest
+        _ -> input
+
 -- Replace +++ with ---
 convertMetadata :: Text -> Text
-convertMetadata = replace "[taxonomies]" "" . replace "+++" "---"
+convertMetadata = tomlToYaml . replace "[taxonomies]" "" . replace "+++" "---"
 
 -- Process a single file
 processFile :: FilePath -> IO ()

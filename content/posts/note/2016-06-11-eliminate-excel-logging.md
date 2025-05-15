@@ -1,9 +1,9 @@
 ---
-title = "Excelログを掃討する"
-date = 2016-06-11
-aliases = ["/posts/note/2016-06-11-eliminate-excel-logging.html"]
+title: "Excelログを掃討する"
+date: 2016-06-11
+aliases: ["/posts/note/2016-06-11-eliminate-excel-logging.html"]
 
-tags = ["excel"]
+tags: ["excel"]
 ---
 
 問題

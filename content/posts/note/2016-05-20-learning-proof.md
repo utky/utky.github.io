@@ -1,9 +1,9 @@
 ---
-title = "証明を学ぶ"
-date = 2016-05-20
-aliases = ["/posts/note/2016-05-20-learning-proof.html"]
+title: "証明を学ぶ"
+date: 2016-05-20
+aliases: ["/posts/note/2016-05-20-learning-proof.html"]
 
-tags = ["math","proof"]
+tags: ["math","proof"]
 ---
 
 証明難しい

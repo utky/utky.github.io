@@ -1,8 +1,8 @@
 ---
-title = "TAPLを読む 01"
-date = 2019-10-01
+title: "TAPLを読む 01"
+date: 2019-10-01
 
-tags = ["tapl"]
+tags: ["tapl"]
 ---
 
 3.2 構文

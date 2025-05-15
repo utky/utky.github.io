@@ -1,9 +1,9 @@
 ---
-title = "Freeモナドを活用して問題を記述する[WIP]"
-date = 2016-03-20
-aliases = ["/posts/note/2016-03-20-haskell-design-note.html"]
+title: "Freeモナドを活用して問題を記述する[WIP]"
+date: 2016-03-20
+aliases: ["/posts/note/2016-03-20-haskell-design-note.html"]
 
-tags = ["haskell"]
+tags: ["haskell"]
 ---
 
 ## ここで書くこと
