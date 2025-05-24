@@ -1,0 +1,55 @@
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Install ghcup and Haskell environment
+      - name: Set up Haskell
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh -s -- --non-interactive
+          . ~/.ghcup/env
+          ghcup install ghc
+          ghcup install cabal
+          ghcup set cabal
+
+      # Build the project
+      - name: Build project
+        run: |
+          . ~/.ghcup/env
+          cabal update
+          cabal build
+
+      # Generate static site
+      - name: Generate static site
+        run: |
+          . ~/.ghcup/env
+          cabal run build-site
+
+      # Upload site content as artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      # Deploy the artifact to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
