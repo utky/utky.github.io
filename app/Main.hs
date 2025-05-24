@@ -142,12 +142,22 @@ buildPostTemplates = do
 outputDirectory :: FilePath
 outputDirectory = "_site/"
 
+copyStaticFiles :: Action ()
+copyStaticFiles = do
+  staticFiles <- getDirectoryFiles "." ["static//**"]
+  _ <- forP staticFiles $ \src -> do
+    let dest = outputDirectory </> dropDirectory1 src
+    copyFileChanged src dest
+    liftIO . putStrLn $ "Copying static file: " ++ src ++ " to " ++ dest
+  return ()
+
 -- | Specific build rules for the Shake system
 --   defines workflow to build the website
 buildRules :: Action ()
 buildRules = do
   templates <- buildPostTemplates
   _ <- buildPosts templates
+  copyStaticFiles
   return ()
 
 main :: IO ()
