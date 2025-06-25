@@ -1,27 +1,25 @@
-{% extends "base.html" %}
-
-{% block content %}
 <h1 class="title">
-  {{ section.title }}
+  {{ title }}
 </h1>
 
 <p>
-{{ section.content | safe }}
+{{{ content }}}
 </p>
-{% if section.pages %}
+
+{{#sections}}
+<h2>Sections</h2>
 <ul>
-  {% for page in section.pages | sort(attribute="date") | reverse %}
-  <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
-  {% endfor %}
+  {{#.}}
+  <li><a href="{{path}}/index.html">{{ title }}</a></li>
+  {{/.}}
 </ul>
-{% endif %}
-{% if section.subsections %}
-<h2></h2>
+{{/sections}}
+
+{{#posts}}
+<h2>Posts</h2>
 <ul>
-  {% for child in section.subsections %}
-  {% set subsection = get_section(path=child) %}
-  <li><a href="{{ subsection.permalink }}">{{ subsection.title }}</a></li>
-  {% endfor %}
+  {{#posts}}
+  <li><a href="{{url}}">{{ title }}</a></li>
+  {{/posts}}
 </ul>
-{% endif %}
-{% endblock content %}
+{{/posts}}
