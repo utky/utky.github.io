@@ -178,7 +178,7 @@ applyTemplates :: [Template] -> Post -> Action Post
 applyTemplates templates post = do
   (p, _) <- forAccumM post templates $ \s t -> do
     let renderedContent = render t s
-        Post pTitle _ pUrl pDate pTags = post
+        Post pTitle _ pUrl pDate pTags = s
         updatedPost = Post pTitle renderedContent pUrl pDate pTags
     return (updatedPost, renderedContent)
   return p
@@ -256,7 +256,7 @@ buildSections templates allPosts = do
   -- 親子関係を構築
   let sectionsWithChildren = map (addChildSections sections) sections
   -- 親子関係を持つセクションを再レンダリング
-  forP sectionsWithChildren reRenderSection
+  forP sectionsWithChildren (reRenderSection templates)
   where
     addChildSections allSections section =
       let childSections = filter (isDirectChild section) allSections
@@ -266,20 +266,21 @@ buildSections templates allPosts = do
       let parentPath = sectionPath parentSection
           childPath = sectionPath childSection
       in parentPath /= childPath && takeDirectory childPath == parentPath
-    
-    reRenderSection section = do
-      renderedSection@Section {sectionContent = renderedContent} <- applyTemplatesToSection templates section
-      let sectionUrl = sectionPath section
-          relativeDestPath = drop 1 sectionUrl ++ "/index.html"  -- "/posts/writings" -> "posts/writings/index.html"
-      writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
-      return renderedSection
+
+reRenderSection :: [Template] -> Section -> Action Section
+reRenderSection templates section = do
+  renderedSection@Section {sectionContent = renderedContent} <- applyTemplatesToSection templates section
+  let sectionUrl = sectionPath section
+      relativeDestPath = drop 1 sectionUrl ++ "/index.html"  -- "/posts/writings" -> "posts/writings/index.html"
+  writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
+  return renderedSection
 
 applyTemplatesToSection :: [Template] -> Section -> Action Section
 applyTemplatesToSection templates section = do
   (s, _) <- forAccumM section templates $ \sec t -> do
     let renderedContent = substitute t (toJSON sec)
-        Section sTitle _ sDesc sPosts sSections sTags sPath = sec
-        updatedSection = Section sTitle renderedContent sDesc sPosts sSections sTags sPath
+        Section sTitle _ sDesc _ sSections sTags sPath = sec
+        updatedSection = Section sTitle renderedContent sDesc [] sSections sTags sPath
     return (updatedSection, renderedContent)
   return s
 
