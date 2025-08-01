@@ -46,5 +46,11 @@
             "problemMatcher": [],
             "dependsOn": ["build"]
         },
+        { "label": "start",
+            "type": "shell",
+            "command": "cabal run server",
+            "problemMatcher": [],
+            "dependsOn": ["generate"]
+        }
     ]
 }

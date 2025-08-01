@@ -17,6 +17,9 @@
   "remoteEnv": {
     "PATH": "/home/vscode/.cabal/bin:/home/vscode/.ghcup/bin:${containerEnv:PATH}"
   },
+  "mounts": [
+    "source=${localEnv:HOME}/.config/gcloud,target=/opt/gcloud/,type=bind,consistency=cached"
+  ],
   "appPort": [
     8080
   ],
