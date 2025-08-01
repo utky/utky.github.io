@@ -17,5 +17,12 @@
   "remoteEnv": {
     "PATH": "/home/vscode/.cabal/bin:/home/vscode/.ghcup/bin:${containerEnv:PATH}"
   },
+  "appPort": [
+    8080
+  ],
+  "containerEnv": {
+    "GOOGLE_CLOUD_PROJECT": "lofilab",
+    "GOOGLE_CLOUD_LOCATION": "global"
+  },
   "onCreateCommand": ".devcontainer/install-script.sh"
 }
