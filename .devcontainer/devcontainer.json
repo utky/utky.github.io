@@ -3,6 +3,10 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,6 +16,16 @@
   },
   "remoteEnv": {
     "PATH": "/home/vscode/.cabal/bin:/home/vscode/.ghcup/bin:${containerEnv:PATH}"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.config/gcloud,target=/opt/gcloud/,type=bind,consistency=cached"
+  ],
+  "appPort": [
+    8080
+  ],
+  "containerEnv": {
+    "GOOGLE_CLOUD_PROJECT": "lofilab",
+    "GOOGLE_CLOUD_LOCATION": "global"
   },
   "onCreateCommand": ".devcontainer/install-script.sh"
 }
