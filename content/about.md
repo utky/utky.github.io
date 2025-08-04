@@ -1,6 +1,7 @@
 ---
 title: "About"
 aliases: ["/about.html"]
+date: 2025-08-01
 ---
 
 [utky (Yutaka Imamura)](https://github.com/utky), 神奈川圏の対象

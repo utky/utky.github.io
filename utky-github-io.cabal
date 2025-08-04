@@ -78,6 +78,7 @@ executable build-site
       , slick
       , text
       , time
+      , directory
 
     -- Directories containing source files.
     hs-source-dirs:   app

@@ -9,12 +9,13 @@
 module Main where
 
 import Control.Arrow (ArrowApply (app))
+import Control.Monad (join)
 import Control.Monad.IO.Class (liftIO)
-import Data.Aeson (FromJSON(..), ToJSON(..), Value (Object, String), toJSON, defaultOptions, fieldLabelModifier, genericParseJSON, genericToJSON, (.:), (.:?), (.!=))
+import Data.Aeson (FromJSON(..), ToJSON(..), Value (Object, String), toJSON, defaultOptions, fieldLabelModifier, genericParseJSON, genericToJSON, (.:), (.:?), (.!=), object, (.=))
 import Data.Aeson.KeyMap (union)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T (readFile)
-import Data.List (isPrefixOf)
+import Data.List (isPrefixOf, sortOn)
 import Data.Traversable (forAccumM)
 import Development.Shake
   ( Action,
@@ -30,34 +31,25 @@ import Development.Shake
     writeFile'
   )
 import Development.Shake.Classes (Binary)
-import Development.Shake.FilePath (dropDirectory1, takeFileName, takeDirectory, (-<.>), (</>), replaceFileName)
+import Development.Shake.FilePath (dropDirectory1, takeFileName, takeDirectory, (-<.>), (</>), replaceExtension, takeBaseName)
 import Development.Shake.Forward (shakeArgsForward)
 import GHC.Generics (Generic)
 import Slick (compileTemplate', convert, markdownToHTML, markdownToHTML', substitute)
+import System.Directory (createDirectoryIfMissing)
 import Text.Mustache (Template)
 
 ---Config-----------------------------------------------------------------------
-
-siteMeta :: SiteMeta
-siteMeta =
-  SiteMeta
-    { siteAuthor = "Me",
-      baseUrl = "https://utky.github.io/",
-      siteTitle = "Hash λ Bye",
-      twitterHandle = "ilyaletre",
-      githubUser = "utky"
-    }
 
 outputFolder :: FilePath
 outputFolder = "_site/"
 
 -- Data models-------------------------------------------------------------------
 
-withSiteMeta :: Value -> Value
-withSiteMeta (Object obj) = Object $ union obj siteMetaObj
+withSiteMeta :: SiteMeta -> Value -> Value
+withSiteMeta siteMeta (Object obj) = Object $ union obj siteMetaObj
   where
     Object siteMetaObj = toJSON siteMeta
-withSiteMeta _ = error "only add site meta to objects"
+withSiteMeta _ _ = error "only add site meta to objects"
 
 data SiteMeta
   = SiteMeta
@@ -67,7 +59,27 @@ data SiteMeta
     twitterHandle :: String, -- Without @
     githubUser :: String
   }
-  deriving (Generic, Eq, Ord, Show, ToJSON)
+  deriving (Generic, Eq, Ord, Show)
+
+instance FromJSON SiteMeta where
+  parseJSON = genericParseJSON defaultOptions
+    { fieldLabelModifier = \field -> case field of
+        "siteAuthor" -> "author"
+        "siteTitle" -> "title"
+        "twitterHandle" -> "twitterHandle"
+        "githubUser" -> "githubUser"
+        _ -> field
+    }
+
+instance ToJSON SiteMeta where
+  toJSON = genericToJSON defaultOptions
+    { fieldLabelModifier = \field -> case field of
+        "siteAuthor" -> "author"
+        "siteTitle" -> "title"
+        "twitterHandle" -> "twitterHandle"
+        "githubUser" -> "githubUser"
+        _ -> field
+    }
 
 -- | Data for the index page
 data IndexInfo
@@ -149,7 +161,7 @@ instance ToJSON Post where
         _ -> field
     }
 
-{-
+{- 
 記事データとテンプレート処理の関係についてメモ
 
 記事データは原則的にテンプレートレンダリングが付随するものであると仮定できる。
@@ -195,8 +207,23 @@ buildPost templates src = do
       postWithUrl = Post pTitle pContent ("/" ++ relativeDestPath) pDate pTags
   renderedPost <- applyTemplates templates postWithUrl
   let Post _ renderedContent _ _ _ = renderedPost
-  writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
+  writeFile' (outputFolder </> relativeDestPath) (T.unpack renderedContent)
   return renderedPost
+
+buildPage :: [Template] -> FilePath -> Action Post
+buildPage templates src = do
+  liftIO . putStrLn $ "Building page: " ++ src
+  postContent <- liftIO . T.readFile $ src
+  (postData :: Post) <- markdownToHTML' postContent
+  let baseName = takeBaseName src
+      relativeDestPath = baseName -<.> "html"
+      Post pTitle pContent _ pDate pTags = postData
+      postWithUrl = Post pTitle pContent ("/" ++ relativeDestPath) pDate pTags
+  renderedPost <- applyTemplates templates postWithUrl
+  let Post _ renderedContent _ _ _ = renderedPost
+  writeFile' (outputFolder </> relativeDestPath) (T.unpack renderedContent)
+  return renderedPost
+
 
 buildPosts :: [Template] -> Action [Post]
 buildPosts templates = do
@@ -210,6 +237,12 @@ buildPostTemplates :: Action [Template]
 buildPostTemplates = do
   let templatePaths = ["templates/post.html", "templates/base.html"]
   mapM compileTemplate' templatePaths
+
+buildPageTemplates :: Action [Template]
+buildPageTemplates = do
+  let templatePaths = ["templates/base.html"]
+  mapM compileTemplate' templatePaths
+
 
 buildSectionTemplates :: Action [Template]
 buildSectionTemplates = do
@@ -287,6 +320,19 @@ applyTemplatesToSection templates section = do
 outputDirectory :: FilePath
 outputDirectory = "_site/"
 
+buildIndex :: SiteMeta -> [Post] -> Action ()
+buildIndex siteMeta allPosts = do
+  liftIO . putStrLn $ "Building index page"
+  let sortedPosts = reverse $ sortOn postDate allPosts
+      latestPosts = take 10 sortedPosts
+      indexInfo = IndexInfo {posts = latestPosts}
+  indexTemplate <- compileTemplate' "templates/index.html"
+  baseTemplate <- compileTemplate' "templates/base.html"
+  let renderedContent = substitute indexTemplate (withSiteMeta siteMeta $ toJSON indexInfo)
+      fullHtml = substitute baseTemplate (withSiteMeta siteMeta $ object ["content" .= renderedContent, "title" .= ("Home" :: String)])
+  liftIO $ createDirectoryIfMissing True outputFolder
+  writeFile' (outputFolder </> "index.html") (T.unpack fullHtml)
+
 copyStaticFiles :: Action ()
 copyStaticFiles = do
   staticFiles <- getDirectoryFiles "." ["static//**"]
@@ -298,16 +344,30 @@ copyStaticFiles = do
 
 -- | Specific build rules for the Shake system
 --   defines workflow to build the website
-buildRules :: Action ()
-buildRules = do
+buildRules :: SiteMeta -> Action ()
+buildRules siteMeta = do
   postTemplates <- buildPostTemplates
   sectionTemplates <- buildSectionTemplates
+  pageTemplates <- buildPageTemplates
   allPosts <- buildPosts postTemplates
   _ <- buildSections sectionTemplates allPosts
+  _ <- buildPage pageTemplates "content/about.md"
+  _ <- buildPage pageTemplates "content/contact.md"
+  let notePosts = filter (isPrefixOf "/posts/note/" . postUrl) allPosts
+  buildIndex siteMeta notePosts
   copyStaticFiles
   return ()
 
+siteMeta :: SiteMeta
+siteMeta = SiteMeta
+  { siteAuthor = "Your Name",
+    baseUrl = "https://utky.github.io/",
+    siteTitle = "Hash λ Bye",
+    twitterHandle = "ilyaletre",
+    githubUser = "utky"
+  }
+
 main :: IO ()
 main = do
-  let shOpts = shakeOptions {shakeVerbosity = Verbose, shakeLintInside = ["\\"]}
-  shakeArgsForward shOpts buildRules
+  let shOpts = shakeOptions {shakeVerbosity = Verbose, shakeLintInside = [""]}
+  shakeArgsForward shOpts (buildRules siteMeta)
