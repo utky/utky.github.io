@@ -8,12 +8,14 @@ date: 2025-08-01
 
 こんにちは。プログラマーをやってます。
 
-普段はアドテク系の会社でDevOps的な仕事をしています。
+普段はアドテク系の会社でOpsやデータ分析関連の仕事をしつつ中間管理職をしています。
 
-* Ansibleによるサーバ運用
-* ネットワーク制御システムの開発・検証
-* 付随するツール作成のためにPythonを使ったり
-* ルータのコンフィグを作成したり
+* 最近
+    * Ansibleによるサーバ運用
+    * データ基盤開発のリード
+* 過去
+    * ネットワーク制御システムの開発・検証
+    * ルータのコンフィグを作成したり
 
 今まで主なネットワーク技術はMPLS, NETCONF, SNMP, BGPです。トラフィックエンジニアリングを活用したVPN構築なども行いました。
 
@@ -27,8 +29,10 @@ date: 2025-08-01
 * [Clojure](https://clojure.org/)
 * [OCaml](https://ocaml.org/)
 * [Standard ML](http://sml-family.org/sml97-defn.pdf)
+* [Scala](https://www.scala-lang.org/)
 
 あたりのプログラミング言語はエレガントで実践的でとても好きです。
+実務的にはScalaが落としどころだなーと思いながらなかなか機会がこない。自分で作るしかない。
 
 仕事用のツールでときおりこっそり導入します。
 
@@ -43,7 +47,13 @@ date: 2025-08-01
 * [ElmのHttp処理部をスタブする](https://qiita.com/ilyaletre/items/a4c8de74a0a4f5e1e51a)
 * [stackとNixを使って安定したビルド環境を作る](https://qiita.com/ilyaletre/items/5cf1e7807e0cdc3ef1cd)
 * [OpenFlowの可変長フィールドをAttoparsecで解析する](https://qiita.com/ilyaletre/items/b0e77aeb67914aec60be)
+* [広告配信データ基盤をクラウド移行した話](https://qiita.com/yu-imamura/items/a94abb7a611849260a66)
+* [Google Cloud コスト削減振り返り (2023年〜2024年)](https://qiita.com/yu-imamura/items/c649dccea8b46e91b6b7)
 
+#### Slides
+
+* [Google Cloudデータ基盤 構成管理の反省と改善](https://speakerdeck.com/supership/google-clouddetaji-pan-gou-cheng-guan-li-nofan-sheng-togai-shan)
+* [SnowflakeのRBACを用いて 安全なデータ活用を促進する ](https://speakerdeck.com/supership/snowflakenorbacwoyong-ite-an-quan-nadetahuo-yong-wocu-jin-suru)
 
 ### What I have done
 
