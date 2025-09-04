@@ -25,12 +25,13 @@ jobs:
           path: |
             ~/.cabal
             dist-newstyle
-          key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}
+          key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project.freeze') }}
           restore-keys: |
             ${{ runner.os }}-cabal-
 
       - name: Build site
         run: |
+          cabal update
           cabal build
           cabal run build-site
       - name: Upload artifact
