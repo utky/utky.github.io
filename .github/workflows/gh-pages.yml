@@ -32,7 +32,6 @@ jobs:
 
       - name: Build site
         run: |
-          cabal update
           cabal build
           cabal run build-site
       - name: Upload artifact
