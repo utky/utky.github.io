@@ -1,0 +1,15 @@
+{
+  "Markdown Front Matter": {
+    "prefix": "frontmatter",
+    "body": [
+      "---",
+      "title: \"${1:タイトル}\"",
+      "date: \"${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}\"",
+      "tags: [${2:タグ}]",
+      "---",
+      "",
+      "$0"
+    ],
+    "description": "Add YAML front matter to markdown (no draft field)"
+  }
+}
