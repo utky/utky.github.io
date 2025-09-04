@@ -27,6 +27,7 @@ jobs:
             dist-newstyle
           key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project.freeze') }}
           restore-keys: |
+            ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project.freeze') }}
             ${{ runner.os }}-cabal-
 
       - name: Build site
