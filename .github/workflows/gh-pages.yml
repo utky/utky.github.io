@@ -23,7 +23,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cabal
+            ~/.cabal/store
+            ~/.cabal/packages
             dist-newstyle
           key: ${{ runner.os }}-cabal-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project.freeze') }}
           restore-keys: |
@@ -32,6 +33,7 @@ jobs:
 
       - name: Build site
         run: |
+          ls -l ~/.cabal/packages/hackage.haskell.org
           cabal build
           cabal run build-site
       - name: Upload artifact
