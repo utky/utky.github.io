@@ -40,9 +40,6 @@ import Text.Mustache (Template)
 
 ---Config-----------------------------------------------------------------------
 
-outputFolder :: FilePath
-outputFolder = "_site/"
-
 -- Data models-------------------------------------------------------------------
 
 withSiteMeta :: SiteMeta -> Value -> Value
@@ -207,7 +204,7 @@ buildPost templates src = do
       postWithUrl = Post pTitle pContent ("/" ++ relativeDestPath) pDate pTags
   renderedPost <- applyTemplates templates postWithUrl
   let Post _ renderedContent _ _ _ = renderedPost
-  writeFile' (outputFolder </> relativeDestPath) (T.unpack renderedContent)
+  writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
   return renderedPost
 
 buildPage :: [Template] -> FilePath -> Action Post
@@ -221,7 +218,7 @@ buildPage templates src = do
       postWithUrl = Post pTitle pContent ("/" ++ relativeDestPath) pDate pTags
   renderedPost <- applyTemplates templates postWithUrl
   let Post _ renderedContent _ _ _ = renderedPost
-  writeFile' (outputFolder </> relativeDestPath) (T.unpack renderedContent)
+  writeFile' (outputDirectory </> relativeDestPath) (T.unpack renderedContent)
   return renderedPost
 
 
@@ -330,8 +327,8 @@ buildIndex siteMeta allPosts = do
   baseTemplate <- compileTemplate' "templates/base.html"
   let renderedContent = substitute indexTemplate (withSiteMeta siteMeta $ toJSON indexInfo)
       fullHtml = substitute baseTemplate (withSiteMeta siteMeta $ object ["content" .= renderedContent, "title" .= ("Home" :: String)])
-  liftIO $ createDirectoryIfMissing True outputFolder
-  writeFile' (outputFolder </> "index.html") (T.unpack fullHtml)
+  liftIO $ createDirectoryIfMissing True outputDirectory
+  writeFile' (outputDirectory </> "index.html") (T.unpack fullHtml)
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
@@ -360,7 +357,7 @@ buildRules siteMeta = do
 
 siteMeta :: SiteMeta
 siteMeta = SiteMeta
-  { siteAuthor = "Your Name",
+  { siteAuthor = "Yutaka Imamura",
     baseUrl = "https://utky.github.io/",
     siteTitle = "Hash λ Bye",
     twitterHandle = "ilyaletre",
