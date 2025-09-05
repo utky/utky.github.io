@@ -15,11 +15,9 @@
         <meta name="twitter:image" content="https://utky.github.io/images/avatar.jpg">
         <meta property="og:image" content="https://utky.github.io/images/avatar.jpg">
         <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-        <!--
         <link rel="stylesheet" type="text/css" href="/css/highlight/agate.css">
-        <script src='/js/highlight.pack.js'></script>
-        <script>hljs.initHighlightingOnLoad();</script>
-        -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <script>document.addEventListener('DOMContentLoaded', (event) => { document.querySelectorAll('pre code').forEach((el) => { hljs.highlightElement(el); }); });</script>
         <link rel="stylesheet" type="text/css" href="/css/default.css" />
         <script>
           const dont_track_me = document.cookie.split(";").includes("dont_track_me=true");
