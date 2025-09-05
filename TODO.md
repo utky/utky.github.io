@@ -23,7 +23,8 @@
 
 ## 機能改善・追加
 
-- [ ] **GitHub Pages:** GitHub Pagesのデプロイ用ワークフローを使ってビルド結果のアーティファクトからPagesを公開するように変更する。 (参考: https://docs.github.com/ja/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0-github-actions-%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AB%E3%82%88%E3%82%8B%E5%85%AC%E9%96%8B )
+- [x] **GitHub Pages:** GitHub Pagesのデプロイ用ワークフローを使ってビルド結果のアーティファクトからPagesを公開するように変更する。 (参考: https://docs.github.com/ja/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0-github-actions-%E3%83%AF%E3%83%BC%E3%82%AF%E3%83%95%E3%83%AD%E3%83%BC%E3%81%AB%E3%82%88%E3%82%8B%E5%85%AC%E9%96%8B )
+- [ ] **GitHub Actions:** ghcupによるコンパイラインストール後の `cabal update` で20分かかる問題を高速化する。
 - [ ] **RSS/Atomフィードの生成:** 新しい記事が公開されたときに通知できるよう、RSS/Atomフィードを生成する機能を追加する。
 - [ ] **タグ別アーカイブページの作成:** 各タグに属する記事の一覧ページ (`/tags/haskell.html` のような) を生成する機能を追加する。
 
