@@ -159,31 +159,6 @@ instance ToJSON Post where
         _ -> field
     }
 
-{- 
-記事データとテンプレート処理の関係についてメモ
-
-記事データは原則的にテンプレートレンダリングが付随するものであると仮定できる。
-したがって記事本体とフロントマターから解析されたデータ構造をテンプレート処理して単一のHTMLに変換するようなながれになる。
-これらの手続きに必要な関数のシグニチャを考える。
-
-data Html =
-  Html
-    {
-      content :: T.Text,
-      url :: String
-    }
-writeHtml :: Html -> FilePath -> Action ()
-
-postToHtml :: HasTemplate t => SiteMeta -> t -> Action Html
-postToHtml siteMeta post = do
-  -- テンプレートは継承関係がある前提で、
-  -- [Child Template, Parent Template, Grand Parent Template] のように取り出す。
-  -- 子要素からテンプレートレンダリングした結果を親要素に当てはめていく。
-  --
-  templates <- liftIO . getTemplates $ t
-
--}
-
 applyTemplates :: [Template] -> Post -> Action Post
 applyTemplates templates post = do
   (p, _) <- forAccumM post templates $ \s t -> do
@@ -298,6 +273,7 @@ buildSections templates allPosts = do
           childPath = sectionPath childSection
       in parentPath /= childPath && takeDirectory childPath == parentPath
 
+-- | TODO: ここの再描画が微妙なのであとあと整理したい
 reRenderSection :: [Template] -> Section -> Action Section
 reRenderSection templates section = do
   renderedSection@Section {sectionContent = renderedContent} <- applyTemplatesToSection templates section
@@ -333,7 +309,7 @@ buildIndex siteMeta allPosts = do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  staticFiles <- getDirectoryFiles "." ["static//**"]
+  staticFiles <- getDirectoryFiles "." ["static//**", "content/posts//*.png", "content/posts//*.jpg"]
   _ <- forP staticFiles $ \src -> do
     let dest = outputDirectory </> dropDirectory1 src
     copyFileChanged src dest
