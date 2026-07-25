@@ -51,6 +51,25 @@
             "command": "cabal run server",
             "problemMatcher": [],
             "dependsOn": ["generate"]
+        },
+        {
+            "label": "new note",
+            "type": "shell",
+            "command": "DATE=$(date +%Y-%m-%d); FILE=\"content/posts/note/$DATE-${input:noteSlug}.md\"; { echo '---'; echo \"title: \\\"${input:noteTitle}\\\"\"; echo \"date: \\\"$DATE\\\"\"; echo 'tags: []'; echo '---'; echo ''; } > \"$FILE\" && code \"$FILE\"",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "noteSlug",
+            "type": "promptString",
+            "description": "スラッグ (英数字・ハイフン)",
+            "default": "new-post"
+        },
+        {
+            "id": "noteTitle",
+            "type": "promptString",
+            "description": "タイトル"
         }
     ]
 }
