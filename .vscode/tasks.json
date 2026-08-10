@@ -55,7 +55,7 @@
         {
             "label": "new note",
             "type": "shell",
-            "command": "DATE=$(date +%Y-%m-%d); FILE=\"content/posts/note/$DATE-${input:noteSlug}.md\"; { echo '---'; echo \"title: \\\"${input:noteTitle}\\\"\"; echo \"date: \\\"$DATE\\\"\"; echo 'tags: []'; echo '---'; echo ''; } > \"$FILE\" && code \"$FILE\"",
+            "command": "DATE=$(TZ=Asia/Tokyo date +%Y-%m-%d); FILE=\"content/posts/note/$DATE-${input:noteSlug}.md\"; { echo '---'; echo \"title: \\\"${input:noteTitle}\\\"\"; echo \"date: \\\"$DATE\\\"\"; echo 'tags: []'; echo '---'; echo ''; } > \"$FILE\" && code \"$FILE\"",
             "problemMatcher": []
         }
     ],
