@@ -20,3 +20,8 @@ zola/public/
 public/
 .shake
 dist-newstyle
+
+# Ignore vim files:
+*~
+*.swp
+*.swo
